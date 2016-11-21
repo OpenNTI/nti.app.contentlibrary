@@ -1,0 +1,16 @@
+{
+    "Items": {
+        "tag:nextthought.com,2011-10:OU-JSON:Timeline-CourseTestContent.timeline.heading_west": {
+            "ntiid": "tag:nextthought.com,2011-10:OU-JSON:Timeline-CourseTestContent.timeline.heading_west",
+            "desc": "An overview of key dates and events",
+            "href": "resources/CourseTestContent/d1b15ecbe7e15f47d1927624e23b40509d37f135/90784fa2c5c148922446e05d45ff35f0aee3e69b.json",
+            "label": "Heading West",
+            "icon": "resources/CourseTestContent/75d1ec44cd623dfdc373b705523e05259f61c821/fd35e23767020999111e1f49239199b4c5eff23e.png"
+        }
+    },
+    "Containers": {
+        "tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.lesson1": [
+            "tag:nextthought.com,2011-10:OU-JSON:Timeline-CourseTestContent.timeline.heading_west"
+        ]
+    }
+}

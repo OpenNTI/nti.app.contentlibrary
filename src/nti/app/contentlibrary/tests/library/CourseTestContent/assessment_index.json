@@ -1,0 +1,595 @@
+{
+	"Items": {
+		"tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.course_test_content": {
+			"AssessmentItems": {},
+			"Items": {
+				"tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.lesson1": {
+					"AssessmentItems": {},
+					"Items": {
+						"tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.quiz": {
+							"AssessmentItems": {
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.1": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.1",
+									"content": "<a name=\"qid.aristotle.1\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10\">Transactional </p>"
+											],
+											"content": "I have a nice, hot apple pie to divide among my four friends. I have to decide how to split up the delicious dessert.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 0,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.10": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.10",
+									"content": "<a name=\"qid.aristotle.10\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.26\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.26\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.27\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.27\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10.28\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.28\">Transactional </p>"
+											],
+											"content": "The people elect the best man or woman to be President.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 0,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.2": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.2",
+									"content": "<a name=\"qid.aristotle.2\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.2\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.2\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.3\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.3\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10.4\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.4\">Transactional </p>"
+											],
+											"content": "You and I swap an old computer for a case of wine.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 2,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.3": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.3",
+									"content": "<a name=\"qid.aristotle.3\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.5\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.5\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.6\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.6\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10.7\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.7\">Transactional </p>"
+											],
+											"content": "I steal your case of wine and drink it all.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 1,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.4": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.4",
+									"content": "<a name=\"qid.aristotle.4\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.8\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.8\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.9\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.9\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10.10\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.10\">Transactional </p>"
+											],
+											"content": "I sign a minimum wage contract at the local Wal-Mart.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 2,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.5": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.5",
+									"content": "<a name=\"qid.aristotle.5\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.11\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.11\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.12\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.12\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10.13\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.13\">Transactional </p>"
+											],
+											"content": "I download a pirated song.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 1,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.6": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.6",
+									"content": "<a name=\"qid.aristotle.6\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.14\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.14\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.15\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.15\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10.16\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.16\">Transactional </p>"
+											],
+											"content": "Congress debates a tax reform.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 0,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.7": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.7",
+									"content": "<a name=\"qid.aristotle.7\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.17\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.17\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.18\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.18\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10.19\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.19\">Transactional </p>"
+											],
+											"content": "A committee chooses the next round of Rhodes Scholars.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 0,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.8": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.8",
+									"content": "<a name=\"qid.aristotle.8\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.20\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.20\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.21\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.21\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10.22\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.22\">Transactional </p>"
+											],
+											"content": "A judge offers lenience to a juvenile offender who pleads guilty.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 1,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.9": {
+									"Class": "Question",
+									"MimeType": "application/vnd.nextthought.naquestion",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.9",
+									"content": "<a name=\"qid.aristotle.9\"></a>",
+									"parts": [
+										{
+											"Class": "MultipleChoicePart",
+											"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+											"choices": [
+												"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.23\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.23\">Distributive </p>",
+												"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.24\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.24\">Corrective </p>",
+												"<a name=\"d7140284ac92d169d24484726d8a2f10.25\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.25\">Transactional </p>"
+											],
+											"content": "I pay a lawn service to cut my yard.",
+											"explanation": "",
+											"hints": [],
+											"solutions": [
+												{
+													"Class": "MultipleChoiceSolution",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+													"value": 2,
+													"weight": 1.0
+												}
+											]
+										}
+									]
+								},
+								"tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.set.qset:QUIZ1_aristotle": {
+									"Class": "QuestionSet",
+									"MimeType": "application/vnd.nextthought.naquestionset",
+									"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.set.qset:QUIZ1_aristotle",
+									"questions": [
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.1",
+											"content": "<a name=\"qid.aristotle.1\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10\">Transactional </p>"
+													],
+													"content": "I have a nice, hot apple pie to divide among my four friends. I have to decide how to split up the delicious dessert.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 0,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										},
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.2",
+											"content": "<a name=\"qid.aristotle.2\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.2\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.2\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.3\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.3\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10.4\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.4\">Transactional </p>"
+													],
+													"content": "You and I swap an old computer for a case of wine.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 2,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										},
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.3",
+											"content": "<a name=\"qid.aristotle.3\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.5\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.5\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.6\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.6\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10.7\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.7\">Transactional </p>"
+													],
+													"content": "I steal your case of wine and drink it all.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 1,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										},
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.4",
+											"content": "<a name=\"qid.aristotle.4\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.8\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.8\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.9\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.9\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10.10\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.10\">Transactional </p>"
+													],
+													"content": "I sign a minimum wage contract at the local Wal-Mart.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 2,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										},
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.5",
+											"content": "<a name=\"qid.aristotle.5\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.11\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.11\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.12\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.12\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10.13\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.13\">Transactional </p>"
+													],
+													"content": "I download a pirated song.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 1,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										},
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.6",
+											"content": "<a name=\"qid.aristotle.6\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.14\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.14\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.15\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.15\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10.16\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.16\">Transactional </p>"
+													],
+													"content": "Congress debates a tax reform.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 0,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										},
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.7",
+											"content": "<a name=\"qid.aristotle.7\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.17\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.17\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.18\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.18\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10.19\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.19\">Transactional </p>"
+													],
+													"content": "A committee chooses the next round of Rhodes Scholars.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 0,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										},
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.8",
+											"content": "<a name=\"qid.aristotle.8\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.20\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.20\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.21\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.21\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10.22\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.22\">Transactional </p>"
+													],
+													"content": "A judge offers lenience to a juvenile offender who pleads guilty.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 1,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										},
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.9",
+											"content": "<a name=\"qid.aristotle.9\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.23\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.23\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.24\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.24\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10.25\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.25\">Transactional </p>"
+													],
+													"content": "I pay a lawn service to cut my yard.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 2,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										},
+										{
+											"Class": "Question",
+											"MimeType": "application/vnd.nextthought.naquestion",
+											"NTIID": "tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.qid.aristotle.10",
+											"content": "<a name=\"qid.aristotle.10\"></a>",
+											"parts": [
+												{
+													"Class": "MultipleChoicePart",
+													"MimeType": "application/vnd.nextthought.assessment.multiplechoicepart",
+													"choices": [
+														"<a name=\"1e5cd4b70d0ca146665b0073e3512f12.26\" ></a>\n\n<p class=\"par\" id=\"1e5cd4b70d0ca146665b0073e3512f12.26\">Distributive </p>",
+														"<a name=\"82a183f5bbcaf7607f1e0fb56399a565.27\" ></a>\n\n<p class=\"par\" id=\"82a183f5bbcaf7607f1e0fb56399a565.27\">Corrective </p>",
+														"<a name=\"d7140284ac92d169d24484726d8a2f10.28\" ></a>\n\n<p class=\"par\" id=\"d7140284ac92d169d24484726d8a2f10.28\">Transactional </p>"
+													],
+													"content": "The people elect the best man or woman to be President.",
+													"explanation": "",
+													"hints": [],
+													"solutions": [
+														{
+															"Class": "MultipleChoiceSolution",
+															"MimeType": "application/vnd.nextthought.assessment.multiplechoicesolution",
+															"value": 0,
+															"weight": 1.0
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							},
+							"NTIID": "tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.quiz",
+							"filename": "tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_quiz.html",
+							"href": "tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_quiz.html"
+						}
+					},
+					"NTIID": "tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.lesson1",
+					"filename": "tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_lesson1.html",
+					"href": "tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_lesson1.html"
+				}
+			},
+			"NTIID": "tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.course_test_content",
+			"filename": "index.html",
+			"href": "index.html"
+		}
+	},
+	"href": "index.html"
+}

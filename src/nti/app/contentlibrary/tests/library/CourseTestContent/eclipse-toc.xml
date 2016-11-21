@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?><toc NTIRelativeScrollHeight="342" background="images/backgrounds/default.png" href="index.html" icon="icons/chapters/generic_book.png" isCourse="true" label="Course Test Content" level="root" levelnum="0" ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.course_test_content" renderVersion="2" xmlns:content="http://www.nextthought.com/toc">
+<object mimeType="application/vnd.nextthought.relatedwork" ntiid="tag:nextthought.com,2011-10:NTI-RelatedWork-CourseTestContent.relatedwork.source1">
+</object>
+    <topic NTIRelativeScrollHeight="1564"
+		   href="tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_course_info.html"
+		   label="Course Info"
+		   level="part" levelnum="1" ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.course_info">
+		<topic
+			href="tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_course_info.html#a0000000003"
+			label="Course Summary" level="chapter" levelnum="2" ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.course_summary"/>
+		<topic
+			href="tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_course_info.html#a0000000004"
+			label="Grading" level="chapter" levelnum="2" ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.grading"/>
+		<topic
+			href="tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_course_info.html#a0000000005"
+			label="Required Books" level="chapter" levelnum="2" ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.required_books"/>
+		<topic
+			href="tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_course_info.html#a0000000006"
+			label="Office Hours" level="chapter" levelnum="2" ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.office_hours"/>
+		<topic
+			href="tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_course_info.html#a0000000007"
+			label="Course Policies" level="chapter" levelnum="2" ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.course_policies"/>
+    </topic>
+    <topic NTIRelativeScrollHeight="34"
+		   href="tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_lesson1.html"
+		   label="Lesson 1" level="part" levelnum="1" ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.lesson1">
+       <topic NTIRelativeScrollHeight="472"
+			  href="tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_section_1.html"
+			  label="Section 1" level="chapter" levelnum="2" ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.section_1">
+		   <object mimeType="application/vnd.nextthought.relatedworkref" ntiid="tag:nextthought.com,2011-10:NTI-RelatedWorkRef-CourseTestContent.relatedworkref.0">
+		   </object>
+       </topic>
+       <topic NTIRelativeScrollHeight="1240"
+			  href="tag_nextthought_com_2011-10_NTI-HTML-CourseTestContent_quiz.html"
+			  label="Quiz" level="chapter"
+			  levelnum="2"
+			  ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.quiz" suppressed="true">
+		   <object mimeType="application/vnd.nextthought.naquestionset" ntiid="tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.set.qset:QUIZ1_aristotle">
+		   </object>
+       </topic>
+       <object label="1.1 Course Overview"
+			   mimeType="application/vnd.nextthought.ntivideo"
+			   ntiid="tag:nextthought.com,2011-10:NTI-NTIVideo-CourseTestContent.ntivideo.video1"
+			   poster="//www.kaltura.com/p/1500101/thumbnail/entry_id/0_ovoe696p/width/1280/"/>
+	   <object
+		   icon="resources/CourseTestContent/09cb8897f4915b6de0529fae7630ca5c8bafd1d1/fd35e23767020999111e1f49239199b4c5eff23e.png"
+		   label="Course Test Content Discussion"
+		   mimeType="application/vnd.nextthought.discussion"
+		   ntiid="tag:nextthought.com,2011-10:NextThought-Forum:GeneralCommunity-Course_Test_Content_Discussion"
+		   title="Discussion description / subtitle"/>
+	   <content:related creator="NextThought, LLC"
+						desc="Unified Video 1"
+						href="tag:nextthought.com,2011-10:USSC-HTML-SeleniumTestContent.unified_video"
+						icon="" label="Selenium Tests"
+						ntiid="tag:nextthought.com,2011-10:NTI-RelatedWorkRef-CourseTestContent.relatedworkref.0"
+						section="required"
+						target-ntiid="tag:nextthought.com,2011-10:USSC-HTML-SeleniumTestContent.unified_video"
+						type="application/vnd.nextthought.content" visibility="everyone"/>
+	   <object label="Quiz"
+			   mimeType="application/vnd.nextthought.naquestionset"
+			   question-count="10" target-ntiid="tag:nextthought.com,2011-10:NTI-NAQ-CourseTestContent.naq.set.qset:QUIZ1_aristotle"/>
+	</topic>
+	<course courseInfo="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.course_info" courseName="NTI 0001" discussionBoard="tag:nextthought.com,2011-10:demo.nextthought.com-Board:GeneralCommunity-DiscussionBoard" instructorForum="tag:nextthought.com,2011-10:demo.nextthought.com-Forum:GeneralCommunity-Announcements" label="Test Course" ntiid="tag:nextthought.com,2011-10:NTI-NTICourse-CourseTestContent.course.1">
+		<unit label="Unit 1" ntiid="tag:nextthought.com,2011-10:NTI-NTICourseUnit-CourseTestContent.course.unit.1">
+			<lesson date="2013-08-20T04:59:59.999999+00:00" topic-ntiid="tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.lesson1"/>
+		</unit>
+		<scope type="public">
+			<entry>NextThought</entry>
+		</scope>
+		<scope type="restricted">
+			<entry>tag:nextthought.com,2011-10:nancy.cunningham@nextthought.com-MeetingRoom:Group-clc3403contentreview_nancy.cunningham@nextthought.com_febba4dc_b3a3_0bc2_68ef_e6dd3a04c923</entry>
+		</scope>
+	</course>
+<reference href="video_index.json" type="application/vnd.nextthought.videoindex"/>
+<content:related creator="NextThought, LLC" desc="Non-course test content." href="tag:nextthought.com,2011-10:USSC-HTML-SeleniumTestContent.selenium_tests" icon="../SeleniumTestContent/icons/chapters/generic_book.png" label="Selenium Tests" ntiid="tag:nextthought.com,2011-10:NTI-RelatedWork-CourseTestContent.relatedwork.source1" target-ntiid="tag:nextthought.com,2011-10:USSC-HTML-SeleniumTestContent.selenium_tests" type="application/vnd.nextthought.content" visibility="everyone"/>
+</toc>

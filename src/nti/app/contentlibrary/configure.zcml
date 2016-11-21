@@ -1,0 +1,227 @@
+<!-- -*- mode: nxml -*- -->
+<configure	xmlns="http://namespaces.zope.org/zope"
+			xmlns:i18n="http://namespaces.zope.org/i18n"
+			xmlns:ext="http://nextthought.com/ntp/ext"
+			xmlns:zcml="http://namespaces.zope.org/zcml">
+
+	<include package="zope.component" file="meta.zcml" />
+	<include package="zope.security" file="meta.zcml" />
+	<include package="zope.component" />
+	<include package="zope.security" />
+
+	<include package=".views" />
+	<include package=".content_unit_preferences" />
+
+	<!-- Workspaces/collections -->
+	<subscriber factory=".workspaces._library_workspace"
+				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
+
+	<subscriber factory=".workspaces._bundle_workspace"
+				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
+
+	<adapter factory=".workspaces.LibraryCollection" />
+	<adapter factory=".workspaces._BundleLibraryCollection" />
+
+	<adapter factory=".workspaces.LibraryCollectionDetailExternalizer" />
+	<adapter factory=".workspaces.LibraryCollectionDetailExternalizer"
+			 name="detail" />
+
+	<!-- permissions cache -->
+	<configure zcml:condition="installed nti.contenttypes.courses">
+		<subscriber handler="._courses._on_enroll_record" />
+		<subscriber handler="._courses._on_unenroll_record" />
+	</configure>
+
+	<!--
+		 The user has a named path adapter to get his personal library.
+		 Currently this is implicitly the Main library but in the future
+		 this might be a collection of named libraries.
+	-->
+	<adapter name="Library"
+			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory=".workspaces._library_workspace_for_user"
+			 provides="zope.traversing.interfaces.IPathAdapter" />
+
+	<!-- Likewise for the bundle library -->
+	<adapter name="ContentBundles"
+			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory=".workspaces._bundle_workspace_for_user"
+			 provides="zope.traversing.interfaces.IPathAdapter" />
+
+	<!-- Also a simple named adapter -->
+	<adapter name="Library"
+			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory=".workspaces._library_workspace_for_user" />
+
+	<adapter for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory=".workspaces._library_for_user" />
+
+	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
+			 factory=".workspaces._library_for_library" />
+
+	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
+			 factory=".workspaces._library_workspace_for_library" />
+
+	<!--
+		 Cache ACLs for things from boto directly (previously, we were
+		 caching the string value)
+	-->
+	<class class="nti.contentlibrary.boto_s3.BotoS3ContentUnit">
+		<implements interface="nti.dataserver.interfaces.IACLProviderCacheable" />
+	</class>
+
+	<!-- Forum support -->
+	<adapter factory=".forum.ContentBoardAdapter"
+			 for="nti.contentlibrary.interfaces.IContentPackageBundle" />
+
+	<subscriber handler=".subscribers._on_content_pacakge_library_synced" />
+
+	<subscriber factory=".forum.ContentBoardLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator"
+				for="nti.contentlibrary.interfaces.IContentPackageBundle" />
+
+	<adapter factory=".forum._ContentBoardACLProvider" />
+	<adapter factory=".forum._ContentForumACLProvider" />
+
+	<!-- Traversal to the forum objects -->
+	<adapter factory="nti.traversal.traversal.DefaultAdapterTraversable"
+			 for="nti.contentlibrary.interfaces.IContentPackageBundle pyramid.interfaces.IRequest" />
+
+	<adapter factory="nti.traversal.traversal.DefaultAdapterTraversable"
+			 for="nti.contentlibrary.interfaces.IContentPackageBundle" />
+
+	<adapter factory=".forum.ContentBoardAdapter"
+			 for="nti.contentlibrary.interfaces.IContentPackageBundle"
+			 provides="zope.traversing.interfaces.IPathAdapter"
+			 name="DiscussionBoard" /> <!-- matches __default_name__ -->
+
+	<adapter factory=".adapters.bundle_to_principal"
+			 for="nti.contentlibrary.interfaces.IContentPackageBundle"
+			 provides="zope.security.interfaces.IPrincipal" />
+
+	<!-- Externalization -->
+	<!-- Note that we want to use the externalization already present, we just need the
+	correct factories registered -->
+	<include package="nti.externalization" file="meta.zcml" />
+	<include package="nti.externalization" />
+
+	<ext:registerMimeFactories module=".forum" />
+
+	<subscriber factory=".decorators._ContentUnitInfoDecorator"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+				for="nti.appserver.interfaces.IContentUnitInfo
+					 pyramid.interfaces.IRequest"/>
+
+	<subscriber factory=".decorators._ContentUnitInfoTitleDecorator"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+				for="nti.appserver.interfaces.IContentUnitInfo
+					 pyramid.interfaces.IRequest"/>
+
+	<subscriber factory=".decorators._ContentBundlePagesLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<subscriber factory=".decorators._IPad120BundleContentPackagesAdjuster"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+				for="nti.contentlibrary.interfaces.IContentPackageBundle
+					 pyramid.interfaces.IRequest"/>
+
+	<subscriber factory=".decorators._UGDLibraryPathLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<subscriber factory=".decorators._PostLibraryPathLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<subscriber factory=".decorators._TopicLibraryPathLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<subscriber factory=".decorators._ForumLibraryPathLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<!-- this thing is not a real IBundle -->
+	<subscriber factory=".decorators._IPad120BundleContentPackagesAdjuster"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+				for="nti.app.products.courseware.legacy_course._LegacyCommunityBasedCourseInstanceFakeBundle
+					 pyramid.interfaces.IRequest"
+				zcml:condition="installed nti.app.products.courseware"/>
+
+	<configure zcml:condition="installed nti.contenttypes.courses">
+		<!-- Catalog -->
+		<!-- Type -->
+		<adapter factory=".catalog._asset_to_contained_type" />
+	
+		<!-- Namespace -->
+		<adapter factory=".catalog._asset_to_namespace" />
+	
+		<!-- NTIID -->
+		<adapter factory=".catalog._asset_to_ntiid" />
+		
+		<!-- Containers -->
+		<adapter factory=".catalog._asset_to_containers" />	
+		
+		<!-- Target -->
+		<adapter factory=".catalog._asset_to_target" />	
+	</configure>
+
+	<!-- Adapters & Subscribers -->
+	<adapter factory=".adapters.presentation_asset_items_factory"
+			 for="nti.contentlibrary.interfaces.IContentUnit"
+			 provides="nti.contenttypes.presentation.interfaces.IPresentationAssetContainer" />
+
+	<adapter factory=".subscribers.ContentPackageRolePermissionManager"
+				provides=".interfaces.IContentPackageRolePermissionManager" />
+
+	<!-- Top-level/hierarchy -->
+	<adapter factory=".adapters._content_unit_to_bundle" />
+
+	<subscriber factory=".adapters._bundles_from_unit"
+				provides="nti.appserver.interfaces.ITopLevelContainerContextProvider"
+				for="nti.contentlibrary.interfaces.IContentUnit
+						nti.dataserver.interfaces.IUser"/>
+
+	<subscriber factory=".adapters._hierarchy_from_obj"
+				provides="nti.appserver.interfaces.IHierarchicalContextProvider"
+				for="*
+					nti.dataserver.interfaces.IUser"/>
+
+	<subscriber factory=".adapters._bundles_from_container_object"
+				provides="nti.appserver.interfaces.IJoinableContextProvider"
+				for="*"/>
+
+	<subscriber factory=".adapters._bundles_from_post"
+				provides="nti.appserver.interfaces.ITopLevelContainerContextProvider"
+				for="nti.dataserver.contenttypes.forums.interfaces.IPost"/>
+
+	<subscriber factory=".adapters._bundles_from_topic"
+				provides="nti.appserver.interfaces.ITopLevelContainerContextProvider"
+				for="nti.dataserver.contenttypes.forums.interfaces.ITopic"/>
+
+	<subscriber factory=".adapters._bundles_from_forum"
+				provides="nti.appserver.interfaces.ITopLevelContainerContextProvider"
+				for="nti.dataserver.contenttypes.forums.interfaces.IForum"/>
+
+	<!-- Content package modifications. -->
+	<!-- addition -->
+	<subscriber handler=".subscribers._update_indices_when_content_changes"
+				for="nti.contentlibrary.interfaces.IContentPackage
+					 zope.lifecycleevent.IObjectAddedEvent" />
+
+	<subscriber handler=".subscribers._initialize_package_roles" />
+
+	<!-- mutation -->
+	<subscriber handler=".subscribers._update_indices_when_content_changes"
+				for="nti.contentlibrary.interfaces.IContentPackage
+					 zope.lifecycleevent.IObjectModifiedEvent" />
+
+	<subscriber handler=".subscribers._update_package_roles" />
+
+	<!-- removal -->
+	<subscriber handler=".subscribers._clear_index_when_content_removed"
+				for="nti.contentlibrary.interfaces.IContentPackage
+					 zope.lifecycleevent.IObjectRemovedEvent" />
+
+	<!-- Filters -->
+	<subscriber	factory=".filters._LibraryContentObjectFilter"
+				provides="nti.appserver.interfaces.ICreatableObjectFilter"
+				for="nti.dataserver.interfaces.IUser" />
+
+</configure>

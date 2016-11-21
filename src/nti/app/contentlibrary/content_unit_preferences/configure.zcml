@@ -1,0 +1,50 @@
+<!-- -*- mode: nxml -*- -->
+<configure	xmlns="http://namespaces.zope.org/zope"
+			xmlns:i18n="http://namespaces.zope.org/i18n"
+			xmlns:ext="http://nextthought.com/ntp/ext"
+			xmlns:zcml="http://namespaces.zope.org/zcml">
+
+	<include package="zope.component" file="meta.zcml" />
+	<include package="zope.security" file="meta.zcml" />
+	<include package="zope.component" />
+	<include package="zope.security" />
+	
+	<subscriber factory=".decorators._ContentUnitPreferencesDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<adapter factory=".adapters._ContainerContentUnitPreferencesFactory"
+			 for="nti.containers.containers.LastModifiedBTreeContainer"
+			 provides=".interfaces.IContentUnitPreferences" />
+
+	<adapter factory=".adapters._DelimitedHierarchyContentUnitPreferencesFactory"
+			 provides=".interfaces.IContentUnitPreferences" />
+
+	<!--
+		 FIXME: These need to be handled at an interface level, not
+	     this class level. The intent is to adapt to the UGD
+	     containers found in a User, but this also catches forum
+	     containers
+	-->
+	<adapter factory=".traversal._ContainerFieldsTraversable"
+			 for="nti.containers.containers.LastModifiedBTreeContainer"
+			 provides="zope.traversing.interfaces.ITraversable"
+			 name="fields" />
+
+	<adapter factory=".traversal._ContainerFieldsTraversable"
+			 for="nti.containers.containers.LastModifiedBTreeContainer
+				  pyramid.interfaces.IRequest"
+			 provides="zope.traversing.interfaces.ITraversable"
+			 name="fields" />
+
+	<adapter factory=".traversal._ContentUnitFieldsTraversable"
+			 for="nti.contentlibrary.interfaces.IContentUnit"
+			 provides="zope.traversing.interfaces.ITraversable"
+			 name="fields" />
+
+	<adapter factory=".traversal._ContentUnitFieldsTraversable"
+			 for="nti.contentlibrary.interfaces.IContentUnit
+				  pyramid.interfaces.IRequest"
+			 provides="zope.traversing.interfaces.ITraversable"
+			 name="fields" />
+
+</configure>

@@ -1,0 +1,121 @@
+/**
+ * $Revision: 20125 $
+ **/
+/**
+ * Important: Using the * descendent selector will
+ * cause problems with dynamically changing font settings.
+ * Only apply the setting to the root.
+ */
+
+#NTIContent .minipage {
+	display: inline-block;
+	margin-top: .5em;
+	margin-right: .25em;
+	margin-bottom: .5em;
+	margin-left: .25em;
+	vertical-align: middle;
+}
+
+#NTIContent .description-item p.par {
+	display: inline;
+}
+
+#NTIContent td > p.par {
+	margin: 0;
+}
+
+#NTIContent td {
+	padding-left: 1.0em;
+	padding-right: 1.0em;
+}
+
+#NTIContent table {
+	margin-left: auto;
+	margin-right: auto;
+	border-spacing: 0;
+}
+
+#NTIContent .table .caption {
+	font-size: 130%;
+	font-weight: bold;
+	text-align: center;
+	margin-bottom: 0.75em;
+}
+
+#NTIContent .sidebar {
+	padding-top: 1em;
+	padding-bottom: 1em;
+	padding-left: 3em;
+	padding-right: 3em;
+	background-color: rgba(235, 235, 235, 0.3);
+}
+
+#NTIContent .sidebar-title {
+	font-size: 175%;
+	font-weight: 200;
+	margin-bottom: 0.5em;
+}
+
+#NTIContent .math.equation {
+	font-size: 130%;
+}
+
+#NTIContent .lineout {
+	text-decoration: line-through;
+}
+
+#NTIContent .modified {
+	text-decoration: underline;
+	color: #1fd26f;
+}
+
+ul.nav {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background: #fff;
+	overflow: hidden;
+}
+
+ul.nav li {
+	display: inline-block;
+	float: left;
+	margin: 0;
+	padding: 0;
+	border: 1px solid #dbdbdb;
+	border-left-width: 0;
+}
+
+ul.nav li:first-of-type {
+	border-left-width: 1px;
+}
+
+ul.nav li a,
+ul.nav li a:hover,
+ul.nav li a:visited,
+ul.nav li a:active,
+ul.nav li a:link {
+	display: inline-block;
+	font: normal normal 12px/30px 'Open Sans', sans-serif;
+	color: #494949 !important;
+	padding: 0 0.8em;
+	text-transform: uppercase;
+}
+
+ul.nav li a:hover {
+	color: #8eb737 !important;
+}
+
+ul.nav a:empty {
+	display: none;
+}
+
+ul.nav p {
+	display: inline;
+	padding: 0;
+	margin: 0;   
+}
+
+div.align-center ul.nav {
+	display: inline-block;
+}

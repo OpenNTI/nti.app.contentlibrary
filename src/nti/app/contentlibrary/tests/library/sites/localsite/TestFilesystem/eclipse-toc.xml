@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<toc NTIRelativeScrollHeight="50"
+	 href="index.html"
+	 icon="icons/chapters/COHEN%20v.%20CALIFORNIA.-icon.png"
+	 label="COHEN v. CALIFORNIA."
+	 level="root"
+	 levelnum="0"
+	 ntiid="tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california."
+	 renderVersion="2"
+	 isCourse="false"
+	 thumbnail="thumbnails/index.png">
+	<topic NTIRelativeScrollHeight="31021"
+		   href="tag_nextthought_com_2011-10_USSC-HTML-Cohen_18.html"
+		   label="COHEN v. CALIFORNIA."
+		   level="part"
+		   levelnum="1"
+		   ntiid="tag:nextthought.com,2011-10:USSC-HTML-Cohen.18"
+		   thumbnail="thumbnails/tag_nextthought_com_2011-10_USSC-HTML-Cohen_18.png">
+		<topic
+			href="tag_nextthought_com_2011-10_USSC-HTML-Cohen_18.html#22"
+			label="I"
+			level="chapter"
+			levelnum="2"
+			ntiid="tag:nextthought.com,2011-10:USSC-HTML-Cohen.22"/>
+		<topic
+			href="tag_nextthought_com_2011-10_USSC-HTML-Cohen_18.html#28"
+			label="II"
+			level="chapter"
+			levelnum="2"
+			ntiid="tag:nextthought.com,2011-10:USSC-HTML-Cohen.28">
+			<object ntiid="tag:nextthought.com,2011-10:testing-NTICard-temp.nticard.1" mimeType="application/vnd.nextthought.nticard">
+			</object>
+		</topic>
+	</topic>
+</toc>

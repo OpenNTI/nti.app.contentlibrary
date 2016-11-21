@@ -1,0 +1,44 @@
+#NTIContent .mathname {
+	font-style: italic;
+}
+
+#NTIContent .math.equation {
+	text-align: center;
+}
+
+#NTIContent .math.equation div {
+	display: inline;
+}
+
+#NTIContent .math.equation div.equation-number {
+	display: inline;
+	float: right;
+}  
+
+#NTIContent table.tabular td {
+	padding-right: 0.5em;
+	padding-left: 0.5em;
+}
+
+#NTIContent span[itemprop~="nti-data-markupenabled"] {
+	box-shadow: 0 0 0 3px #ebebeb;
+	margin-bottom: 4em;
+	line-height: 0px;
+}
+
+#NTIContent .subparagraph.title {
+	padding-left: 30px;
+	font-weight: bold;
+	margin-bottom: 0px !important;
+	margin-top: 1em !important;
+}
+
+#NTIContent li > p.par {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+#NTIContent ol.enumerate {
+	margin-top: 0px;
+	padding-left: 30px;
+}

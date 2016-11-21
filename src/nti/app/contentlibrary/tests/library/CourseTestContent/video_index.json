@@ -1,0 +1,41 @@
+{
+    "Items": {
+        "tag:nextthought.com,2011-10:NTI-NTIVideo-CourseTestContent.ntivideo.video1": {
+            "mimeType": "application/vnd.nextthought.ntivideo",
+            "description": "Course Overview",
+            "creator": null,
+            "title": "1.1 Course Overview",
+            "closedCaptions": null,
+            "ntiid": "tag:nextthought.com,2011-10:NTI-NTIVideo-CourseTestContent.ntivideo.video1",
+            "sources": [
+                {
+                    "service": "kaltura",
+                    "width": 640,
+                    "poster": "//www.kaltura.com/p/1500101/thumbnail/entry_id/0_ovoe696p/width/1280/",
+                    "height": 480,
+                    "source": [
+                        "1500101:0_ovoe696p"
+                    ],
+                    "type": [
+                        "video/kaltura"
+                    ],
+                    "thumbnail": "//www.kaltura.com/p/1500101/thumbnail/entry_id/0_ovoe696p/width/640/"
+                }
+            ],
+            "transcripts": [
+                {
+                    "srcjsonp": "resources/CourseTestContent/e19928b35ec37247b13201e47a4679900c7ecf6d/9b3fe7737c9828ea6a552664d89b26bc8de8a15e.jsonp",
+                    "src": "resources/CourseTestContent/e19928b35ec37247b13201e47a4679900c7ecf6d/90784fa2c5c148922446e05d45ff35f0aee3e69b.vtt",
+                    "type": "text/vtt",
+                    "lang": "en",
+                    "purpose": "normal"
+                }
+            ]
+        }
+    },
+    "Containers": {
+        "tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.lesson1": [
+            "tag:nextthought.com,2011-10:NTI-NTIVideo-CourseTestContent.ntivideo.video1"
+        ]
+    }
+}

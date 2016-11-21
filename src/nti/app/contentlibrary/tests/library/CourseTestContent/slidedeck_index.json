@@ -1,0 +1,27 @@
+{
+    "Items": {
+    	"tag:nextthought.com,2011-10:OU-NTISlideDeck-CourseTestContent.nsd.pres:Nested_Conditionals": {
+            "MimeType": "application/vnd.nextthought.ntislidedeck",
+            "Videos": [
+                {
+                    "MimeType": "application/vnd.nextthought.ntislidevideo",
+                    "video-ntiid": "tag:nextthought.com,2011-10:NTI-NTIVideo-CourseTestContent.ntivideo.video1",
+                    "title": "Nested Conditionals",
+                    "creator": "Deborah Trytten",
+                    "slidedeckid": "tag:nextthought.com,2011-10:OU-NTISlideDeck-CourseTestContent.nsd.pres:Nested_Conditionals",
+                    "thumbnail": "//www.kaltura.com/p/1500101/thumbnail/entry_id/1_z5n8j7tw/width/640/",
+                    "ntiid": "tag:nextthought.com,2011-10:OU-NTISlideVideo-CourseTestContent.nsd.pres:Nested_Conditionals",
+                    "class": "ntislidevideo"
+                }
+            ],
+            "ntiid": "tag:nextthought.com,2011-10:OU-NTISlideDeck-CourseTestContent.nsd.pres:Nested_Conditionals",
+            "class": "ntislidedeck",
+            "creator": "sjohnson@nextthought.com"
+        }
+    },
+    "Containers": {
+        "tag:nextthought.com,2011-10:NTI-HTML-CourseTestContent.lesson1": [
+            "tag:nextthought.com,2011-10:OU-NTISlideDeck-CourseTestContent.nsd.pres:Nested_Conditionals"
+        ]
+    }
+}
