@@ -2,9 +2,9 @@ import codecs
 from setuptools import setup, find_packages
 
 entry_points = {
-    "z3c.autoinclude.plugin": [
-        'target = nti.app',
-    ]
+	"z3c.autoinclude.plugin": [
+		'target = nti.app',
+	]
 }
 
 def _read(fname):
@@ -19,7 +19,7 @@ setup(
 	description="NTI app contentlibrary",
 	long_description=_read('README.rst'),
 	license='Apache',
-	keywords='solr',
+	keywords='Application Contentlibrary',
 	classifiers=[
 		'Intended Audience :: Developers',
 		'Natural Language :: English',
