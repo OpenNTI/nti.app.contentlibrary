@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# nti.appcontentlibrary documentation build configuration file, created by
+# nti.app.contentlibrary documentation build configuration file, created by
 # sphinx-quickstart on Tue Aug  2 08:43:18 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -153,7 +153,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'nti.appcontentlibrary v1.0'
+# html_title = u'nti.app.contentlibrary v1.0'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
