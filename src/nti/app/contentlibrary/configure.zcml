@@ -14,6 +14,15 @@
 	<include package=".views" />
 	<include package=".content_unit_preferences" />
 
+	<!-- ACL -->
+	<adapter factory=".acl._ContentPackageLibraryACLProvider" />
+	<adapter factory=".acl._ContentPackageBundleLibraryACLProvider" />
+	<adapter factory=".acl._DelimitedHierarchyContentUnitACLProvider" />
+	<adapter factory=".acl._DelimitedHierarchyContentPackageACLProvider" />
+	
+	<adapter factory=".acl._TestingLibraryTOCEntryACLProvider"
+			 zcml:condition="have testmode" />
+
 	<!-- Workspaces/collections -->
 	<subscriber factory=".workspaces._library_workspace"
 				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
