@@ -14,6 +14,10 @@
 	<include package=".views" />
 	<include package=".content_unit_preferences" />
 
+	<!-- NTIID Resolvers -->
+	<utility factory=".ntiids._ContentResolver" name="HTML" />
+	<utility factory=".ntiids._ContentResolver" name="Root" />
+
 	<!-- ACL -->
 	<adapter factory=".acl._ContentPackageLibraryACLProvider" />
 	<adapter factory=".acl._ContentPackageBundleLibraryACLProvider" />
