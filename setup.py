@@ -19,7 +19,7 @@ setup(
 	description="NTI app contentlibrary",
 	long_description=_read('README.rst'),
 	license='Apache',
-	keywords='Application Contentlibrary',
+	keywords='pyramid contentlibrary',
 	classifiers=[
 		'Intended Audience :: Developers',
 		'Natural Language :: English',
