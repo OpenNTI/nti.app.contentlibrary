@@ -9,7 +9,7 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 
-	<include package="nti.contentlibray" />
+	<include package="nti.contentlibrary" />
 	
 	<include package=".views" />
 	<include package=".content_unit_preferences" />
