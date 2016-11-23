@@ -34,6 +34,7 @@ setup(
 	namespace_packages=['nti', 'nti.app'],
 	install_requires=[
 		'setuptools',
+		'nti.contentlibrary'
 	],
 	entry_points=entry_points,
 )
