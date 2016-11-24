@@ -9,10 +9,31 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 
-	<!-- Content card resolution; temporary? -->
+	<!-- Content card resolution -->
 	<utility factory=".card_views._ContentCardResolver" name="NTICard" />
 	<utility factory=".card_views._ContentCardResolver" name="nticard" />
 			
 	<adapter factory=".library_views._ContentPackageLibraryCacheController" />
 		
+	<!-- Glossary -->
+	<subscriber handler=".glossary_views.add_main_glossary_from_new_content" />
+
+	<adapter name="Glossary"
+			 factory=".glossary_views._GlossaryPathAdapter"
+			 provides="nti.appserver.interfaces.INamedLinkPathAdapter"
+			 for="nti.appserver.interfaces.IPageContainerResource 
+			 	  pyramid.interfaces.IRequest" />
+
+	<adapter name="Glossary"
+			 factory=".glossary_views._GlossaryPathAdapter"
+			 provides="nti.appserver.interfaces.INamedLinkPathAdapter"
+			 for="nti.appserver.interfaces.IRootPageContainerResource 
+			 	  pyramid.interfaces.IRequest" />
+
+	<adapter name="Glossary"
+			 factory=".glossary_views._GlossaryPathAdapter"
+			 provides="nti.appserver.interfaces.INamedLinkPathAdapter"
+			 for="nti.appserver.interfaces.INewPageContainerResource 
+			 	  pyramid.interfaces.IRequest" />
+
 </configure>
