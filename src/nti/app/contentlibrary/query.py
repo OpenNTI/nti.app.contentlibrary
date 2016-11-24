@@ -21,14 +21,14 @@ from nti.contenttypes.presentation.interfaces import INTIVideo
 from nti.contenttypes.presentation.interfaces import INTIPollRef
 from nti.contenttypes.presentation.interfaces import INTISurveyRef
 
-from nti.dataserver.interfaces import IIDContainersQuerier
+from nti.dataserver.interfaces import IUserNTIIDContainersQuerier
 
 from nti.ntiids import ntiids
 
 from nti.site.site import get_component_hierarchy_names
 
-@interface.implementer(IIDContainersQuerier)
-class _NTIIDContainers(object):
+@interface.implementer(IUserNTIIDContainersQuerier)
+class _UserNTIIDContainers(object):
 
 	def query(self, user, ntiid, include_stream, stream_only):
 		containers = ()

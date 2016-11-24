@@ -240,6 +240,6 @@
 				for="nti.dataserver.interfaces.IUser" />
 
 	<!-- Query -->
-	<utility factory=".query._NTIIContainers" />
+	<utility factory=".query._UserNTIIDContainers" />
 
 </configure>
