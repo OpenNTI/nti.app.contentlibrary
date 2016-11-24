@@ -239,4 +239,7 @@
 				provides="nti.appserver.interfaces.ICreatableObjectFilter"
 				for="nti.dataserver.interfaces.IUser" />
 
+	<!-- Query -->
+	<utility factory=".query._NTIIContainers" />
+
 </configure>
