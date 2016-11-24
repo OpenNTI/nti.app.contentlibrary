@@ -52,21 +52,23 @@ from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 
-from nti.appserver import interfaces as app_interfaces
+from nti.appserver.interfaces import INamedLinkView
+from nti.appserver.interfaces import INamedLinkPathAdapter
 
-from nti.contentlibrary import interfaces as lib_interfaces
+from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 from nti.contentlibrary.eclipse import MAIN_CSV_CONTENT_GLOSSARY_FILENAME
 
 from nti.dataserver import authorization as nauth
 
 from nti.dictserver import lookup
-from nti.dictserver import interfaces as dict_interfaces
+
+from nti.dictserver.interfaces import IDictionaryTermDataStorage
 
 from nti.dictserver.storage import TrivialExcelCSVDataStorage
 
-@interface.implementer(app_interfaces.INamedLinkPathAdapter,
-					   ITraversable)
+@interface.implementer(INamedLinkPathAdapter, ITraversable)
 class _GlossaryPathAdapter(Contained):
 	"""
 	A path adapter that we can traverse to in order to get
@@ -97,7 +99,7 @@ class _GlossaryPathAdapter(Contained):
 			 request_method='GET',
 			 permission=nauth.ACT_READ,
 			 http_cache=datetime.timedelta(days=1))
-@interface.implementer(app_interfaces.INamedLinkView)
+@interface.implementer(INamedLinkView)
 class GlossaryView(object):
 	"""
 	Primary reading glossary view.
@@ -112,7 +114,7 @@ class GlossaryView(object):
 		ntiid = request.context.ntiid
 
 		# Currently, we only support merging in content-specific glossary values
-		library = request.registry.queryUtility(lib_interfaces.IContentPackageLibrary)
+		library = request.registry.queryUtility(IContentPackageLibrary)
 		if library:
 			path = library.pathToNTIID(ntiid) or ()
 		else:
@@ -121,9 +123,9 @@ class GlossaryView(object):
 		# Collect all the dictionaries, from most specific to global
 		dictionaries = []
 		for unit in path:
-			unit_dict = request.registry.queryUtility(dict_interfaces.IDictionaryTermDataStorage, name=unit.ntiid)
+			unit_dict = request.registry.queryUtility(IDictionaryTermDataStorage, name=unit.ntiid)
 			dictionaries.append(unit_dict)
-		dictionaries.append(request.registry.queryUtility(dict_interfaces.IDictionaryTermDataStorage))
+		dictionaries.append(request.registry.queryUtility(IDictionaryTermDataStorage))
 
 		info = term
 		for dictionary in dictionaries:
@@ -140,10 +142,9 @@ class GlossaryView(object):
 		# Let the web layer encode to utf-8 (the default for XML)
 		request.response.charset = b'utf-8'
 		request.response.status_int = 200
-
 		return request.response
 
-@component.adapter(lib_interfaces.IContentPackage, IObjectCreatedEvent)
+@component.adapter(IContentPackage, IObjectCreatedEvent)
 def add_main_glossary_from_new_content(title, event):
 	glossary_source = title.read_contents_of_sibling_entry(MAIN_CSV_CONTENT_GLOSSARY_FILENAME)
 	if glossary_source:
