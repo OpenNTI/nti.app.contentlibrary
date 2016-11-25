@@ -14,6 +14,9 @@
 	<include package=".views" />
 	<include package=".content_unit_preferences" />
 
+	<!-- Events -->
+	<subscriber handler=".application._sync_global_library" />
+
 	<!-- NTIID Resolvers -->
 	<utility factory=".ntiids._ContentResolver" name="HTML" />
 	<utility factory=".ntiids._ContentResolver" name="Root" />
