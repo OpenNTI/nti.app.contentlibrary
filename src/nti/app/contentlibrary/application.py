@@ -19,7 +19,7 @@ from nti.appserver.interfaces import IApplicationSettings
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
-from nti.processlifetime import IProcessStarting
+from nti.processlifetime import IApplicationProcessStarting
 from nti.processlifetime import IApplicationTransactionOpenedEvent
 
 @component.adapter(IApplicationTransactionOpenedEvent)
@@ -33,7 +33,7 @@ def _sync_global_library(_):
 		# to allow loading the packages to make persistent changes.
 		library.syncContentPackages()
 
-@component.adapter(IProcessStarting)
+@component.adapter(IApplicationProcessStarting)
 def _on_process_starting(event):
 	# Load a library, if needed. We take the first of:
 	# settings['library_zcml']
