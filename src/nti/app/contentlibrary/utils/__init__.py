@@ -9,6 +9,9 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import urlparse
+import collections
+
 from zope import component
 
 from nti.contentlibrary.interfaces import IContentUnit
@@ -16,8 +19,14 @@ from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
+from nti.dataserver import authorization as nauth
+
+from nti.dataserver.interfaces import IMutableGroupMember
+
 from nti.mimetype.mimetype import nti_mimetype_with_class
 
+from nti.ntiids.ntiids import get_provider
+from nti.ntiids.ntiids import get_specific
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 PAGE_INFO_MT = nti_mimetype_with_class('pageinfo')
@@ -91,3 +100,57 @@ def yield_sync_content_packages(ntiids=()):
 			elif not IGlobalContentPackage.providedBy(package):
 				yield package
 yield_content_packages = yield_sync_content_packages
+
+def _update_users_content_roles(user, idurl, content_roles):
+	"""
+	Update the content roles assigned to the given user based on information
+	returned from an external provider.
+
+	:param user: The user object
+	:param idurl: The URL identifying the user on the external system. All
+		content roles we update will be based on this idurl; in particular, we assume
+		that the base hostname of the URL maps to a NTIID ``provider``, and we will
+		only add/remove roles from this provider. For example, ``http://openid.primia.org/username``
+		becomes the provider ``prmia.``
+	:param iterable content_roles: An iterable of strings naming provider-local
+		content roles. If empty/None, then the user will be granted no roles
+		from the provider of the ``idurl``; otherwise, the content roles from the given
+		``provider`` will be updated to match. The local roles can be the exact (case-insensitive) match
+		for the title of a work, and the user will be granted access to the derived NTIID for the work
+		whose title matches. Otherwise (no title match), the user will be granted direct access
+		to the role as given.
+	"""
+	member = component.getAdapter(user, IMutableGroupMember, nauth.CONTENT_ROLE_PREFIX)
+	if not content_roles and not member.hasGroups():
+		return  # No-op
+
+	provider = urlparse.urlparse(idurl).netloc.split('.')[-2]  # http://x.y.z.nextthought.com/openid => nextthought
+	provider = provider.lower()
+
+	empty_role = nauth.role_for_providers_content(provider, '')
+
+	# Delete all of our provider's roles, leaving everything else intact
+	other_provider_roles = [x for x in member.groups if not x.id.startswith(empty_role.id)]
+	# Create new roles for what they tell us
+	# NOTE: At this step here we may need to map from external provider identifiers (stock numbers or whatever)
+	# to internal NTIID values. Somehow. Searching titles is one way to ease that
+
+	library = component.queryUtility(IContentPackageLibrary)
+
+	roles_to_add = []
+	# Set up a map from title to list-of specific-parts-of-ntiids for all content from this provider
+	provider_packages = collections.defaultdict(list)
+	for package in (library.contentPackages if library is not None else ()):
+		if get_provider(package.ntiid).lower() == provider:
+			provider_packages[package.title.lower()].append(get_specific(package.ntiid))
+
+	for local_role in (content_roles or ()):
+		local_role = local_role.lower()
+		if local_role in provider_packages:
+			for specific in provider_packages[local_role]:
+				roles_to_add.append(nauth.role_for_providers_content(provider, specific))
+		else:
+			roles_to_add.append(nauth.role_for_providers_content(provider, local_role))
+
+	member.setGroups(other_provider_roles + roles_to_add)
+update_users_content_roles = _update_users_content_roles
