@@ -24,10 +24,11 @@ from pyramid.threadlocal import get_current_request
 
 from nti.app.contentlibrary._permissioned import _PermissionedContentPackageMixin
 
+from nti.app.contentlibrary.workspaces.interfaces import ILibraryCollection
+
 from nti.appserver.workspaces.interfaces import IWorkspace
 from nti.appserver.workspaces.interfaces import ICollection
 from nti.appserver.workspaces.interfaces import IUserService
-from nti.appserver.workspaces.interfaces import ILibraryCollection
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary

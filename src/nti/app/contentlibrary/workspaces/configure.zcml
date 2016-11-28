@@ -4,6 +4,10 @@
 			xmlns:ext="http://nextthought.com/ntp/ext"
 			xmlns:zcml="http://namespaces.zope.org/zcml">
 
+	<!-- Renderers -->
+	<adapter factory="nti.app.renderers.caching.UseTheRequestContextCacheController"
+			 for=".interfaces.ILibraryCollection" />
+
 	<!-- Workspaces/collections -->
 	<subscriber factory=".adapters._library_workspace"
 				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
