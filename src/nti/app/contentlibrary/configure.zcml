@@ -33,55 +33,14 @@
 	<adapter factory=".acl._TestingLibraryTOCEntryACLProvider"
 			 zcml:condition="have testmode" />
 
-	<!-- Workspaces/collections -->
-	<subscriber factory=".workspaces._library_workspace"
-				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
-
-	<subscriber factory=".workspaces._bundle_workspace"
-				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
-
-	<adapter factory=".workspaces.LibraryCollection" />
-	<adapter factory=".workspaces._BundleLibraryCollection" />
-
-	<adapter factory=".workspaces.LibraryCollectionDetailExternalizer" />
-	<adapter factory=".workspaces.LibraryCollectionDetailExternalizer"
-			 name="detail" />
-
 	<!-- permissions cache -->
 	<configure zcml:condition="installed nti.contenttypes.courses">
 		<subscriber handler="._courses._on_enroll_record" />
 		<subscriber handler="._courses._on_unenroll_record" />
 	</configure>
 
-	<!--
-		 The user has a named path adapter to get his personal library.
-		 Currently this is implicitly the Main library but in the future
-		 this might be a collection of named libraries.
-	-->
-	<adapter name="Library"
-			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
-			 factory=".workspaces._library_workspace_for_user"
-			 provides="zope.traversing.interfaces.IPathAdapter" />
-
-	<!-- Likewise for the bundle library -->
-	<adapter name="ContentBundles"
-			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
-			 factory=".workspaces._bundle_workspace_for_user"
-			 provides="zope.traversing.interfaces.IPathAdapter" />
-
-	<!-- Also a simple named adapter -->
-	<adapter name="Library"
-			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
-			 factory=".workspaces._library_workspace_for_user" />
-
-	<adapter for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
-			 factory=".workspaces._library_for_user" />
-
-	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
-			 factory=".workspaces._library_for_library" />
-
-	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
-			 factory=".workspaces._library_workspace_for_library" />
+	<!-- Workspaces/collections -->
+	<include package=".workspaces" />
 
 	<!--
 		 Cache ACLs for things from boto directly (previously, we were

@@ -1,0 +1,50 @@
+<!-- -*- mode: nxml -*- -->
+<configure	xmlns="http://namespaces.zope.org/zope"
+			xmlns:i18n="http://namespaces.zope.org/i18n"
+			xmlns:ext="http://nextthought.com/ntp/ext"
+			xmlns:zcml="http://namespaces.zope.org/zcml">
+
+	<!-- Workspaces/collections -->
+	<subscriber factory="._library_workspace"
+				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
+
+	<subscriber factory="._bundle_workspace"
+				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
+
+	<adapter factory=".LibraryCollection" />
+	<adapter factory="._BundleLibraryCollection" />
+
+	<adapter factory=".LibraryCollectionDetailExternalizer" />
+	<adapter factory=".LibraryCollectionDetailExternalizer" name="detail" />
+
+	<!--
+		 The user has a named path adapter to get his personal library.
+		 Currently this is implicitly the Main library but in the future
+		 this might be a collection of named libraries.
+	-->
+	<adapter name="Library"
+			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory="._library_workspace_for_user"
+			 provides="zope.traversing.interfaces.IPathAdapter" />
+
+	<!-- Likewise for the bundle library -->
+	<adapter name="ContentBundles"
+			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory="._bundle_workspace_for_user"
+			 provides="zope.traversing.interfaces.IPathAdapter" />
+
+	<!-- Also a simple named adapter -->
+	<adapter name="Library"
+			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory="._library_workspace_for_user" />
+
+	<adapter for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory="._library_for_user" />
+
+	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
+			 factory="._library_for_library" />
+
+	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
+			 factory="._library_workspace_for_library" />
+
+</configure>
