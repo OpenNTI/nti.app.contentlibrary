@@ -12,8 +12,7 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
-# TODO: Fix this reference
-from nti.appserver.workspaces.interfaces import ILibraryCollection
+from nti.app.contentlibrary.workspaces.interfaces import ILibraryCollection
 
 from nti.externalization.externalization import to_external_object
 
