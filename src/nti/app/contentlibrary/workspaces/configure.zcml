@@ -5,17 +5,17 @@
 			xmlns:zcml="http://namespaces.zope.org/zcml">
 
 	<!-- Workspaces/collections -->
-	<subscriber factory="._library_workspace"
+	<subscriber factory=".adapters._library_workspace"
 				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
 
-	<subscriber factory="._bundle_workspace"
+	<subscriber factory=".adapters._bundle_workspace"
 				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
 
-	<adapter factory=".LibraryCollection" />
-	<adapter factory="._BundleLibraryCollection" />
+	<adapter factory=".adapters.LibraryCollection" />
+	<adapter factory=".adapters._BundleLibraryCollection" />
 
-	<adapter factory=".LibraryCollectionDetailExternalizer" />
-	<adapter factory=".LibraryCollectionDetailExternalizer" name="detail" />
+	<adapter factory=".externalization.LibraryCollectionDetailExternalizer" />
+	<adapter factory=".externalization.LibraryCollectionDetailExternalizer" name="detail" />
 
 	<!--
 		 The user has a named path adapter to get his personal library.
@@ -24,27 +24,27 @@
 	-->
 	<adapter name="Library"
 			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
-			 factory="._library_workspace_for_user"
+			 factory=".adapters._library_workspace_for_user"
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 
 	<!-- Likewise for the bundle library -->
 	<adapter name="ContentBundles"
 			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
-			 factory="._bundle_workspace_for_user"
+			 factory=".adapters._bundle_workspace_for_user"
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 
 	<!-- Also a simple named adapter -->
 	<adapter name="Library"
 			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
-			 factory="._library_workspace_for_user" />
+			 factory=".adapters._library_workspace_for_user" />
 
 	<adapter for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
-			 factory="._library_for_user" />
+			 factory=".adapters._library_for_user" />
 
 	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
-			 factory="._library_for_library" />
+			 factory=".adapters._library_for_library" />
 
 	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
-			 factory="._library_workspace_for_library" />
+			 factory=".adapters._library_workspace_for_library" />
 
 </configure>
