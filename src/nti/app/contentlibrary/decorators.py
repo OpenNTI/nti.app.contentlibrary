@@ -18,9 +18,9 @@ from pyramid.interfaces import IRequest
 
 from nti.app.contentlibrary import LIBRARY_PATH_GET_VIEW
 
-from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
+from nti.app.contentlibrary.interfaces import IContentUnitInfo
 
-from nti.appserver.interfaces import IContentUnitInfo
+from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary

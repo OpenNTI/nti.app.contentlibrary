@@ -51,4 +51,16 @@
 	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
 			 factory=".adapters._library_workspace_for_library" />
 
+	<!-- Mark classes -->
+	<class class="nti.appserver.workspaces.NTIIDEntry">
+		<implements interface="..interfaces.IContentUnitInfo" />
+	</class>
+	<class class="nti.appserver.workspaces.RootNTIIDEntry">
+		<implements interface="..interfaces.IContentUnitInfo" />
+	</class>
+
+	<!-- Decorators -->
+	<subscriber factory=".decorators.ContentUnitInfoHrefDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator"/>
+
 </configure>

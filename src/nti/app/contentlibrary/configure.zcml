@@ -89,12 +89,12 @@
 
 	<subscriber factory=".decorators._ContentUnitInfoDecorator"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-				for="nti.appserver.interfaces.IContentUnitInfo
+				for=".interfaces.IContentUnitInfo
 					 pyramid.interfaces.IRequest"/>
 
 	<subscriber factory=".decorators._ContentUnitInfoTitleDecorator"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-				for="nti.appserver.interfaces.IContentUnitInfo
+				for=".interfaces.IContentUnitInfo
 					 pyramid.interfaces.IRequest"/>
 
 	<subscriber factory=".decorators._ContentBundlePagesLinkDecorator"
@@ -143,6 +143,8 @@
 	</configure>
 
 	<!-- Adapters & Subscribers -->
+	<adapter factory=".renderers._ContentUnitInfoCacheController" />
+		
 	<adapter factory=".adapters.presentation_asset_items_factory"
 			 for="nti.contentlibrary.interfaces.IContentUnit"
 			 provides="nti.contenttypes.presentation.interfaces.IPresentationAssetContainer" />
@@ -206,5 +208,5 @@
 
 	<!-- Query -->
 	<utility factory=".query._UserNTIIDContainers" />
-
+		
 </configure>

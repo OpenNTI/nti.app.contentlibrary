@@ -102,10 +102,9 @@ class IContentPackageRolePermissionManager(IRolePermissionManager):
 
 # App server
 
-from nti.dataserver.interfaces import ILinked
+from nti.appserver.interfaces import INTIIDEntry
 
-# TODO: Fix this reference
-class IContentUnitInfo(ILocation, ILastModified, ILinked):
+class IContentUnitInfo(INTIIDEntry):
 	"""
 	Information about a particular bit of content and the links it contains.
 	"""

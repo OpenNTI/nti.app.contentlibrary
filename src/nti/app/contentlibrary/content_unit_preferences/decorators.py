@@ -16,12 +16,12 @@ from zope import interface
 
 from pyramid.interfaces import IRequest
 
+from nti.app.contentlibrary.interfaces import IContentUnitInfo
+
 from nti.app.contentlibrary.content_unit_preferences.prefs import prefs_present
 from nti.app.contentlibrary.content_unit_preferences.prefs import find_prefs_for_content_and_user
 
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
-
-from nti.appserver.interfaces import IContentUnitInfo
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
