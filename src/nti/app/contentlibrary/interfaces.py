@@ -11,10 +11,13 @@ __docformat__ = "restructuredtext en"
 # pylint: disable=I0011,R0901
 
 # If passing strings, they require bytes, NOT unicode, or they fail
+
 from zope.container.constraints import contains
 from zope.container.constraints import containers
 
 from zope.securitypolicy.interfaces import IRolePermissionManager
+
+from nti.contentlibrary.interfaces import IContentUnit
 
 # Content-specific boards and forums
 # We define these as a distinct set of classes/interfaces/mimetypes/ntiids
@@ -96,3 +99,19 @@ class IContentPackageRolePermissionManager(IRolePermissionManager):
 		"""
 		Initialize our role manager to default status.
 		"""
+
+# App server
+
+from nti.dataserver.interfaces import ILinked
+
+# TODO: Fix this reference
+class IContentUnitInfo(ILocation, ILastModified, ILinked):
+	"""
+	Information about a particular bit of content and the links it contains.
+	"""
+
+	contentUnit = Object(IContentUnit,
+						 title="The IContentUnit this object provides info for, if there is one.",
+						 description=""" Typically this will only be provided for one-off requests.
+									Bulk collections/requests will not have it.
+									""")
