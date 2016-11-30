@@ -209,4 +209,15 @@
 	<!-- Query -->
 	<utility factory=".query._UserNTIIDContainers" />
 		
+	<!-- Search pacakge resolvers -->
+	<utility factory=".search._DefaultRootPackageResolver" />
+					
+	<subscriber factory=".search._DefaultSearchPacakgeResolver"
+				provides="nti.contentsearch.interfaces.ISearchPackageResolver"
+				for="nti.dataserver.interfaces.IUser" />
+					
+	<subscriber factory=".search._ContentUnitSearchHitPredicate"
+				provides="nti.contentsearch.interfaces.ISearchHitPredicate"
+				for="nti.contentlibrary.interfaces.IContentUnit" />
+
 </configure>
