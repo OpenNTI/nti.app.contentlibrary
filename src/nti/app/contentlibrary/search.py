@@ -21,9 +21,9 @@ from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackageBundle 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
-from nti.contentsearch.interfaces import ISearchPackageResolver
 from nti.contentsearch.interfaces import ISearchHitPredicate
 from nti.contentsearch.interfaces import IRootPackageResolver
+from nti.contentsearch.interfaces import ISearchPackageResolver
 
 from nti.contentsearch.predicates import DefaultSearchHitPredicate
 
