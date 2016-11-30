@@ -81,4 +81,7 @@ class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
 		return get_current_request()
 
 	def allow(self, item, score, query):
-		return has_permission(ACT_READ, item, self.request)
+		if self.principal is None:
+			return True
+		else:
+			return has_permission(ACT_READ, item, self.request)
