@@ -220,4 +220,7 @@
 				provides="nti.contentsearch.interfaces.ISearchHitPredicate"
 				for="nti.contentlibrary.interfaces.IContentUnit" />
 
+	<!-- Resolving metadata, used in the implementation of links -->
+	<adapter factory=".resolvers.ContentMetadataFromContentUnit" />
+	
 </configure>
