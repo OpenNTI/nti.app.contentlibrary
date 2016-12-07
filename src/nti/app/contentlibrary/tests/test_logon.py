@@ -22,11 +22,11 @@ from nti.dataserver import users
 
 from nti.dataserver import interfaces as nti_interfaces
 
+from nti.app.contentlibrary.tests import ExLibraryApplicationTestLayer
+
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans  # , WithMockDS
-
-from nti.app.contentlibrary.tests import ExLibraryApplicationTestLayer
 
 class TestLogonViews(ApplicationLayerTest):
 	
