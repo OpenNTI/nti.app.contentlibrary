@@ -12,6 +12,7 @@
 	<include package="nti.contentlibrary" />
 	
 	<include package=".views" />
+	<include package=".policies" />
 	<include package=".appserver" />
 	<include package=".content_unit_preferences" />
 

@@ -1,0 +1,22 @@
+<!-- -*- mode: nxml -*- -->
+<configure	xmlns="http://namespaces.zope.org/zope"
+			xmlns:i18n="http://namespaces.zope.org/i18n"
+			xmlns:zcml="http://namespaces.zope.org/zcml">
+
+	<include package="zope.component" file="meta.zcml" />
+	<include package="zope.security" file="meta.zcml" />
+	<include package="zope.component" />
+	<include package="zope.security" />
+
+	<!--
+		The policy for censoring things from regular, non-coppa
+		users by default isn't enabled. If desired, it can be added in a
+		site configuration.
+	-->
+	<!--
+		<adapter factory="nti.contentfragments.censor.DefaultCensoredContentPolicy"
+		for="nti.dataserver.interfaces.IUser *" />
+		<adapter factory=".censoring.user_filesystem_censor_policy" />
+	-->
+
+</configure>
