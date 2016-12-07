@@ -12,7 +12,8 @@
 	<subscriber handler=".application._on_process_starting" />
 	<subscriber handler=".application._sync_global_library" />
 	
-	<!-- NTII root resolvers -->
+	<!-- NTII resolvers -->
+	<utility factory=".resolvers._DefaultNTIIDLeafResolver" />
 	<utility factory=".resolvers._DefaultNTIIDRootResolver" />
 
 	<!-- Query -->
