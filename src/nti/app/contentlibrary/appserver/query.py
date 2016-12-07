@@ -12,7 +12,7 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
-from nti.appserver.interfaces import IUserContainerQuerier
+from nti.appserver.interfaces import IUserContainersQuerier
 
 from nti.contentlibrary.indexed_data import get_catalog as lib_catalog
 
@@ -27,8 +27,8 @@ from nti.ntiids import ntiids
 
 from nti.site.site import get_component_hierarchy_names
 
-@interface.implementer(IUserContainerQuerier)
-class _UserContainerQuerier(object):
+@interface.implementer(IUserContainersQuerier)
+class _UserContainersQuerier(object):
 
 	def query(self, user, ntiid, include_stream, stream_only):
 		containers = ()

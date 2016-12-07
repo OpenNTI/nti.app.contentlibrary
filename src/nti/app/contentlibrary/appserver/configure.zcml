@@ -16,6 +16,6 @@
 	<utility factory=".resolvers._DefaultNTIIDRootResolver" />
 
 	<!-- Query -->
-	<utility factory=".query._UserContainerQuerier" />
+	<utility factory=".query._UserContainersQuerier" />
 	
 </configure>
