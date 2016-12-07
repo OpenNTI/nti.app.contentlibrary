@@ -204,9 +204,6 @@
 	<subscriber	factory=".filters._LibraryContentObjectFilter"
 				provides="nti.appserver.interfaces.ICreatableObjectFilter"
 				for="nti.dataserver.interfaces.IUser" />
-
-	<!-- Query -->
-	<utility factory=".query._UserContainerQuerier" />
 		
 	<!-- Search pacakge resolvers -->
 	<utility factory=".search._DefaultRootPackageResolver" />

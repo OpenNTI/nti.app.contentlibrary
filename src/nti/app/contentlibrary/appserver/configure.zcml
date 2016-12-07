@@ -15,4 +15,7 @@
 	<!-- NTII root resolvers -->
 	<utility factory=".resolvers._DefaultNTIIDRootResolver" />
 
+	<!-- Query -->
+	<utility factory=".query._UserContainerQuerier" />
+	
 </configure>
