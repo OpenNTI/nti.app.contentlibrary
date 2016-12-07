@@ -12,13 +12,11 @@
 	<include package="nti.contentlibrary" />
 	
 	<include package=".views" />
+	<include package=".appserver" />
 	<include package=".content_unit_preferences" />
 
 	<!-- Events -->
 	<subscriber handler=".logon._on_openid_user_created" />
-
-	<subscriber handler=".application._on_process_starting" />
-	<subscriber handler=".application._sync_global_library" />
 
 	<!-- NTIID Resolvers -->
 	<utility factory=".ntiids._ContentResolver" name="HTML" />
