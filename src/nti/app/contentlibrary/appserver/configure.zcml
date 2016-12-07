@@ -18,5 +18,6 @@
 
 	<!-- Query -->
 	<utility factory=".query._UserContainersQuerier" />
-	
+	<utility factory=".query._ContainedObjectsQuerier" />
+
 </configure>
