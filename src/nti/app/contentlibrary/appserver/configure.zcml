@@ -13,8 +13,8 @@
 	<subscriber handler=".application._sync_global_library" />
 	
 	<!-- NTII resolvers -->
-	<utility factory=".resolvers._DefaultNTIIDLeafResolver" />
-	<utility factory=".resolvers._DefaultNTIIDRootResolver" />
+	<utility factory=".resolvers._DefaultContainerLeafResolver" />
+	<utility factory=".resolvers._DefaultContainerRootResolver" />
 
 	<!-- Query -->
 	<utility factory=".query._UserContainersQuerier" />
