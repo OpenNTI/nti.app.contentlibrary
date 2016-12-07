@@ -62,14 +62,14 @@ class _DefaultRootPackageResolver(object):
 
 	def get_ntiid_path(self, ntiid):
 		library = component.queryUtility(IContentPackageLibrary)
-		if library and ntiid:
+		if library is not None and ntiid:
 			paths = library.pathToNTIID(ntiid)
 			return tuple(p.ntiid for p in paths) if paths else ()
 		return ()
 
 	def resolve(self, ntiid):
 		library = component.queryUtility(IContentPackageLibrary)
-		paths = library.pathToNTIID(ntiid) if library else None
+		paths = library.pathToNTIID(ntiid) if library is not None else None
 		return paths[0] if paths else None
 
 @component.adapter(IContentUnit)
