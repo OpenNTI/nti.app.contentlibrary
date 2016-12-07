@@ -14,22 +14,25 @@ import os.path
 
 from zope import component
 from zope import interface
+
 from zope.location.interfaces import IRoot
-from zope.traversing.interfaces import IEtcNamespace
 
 from zope.site.folder import Folder
 from zope.site.folder import rootFolder
 
-from nti.contentlibrary.interfaces import IContentPackageLibrary
-
-from nti.app.testing.application_webtest import ApplicationTestLayer
+from zope.traversing.interfaces import IEtcNamespace
 
 from nti.contentlibrary.bundle import ContentPackageBundleLibrary
-from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
-from nti.contentlibrary.interfaces import ISyncableContentPackageBundleLibrary
+
 from nti.contentlibrary.filesystem import EnumerateOnceFilesystemLibrary as FileLibrary
 
+from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
+from nti.contentlibrary.interfaces import ISyncableContentPackageBundleLibrary
+
 from nti.dataserver.interfaces import IDataserver
+
+from nti.app.testing.application_webtest import ApplicationTestLayer
 
 from nti.dataserver.tests.mock_dataserver import mock_db_trans
 
@@ -146,3 +149,53 @@ class ContentLibraryApplicationTestLayer(ApplicationTestLayer):
 		pass
 
 	# TODO: May need to recreate the application with this library?
+
+class ExLibraryApplicationTestLayer(ApplicationTestLayer):
+
+	library_dir = os.path.join(os.path.dirname(__file__), 'ExLibrary')
+
+	@classmethod
+	def _setup_library(cls, *args, **kwargs):
+		return FileLibrary(cls.library_dir)
+
+	@classmethod
+	def setUp(cls):
+		# Must implement!
+		gsm = component.getGlobalSiteManager()
+		cls.__old_library = gsm.queryUtility(IContentPackageLibrary)
+		if cls.__old_library is not None:
+			cls.__old_library.resetContentPackages()
+
+		lib = cls._setup_library()
+
+		gsm.registerUtility(lib, IContentPackageLibrary)
+		lib.syncContentPackages()
+		cls.__current_library = lib
+
+	@classmethod
+	def tearDown(cls):
+		# Must implement!
+		gsm = component.getGlobalSiteManager()
+		cls.__current_library.resetContentPackages()
+		gsm.unregisterUtility(cls.__current_library, IContentPackageLibrary)
+		del cls.__current_library
+		if cls.__old_library is not None:
+			gsm.registerUtility(cls.__old_library, IContentPackageLibrary)
+			# XXX Why would we need to sync the content packages here? It's been
+			# sidelined this whole time. Doing so leads to InappropriateSiteError
+			#cls.__old_library.syncContentPackages()
+
+		del cls.__old_library
+		gc.collect()
+
+	# TODO: May need to recreate the application with this library?
+
+	@classmethod
+	def testSetUp(cls):
+		# must implement!
+		pass
+
+	@classmethod
+	def testTearDown(cls):
+		# must implement!
+		pass

@@ -1,0 +1,673 @@
+<dom-document xmlns:plastex="http://plastex.sf.net"  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"  xmlns:nti="http://nextthought.com/xml/v1/"  xmlns:aops="http://artofproblemsolving.com/xml/v1/" >
+<documentclass id="a0000000001">
+	  <plastex:arg name="options"/>
+	  <plastex:arg name="name">book</plastex:arg>
+</documentclass> <usepackage id="a0000000002">
+	  <plastex:arg name="options">{u'utf8': u'True'}</plastex:arg>
+	  <plastex:arg name="names">[u'inputenc']</plastex:arg>
+</usepackage> <usepackage id="a0000000003">
+	  <plastex:arg name="options"/>
+	  <plastex:arg name="names">[u'textcomp']</plastex:arg>
+</usepackage> <usepackage id="a0000000004">
+	  <plastex:arg name="options">{u'pdftex': u'True'}</plastex:arg>
+	  <plastex:arg name="names">[u'graphicx']</plastex:arg>
+</usepackage> <RequirePackage id="a0000000005">
+	  <plastex:arg name="options"/>
+	  <plastex:arg name="names">[u'mathcounts']</plastex:arg>
+</RequirePackage> <par id="None">
+</par><usepackage id="a0000000006">
+	  <plastex:arg name="options"/>
+	  <plastex:arg name="names">[u'nti.contentrendering.ntilatexmacros']</plastex:arg>
+</usepackage> <usepackage id="a0000000007">
+	  <plastex:arg name="options"/>
+	  <plastex:arg name="names">[u'fancybox']</plastex:arg>
+</usepackage> <usepackage id="a0000000008">
+	  <plastex:arg name="options"/>
+	  <plastex:arg name="names">[u'float']</plastex:arg>
+</usepackage> <usepackage id="a0000000009">
+	  <plastex:arg name="options"/>
+	  <plastex:arg name="names">[u'url']</plastex:arg>
+</usepackage> <usepackage id="a0000000010">
+	  <plastex:arg name="options"/>
+	  <plastex:arg name="names">[u'amsmath']</plastex:arg>
+</usepackage> <def id="a0000000011">
+	  <plastex:arg name="definition">[]</plastex:arg>
+	  <plastex:arg name="args">[u'#', u'1']</plastex:arg>
+	  <plastex:arg name="name">hyperlabel</plastex:arg>
+</def> <usepackage id="a0000000012">
+	  <plastex:arg name="options"/>
+	  <plastex:arg name="names">[u'hyperref']</plastex:arg>
+</usepackage> <par id="None">
+</par><title id="a0000000013">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">COSMETOLOGY</plastex:arg>
+</title> <author id="a0000000014">
+	  <plastex:arg name="self">MILADY</plastex:arg>
+</author> <document id="a0000000015">
+<par id="c348c068cc879bacc30ea068c65b2e39">
+<minipage id="a0000000016">
+	  <plastex:arg name="width">469.755pt</plastex:arg>
+	  <plastex:arg name="pos">c</plastex:arg>
+ <center id="a0000000017">
+ <bgroup id="a0000000018">
+<bgroup id="a0000000019">
+<includegraphics style="height:400pt" id="3606475d0f77a433a391fb469f1a7b4c">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'keepaspectratio': u'true', u'height': u'400pt'}</plastex:arg>
+	  <plastex:arg name="file">Images/Book_Cover.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup></center> </minipage> </par><chapter ref="1" id="a0000000020">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">HISTORY AND CAREER OPPORTUNIITIES</plastex:arg>
+<subsection ref="1.1" id="a0000000021">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">Learning Objectives</plastex:arg>
+<par id="2a12e8005edd48c57c57f64c7ab07f17">
+After completing this chapter, you will be able to: </par><par id="312715c5c13a823fe82a4b8e8d8c6ee5">
+<enumerate id="a0000000022">
+	  <plastex:arg name="type"/>
+<item ref="1" id="a0000000023">
+	  <plastex:arg name="term"/>
+<par id="8927afac61a5ba37ea27d87621b246b5">
+Explain the origins of appearance enhancement. </par></item><item ref="2" id="a0000000024">
+	  <plastex:arg name="term"/>
+<par id="3c3e6e5d3e11b3a94729106c84ba1a98">
+Name the advancements made in cosmetology during the nineteenth, twentieth, and early twenty-first centuries. </par></item><item ref="3" id="a0000000025">
+	  <plastex:arg name="term"/>
+<par id="8e25c52a6a3cf34232040ef4bdadc3c6">
+List several career opportunities available to a licensed beauty practitioner. </par></item></enumerate></par></subsection><section ref="1.1" id="a0000000026">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">Introduction</plastex:arg>
+<par id="dee57af7d749d5d7fb68a12bba9bc953">
+<textbf id="a0000000027">
+	  <plastex:arg name="self">Cosmetology</plastex:arg>
+</textbf> (kahz-muh-TAHL-uh-jee) is a term used to encompass a broad range of specialty areas, including hairstyling, nail technology, and esthetics. Cosmetology is defined as the art and science of beautifying and improving the skin, nails, and hair and includes the study of cosmetics and their application. The term comes from the Greek word kosmetikos, meaning skilled in the use of cosmetics. Archaeological studies reveal that haircutting and hairstyling were practiced in some form as early as the Ice Age. </par><par id="f6c516250ce7d04526e5096f1fbbf59e">
+<center id="a0000000028">
+ <bgroup id="a0000000029">
+<bgroup id="a0000000030">
+<includegraphics style="width:495pt" id="4c330db4782320718d6d013bc8b16668">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'width': u'495pt', u'keepaspectratio': u'true'}</plastex:arg>
+	  <plastex:arg name="file">Images/Plant.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> </center></par><par id="b831058f874252de2a79753fabaf86b5">
+The simple but effective cosmetic implements used at the dawn of history were shaped from sharpened flints, oyster shells, or bone. Animal sinew or strips of hide were used to tie the hair back or as adornment. Ancient people around the world used coloring matter on their hair, skin, and nails, and they practiced tattooing. Pigments were made from berries, tree bark, minerals, insects, nuts, herbs, leaves, and other materials. Many of these colorants are still used today. </par><subsection ref="1.1.1" id="a0000000031">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">Why Study Cosmetology History and Career Opportunities?</plastex:arg>
+<par id="e29fb0aad761390cb13bfb879dcfa68c">
+<center id="a0000000032">
+ <bgroup id="a0000000033">
+<bgroup id="a0000000034">
+<ntiincludevideo id="a0000000035">
+	  <plastex:arg name="text">http://www.youtube.com/embed/OubK46GkFRM</plastex:arg>
+</ntiincludevideo></bgroup></bgroup> </center></par><par id="d6e50fbd017203e55fd67b0856e0ff6c">
+<textbf id="a0000000036">
+	  <plastex:arg name="self">Cosmetologists should study and have a thorough understanding of the history of cosmetology and the career opportunities available because:</plastex:arg>
+</textbf> </par><par id="7e97b5fae81fe1f22f986ceea9898fe5">
+<itemize id="a0000000037">
+<item ref="1" id="a0000000038">
+	  <plastex:arg name="term"/>
+<par id="14deb6cedffcf73b90d6c0ccea1633b5">
+Many very old methods have evolved into techniques still used today. Studying the origin of these techniques can be useful in fully understanding how to use them today. </par></item><item ref="2" id="a0000000039">
+	  <plastex:arg name="term"/>
+<par id="f8fb853c2ed213e8d98854ec0d344e3c">
+Knowing the history of your profession can help you predict and understand upcoming trends. </par></item><item ref="3" id="a0000000040">
+	  <plastex:arg name="term"/>
+<par id="41da619f90652c7caa917f1ef7febf06">
+By learning about many possible career paths, you’ll see the wide range of opportunities open to cosmetologists. </par></item></itemize></par></subsection></section><section ref="1.2" id="a0000000041">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">Brief History of Cosmetology</plastex:arg>
+<subsection ref="1.2.1" id="a0000000042">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">The Egyptians</plastex:arg>
+<par id="5f192ece9c422824aba6b9d0b08eaa79">
+ The Egyptians were the first to cultivate beauty in an extravagant fashion. They used cosmetics as part of their personal beautification habits, religious ceremonies, and preparation of the deceased for burial. </par><par id="c3bbbe9d84977ea73aacedb267aef32c">
+As early as 3000 BC, Egyptians used minerals, insects, and berries to create makeup for their eyes, lips, and skin. Henna was used to stain their hair and nails a rich, warm red. They were also the first civilization to infuse essential oils from the leaves, bark, and blossoms ofplants for use as perfumes and for purification purposes. Queen Nefertiti (circa 1400 BC) stained her nails red by dipping her fingertips in henna, wore lavish makeup designs, and used custom-blended essential oils as signature scents. Queen Cleopatra (circa 50 BC) took this dedication to beauty to an entirely new level by erecting a personal cosmetics factory next to the Dead Sea. </par><par id="bafa83bef0a8ec94519309270e17641e">
+<figure id="a0000000043">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="2efd402d195ab86a5cdbf7e1ff9b7efa">
+<center id="a0000000044">
+ <bgroup id="a0000000045">
+<bgroup id="a0000000046">
+<includegraphics style="width:314pt" id="5390363e273e796871c829392eb3a366">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'width': u'314pt', u'keepaspectratio': u'true'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-1_Egyptians.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.1" id="a0000000047">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">The Egyptians wore elaborate hairstyles and cosmetics.</plastex:arg>
+</caption> </center></par></figure></par><par id="d1fdc03a1c668ac866972aa7af467dae">
+Ancient Egyptians are also credited with creating kohl makeup-originally made from a mixture of ground galena (a black mineral), sulfur, and animal fat-to heavily line the eyes, alleviate eye inflammation, and protect the eyes from the glare of the sun. </par><par id="57fc7b5aab05465a1d80ca259ada6c43">
+In both ancient Egypt and Rome, military commanders stained their nails and lips in matching colors before important battles. </par></subsection><subsection ref="1.2.2" id="a0000000048">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">The Chinese</plastex:arg>
+<par id="8b0df512c406b1e4e1fbd47739b6daf3">
+ History also shows that during the Shang Dynasty (circa 1600 BC), Chinese aristocrats rubbed a tinted mixture of gum arabic, gelatin, beeswax, and egg whites onto their nails to color them crimson or ebony. Throughout the Chou Dynasty (circa 1100 BC), gold and silver were the royal colors. During this early period in Chinese history, nail tinting was so closely tied to social status that commoners caught wearing a royal nail color faced a punishment of death. </par></subsection><subsection ref="1.2.3" id="a0000000049">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">The Greeks</plastex:arg>
+<par id="9edc7218c59584909c100848fb9d1571">
+<figure id="a0000000050">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="fb859f0f26313b4cf5a2591fa78fa7f1">
+<center id="a0000000051">
+ <bgroup id="a0000000052">
+<bgroup id="a0000000053">
+<includegraphics style="width:311pt" id="aada3bc2f67eaccc9b9ed9e2eab1396b">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'width': u'311pt', u'keepaspectratio': u'true'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-2_Greeks.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.2" id="a0000000054">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">The Greeks advanced Grooming and skin care.</plastex:arg>
+</caption> </center></par></figure></par><par id="ead1008d4b032470c5564e44b6d4936b">
+During the golden age of Greece (circa 500 BC), hairstyling became a highly developed art. The ancient Greeks made lavish use of perfumes and cosmetics in their religious rites, in grooming, and for medicinal purposes. They built elaborate baths and developed excellent methods of dressing the hair and caring for the skin and nails. Greek women applied preparations ofwhite lead onto their faces, kohl around their eyes, and vermillion upon their cheeks and lips. Vermillion is a brilliant red pigment, made by grinding cinnabar (a mineral that is the chief source of mercury) to a fine powder. It was mixed with ointment or dusted on the skin in the same way cosmetics are applied today. </par></subsection><subsection ref="1.2.4" id="a0000000055">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">The Romans</plastex:arg>
+<par id="38dfedf1f837e608a7a3bf738bf25660">
+<figure id="a0000000056">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="b1cd67d337085238d209fc4717961620">
+<center id="a0000000057">
+ <bgroup id="a0000000058">
+<bgroup id="a0000000059">
+<includegraphics style="width:310pt" id="625d5fbd4a9e9b3a60a3e697c12ee36b">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'width': u'310pt', u'keepaspectratio': u'true'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-3_Romans.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.3" id="a0000000060">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">The Romans applied various preparations to the skin.</plastex:arg>
+</caption> </center></par></figure></par><par id="61d889f3a6b557299949936c19270a3e">
+Roman women lavishly used fragrances and cosmetics. Facials made of milk and bread or fine wine were popular. Other facials were made of corn with flour and milk, or from flour and fresh butter. A mixture of chalk and white lead was used as a facial cosmetic. Women used hair color to indicate their class in society. Noblewomen tinted their hair red, middle-class women colored their hair blond, and poor women dyed their hair black. </par></subsection><subsection ref="1.2.5" id="a0000000061">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">The Middle Ages</plastex:arg>
+<par id="c76ea64e6aa93edaeeddd46eb271078d">
+The Middle Ages is the period of European history between classical antiquity and the Renaissance, beginning with the downfall of Rome, circa AD 476, and lasting until about 1450. Beauty culture is evidenced by tapestries, sculptures, and other artifacts from this period. All of these show towering headdresses, intricate hairstyles, and the use of cosmetics on skin and hair. Women wore colored makeup on their cheeks and lips, but not on their eyes. Around AD 1000, a Persian physician and alchemist named Avicenna refined the process of steam distillation. This ushered in the modern era of steam-distilled essential oils that we use today. </par></subsection><subsection ref="1.2.6" id="a0000000062">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">The Renaissance</plastex:arg>
+<par id="393cf3450c726e7a893e3670755aae08">
+<figure id="a0000000063">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="8c15f117dc3a6610186091d58bd669ef">
+<center id="a0000000064">
+ <bgroup id="a0000000065">
+<bgroup id="a0000000066">
+<includegraphics style="height:222pt" id="a7cc321eae2ac565ac390958a8378f10">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'keepaspectratio': u'true', u'height': u'222pt'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-4_Renaissance.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.4" id="a0000000067">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">During the Renaissance, shaving or tweezing of the eyebrows and hairline to show a greater expanse of the forehead was thought to make women appear more intelligent.</plastex:arg>
+</caption> </center></par></figure></par><par id="872333e2327a1adffcb8eedc0d3e02bf">
+This is the period in history during which Western civilization made the transition from medieval to modern history. Paintings and written records tell us a great deal about the grooming practices of the time. One of the most unusual practices was the shaving of the eyebrows and the hairline to show a greater expanse of forehead. A brow-less forehead was thought to give women a look of greater intelligence. During this period, both men and women took great pride in their physical appearance and wore elaborate, elegant clothing. Fragrances and cosmetics were used, although highly colored preparations of the lips, cheeks, and eyes were discouraged. </par></subsection><subsection ref="1.2.7" id="a0000000068">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">The Victorian Age</plastex:arg>
+<par id="2a715a2dd57f4cf7312f043ba898b05a">
+<figure id="a0000000069">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="ca04e1143330331098f0e8fe3c36dc65">
+<center id="a0000000070">
+ <bgroup id="a0000000071">
+<bgroup id="a0000000072">
+<includegraphics style="height:300pt" id="599dd35705cc61c0eae8c8c14af544b3">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'keepaspectratio': u'true', u'height': u'300pt'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-5_Victorian.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.5" id="a0000000073">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">During the Victorian Period, makeup and showy clothing were discouraged except in the theater.</plastex:arg>
+</caption> </center></par></figure></par><par id="a10b8edaec2dd6fc8a66395fcb0ad28e">
+The reign of Queen Victoria of England, between 1837 and 1901, was known as the Victorian Age. Fashions in dress and personal grooming were drastically influenced by the social mores of this austere and restrictive period in history. To preserve the health and beauty of the skin, women used beauty masks and packs made from honey, eggs, milk, oatmeal, fruits, vegetables, and other natural ingredients. Victorian women are said to have pinched their cheeks and bitten their lips to induce natural color rather than use cosmetics, such as rouge or lip color. </par></subsection><subsection ref="1.2.8" id="a0000000074">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">The Twentieth Century</plastex:arg>
+<par id="7833daa1266214830be2389d983226cb">
+In the early twentieth century, the invention of motion pictures coincided with an abrupt shift in American attitudes. As viewers saw pictures of celebrities with flawless complexions, beautiful hairstyles, and manicured nails, standards of feminine beauty began to change. This era also signaled the spread of industrialization, which brought a new prosperity to the United States. Beauty applications began to follow the trends set by celebrities and society figures. </par><par id="5950bc555c3afa62c2080781cf977e15">
+<figure id="a0000000075">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="0b67658b4e2b623716dc2c380d4fa3c3">
+<center id="a0000000076">
+ <bgroup id="a0000000077">
+<bgroup id="a0000000078">
+<includegraphics style="height:205px" id="dac9c3565ba3431dd6b60c6d717c70bf">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'keepaspectratio': u'true', u'height': u'205px'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-6_Twentieth_Century.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.6" id="a0000000079">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">Dramatic changes in beauty and fashion occured through the decades of the twentieth century.</plastex:arg>
+</caption> </center></par></figure></par><subsubsection id="a0000000080">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">1901–1910</plastex:arg>
+<par id="dfb96d380c27b2bd9cef2361936bd649">
+In 1904, Max Faktor emigrated from Lodz, Poland, to the United States. By 1908, he had Americanized his name to Max Factor and moved to Los Angeles, where he began making and selling makeup. His makeup was popular with movie stars because it wouldn’t cake or crack, even under hot studio lights. </par><par id="addc5c9582a52106dfc58bc0e22c5d67">
+On October 8, 1906, Charles Nessler invented a heavily wired machine that supplied electrical current to metal rods around which hair strands were wrapped. These heavy units were heated during the waving process. They were kept away from the scalp by a complex system of counterbalancing weights that were suspended from an overhead chandelier mounted on a stand. Two methods were used to wind hair strands around the metal units. Long hair was wound from the scalp to the ends in a technique called spiral wrapping. After World War I, when women cut their hair into the short bobbed style, the croquignole (KROH-ken-yohl) wrapping technique was introduced. In this method, shorter hair was wound from the ends toward the scalp. The hair was then styled into deep waves with loose end-curls. </par><par id="fba62573906c5ea8a8245373e2c0147c">
+One of the most notable success stories of the cosmetology industry is that of Sarah Breedlove. She was the daughter of former slaves and was orphaned at age seven when she went to work in the cotton fields of the Mississippi delta. In 1906, Sarah married her third husband, C. J. Walker, and became known as Madame C. J. Walker. Sarah suffered from a scalp condition and began to lose her hair, which caused her to experiment with store- bought products and homemade remedies. She began to sell her scalp conditioning and healing treatment called “Madam Walker’s Wonderful Hair Grower.” She devised sophisticated sales and marketing strategies and traveled extensively to give product demonstrations. In 1910, she moved her company to Indianapolis where she built a factory, hair salon, and training school. As she developed new products, her empire grew. She devoted much time and money to a variety of causes in Indianapolis, including the National Association for the Advancement of Colored People (NAACP) and the Young Men’s Christian Association (YMCA). In 1917, she organized a convention for her Madam C. J. Walker Hair Culturists Union of America. This was one of the first national meetings for businesswomen ever held. By the time of her death, she had established herself as a pioneer in the modern African- American hair care and cosmetics industry. </par><par id="592c4766b54ac300b3f2d70bc4219da9">
+In 1872, Marcel Grateau (AKA Francois Marcel) invented the first curling iron-tongs heated by a gas burner. Later, around 1923, he created an electric version. Because he introduced several electric versions, the actual date of the invention remains in dispute. Grateau went on to develop a permanent wave machine, barbers clippers, a safety razor, and other devices. </par></subsubsection><subsubsection id="a0000000081">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">1920s</plastex:arg>
+<par id="de46e02b4700b82900083719e95767a9">
+The cosmetics industry grew rapidly during the 1920s. Advertising expenditures in radio alone went from <unknown modifier="$" id="a0000000082">
+</unknown>390,000 in 1927 to <unknown modifier="$" id="a0000000083">
+</unknown>3.2 million in 1930. At first, many women’s magazines deemed cosmetics improper and refused to print cosmetic advertisements, but by the end of the 1920s, cosmetics provided one of their largest sources of advertising revenue. </par></subsubsection><subsubsection id="a0000000084">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">1930s</plastex:arg>
+<par id="b65a60384634ec63dfe66d3e8a2d5d9b">
+In 1931, the preheat-perm method was introduced. First, hair was wrapped using the croquignole method. Then, clamps that had been preheated by a separate electrical unit were placed over the wound curls. An alternative to the machine perm was introduced in 1932 when chemists Ralph L. Evans and Everett G. McDonough pioneered a method that used heat generated by chemical reaction: small flexible pads containing a chemical mixture were wound around hair strands, When the pads were moistened with water, a chemical heat was released that created long-lasting curls. Thus the first machineless permanent wave was born. Salon clients were no longer subjected to the dangers and discomforts of the Nessler machine. </par><par id="de9970410e8fda34dc9fd4a9788cfbb8">
+In 1932, nearly 4,000 years after the first recorded nail-color craze, Charles Revson of Revlon fame marketed the first nail polish-as opposed to a nail stain-using formulas that were borrowed from the automobile paint industry. This milestone marked a dramatic shift in nail cosmetics as women finally had an array of nail lacquers available to them. The early screen sirens Jean Harlow and Gloria Swanson glamorized this hip new nail fashion in silent pictures and early talkies by appearing in films wearing matching polish on their fingers and toes. </par><par id="1b2a0cb55c6d06e9523e363d7c2f4027">
+Also in 1932, Lawrence Gelb, a New York Chemist, introduced the first permanent haircolor product and founded a company called Clairol. In 1935, Max Factor created pancake makeup to make actors’ skin look natural on color film. In 1938, Arnold F. Willatt invented the cold wave that used no machines or heat. The cold wave is considered to be the precursor to the modern perm. </par><par id="766cf1994ab0aa1fcd222af50482d009">
+<sidebar id="a0000000085">
+<par id="a4b0b766f161ecf6d6dafa9061dea656">
+ Up until the nineteenth century, many barbers also performed minor surgeries and practiced dentistry. In fact, the barber pole, a symbol of the barber-surgeon, has its roots in a medical procedure called bloodletting that was once thought to strengthen the immune system. The pole is believed to represent the staff that patients held tightly to make the veins in their arms stand out during the procedure. The bottom cap represents the basin used to catch the blood. The red and white stripes represent the bandages that stopped the bleeding and were then hung on the pole to dry. As the wind blew, these bandages would become twisted around the pole, forming a red-and-white pattern. </par><par id="e7c00251d2827ee6085f7893457510a9">
+The modern barber pole, then, was originally the symbol of the barber-surgeon, and is believed to represent the bandages (white), blood (red), and veins (blue) involved in bloodletting. Up until the end of the nineteenth century, even in the United States, both men and women wore wigs. Today wigs are making a resurgence as a fashion item, riding the popularity wave of hair extensions. </par><par id="880a7b9b4f260eb63167516d51fa3694">
+<figure id="a0000000086">
+	  <plastex:arg name="loc"/>
+<par id="b1bf9d7309a9cb987ccaa1e677411863">
+<bgroup id="a0000000087">
+<bgroup id="a0000000088">
+<includegraphics style="height:200pt" id="d8314cc1c0f91b2ed10c7fea4d395534">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'keepaspectratio': u'true', u'height': u'200pt'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-7_Barber_Pole.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> </par><par id="9664df11d5782e53cb3cdfbadd789e00">
+<caption ref="1.7" id="a0000000089">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">A traditional barber pole.</plastex:arg>
+</caption></par></figure></par></sidebar> </par></subsubsection><subsubsection id="a0000000090">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">1940s</plastex:arg>
+<par id="034c1f463fdc976eca99d5ad91d221c6">
+In 1941, scientists developed another method of permanent waving that used waving lotion. Because this perm did not use heat, it was also called a cold wave. Cold waves replaced virtually all predecessors and competitors. In fact, the terms cold waving and permanent waving became practically synonymous. Modern versions of cold waves, usually referred to as alkaline perms, are very popular today. The term texture services is used today to refer to the variety of permanent waving and straightening services available for various hair types and conditions. </par></subsubsection><subsubsection id="a0000000091">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">1951–2000</plastex:arg>
+<par id="6afc300b7be23d55a20be085d9006418">
+The second half of the twentieth century saw the introduction of tube mascara, improved hair care and nail products, and the boom and then death of the weekly salon appointment. In the late 1960s, Vidal Sassoon turned the hairstyling world on its ear with his revolutionary geometric cuts. The 1970s saw a new era in highlighting when French hairdressers introduced the art of hair weaving using aluminum foil. In the 1980s, makeup went full circle, from barely there to heavily made-up “cat-eyes” and the heavy use of eye shadows and blush. In the 1990s, haircolor became gentler, allowing all ethnicities to enjoy being blonds, brunettes, or redheads. In 1998, Creative Nail Design introduced the first spa pedicure system to the professional beauty industry. </par></subsubsection></subsection><subsection ref="1.2.9" id="a0000000092">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">The Twenty-First Century</plastex:arg>
+<par id="4ffeb442ed98afff4811a7f5917d834a">
+Toay, hairstylists have far gentler, no-fade haircolor. Estheticians can noticeably rejuvenate the skin, as well as keep disorders such as sunspots and mild acne at bay. The beauty industry has also entered the age of specialization. Now cosmetologists frequently specialize either in haircolor or in haircutting; estheticians specialize in esthetic or medical-aesthetic services; and nail technicians either offer a full array of services or specialize in artificial nail enhancements, natural nail care, or even pedicures. </par><par id="5dd67fab342962e4ce95695cd0f709f2">
+Since the late 1980s, the salon industry has evolved to include day spas, a name that was first coined by beauty legend Noel DeCaprio. Day spas now represent an excellent employment opportunity for beauty practitioners. </par><par id="4dd7ce3de8b8a7b794f3cf6382bf47f3">
+<figure id="a0000000093">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="904a23789ee5474af3608e11718c22c2">
+<center id="a0000000094">
+ <bgroup id="a0000000095">
+<bgroup id="a0000000096">
+<includegraphics style="height:270pt" id="dc1f018853cdc0ff5d87c1b866eeef29">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'keepaspectratio': u'true', u'height': u'270pt'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-8_Day_Spa.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.8" id="a0000000097">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">Day spas are increasing in number and popularity.</plastex:arg>
+</caption> </center></par></figure></par><par id="8b1b127476bec745455bb32d6ddc5a86">
+Men-only specialty spas and barber spas have also grown in popularity. These spas provide exciting new opportunities for men’s hair, nail, and skin-care specialists. </par></subsection></section><section ref="1.3" id="a0000000098">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">Career Paths for Cosmetologists</plastex:arg>
+<par id="93e17526d89b43457294dff01aa89295">
+<figure id="a0000000099">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="a8521b30c2fccccbac3c82d1d952a4a6">
+<center id="a0000000100">
+ <bgroup id="a0000000101">
+<bgroup id="a0000000102">
+<includegraphics style="height:297pt" id="a7b3e5981b2009c6ec804b64481cbb17">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'keepaspectratio': u'true', u'height': u'297pt'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-10_Haircolor_Specialist.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.9" id="a0000000103">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">Haircolor specialists are in great demand.</plastex:arg>
+</caption> </center></par></figure></par><par id="9878aeee1e0745c0b784265977145a6f">
+Once you have completed your schooling and are licensed, you will be amazed at how many career opportunities will open up to you. The possibilities can be endless for a hard-working professional cosmetologist who approaches her or his career with a strong sense of personal integrity. Within the industry there are numerous specialties, such as the following: </par><par id="4a255338d28f93237d2d6a8c9de6a0c7">
+<description id="a0000000104">
+<item ref="1" id="a0000000105">
+	  <plastex:arg name="term">Haircolor specialist.</plastex:arg>
+<par id="119b2867fcef9dedeb2da0ea51c09186">
+Once you have received additional training and experience in haircolor, you may be responsible for training others in your salon to perform color services or work for a product manufacturer, where you will be expected to train other professionals how best to perform color services according to the company’s guidelines and product instructions. </par></item><item ref="2" id="a0000000106">
+	  <plastex:arg name="term">Texture specialist.</plastex:arg>
+<par id="03edb407464bf694a0eec88436393ee3">
+Once you have received additional training and experience in texture services you may be responsible for training others to perform texture services in the salon, or work for a manufacturer where you will be expected to train others on how best to perform texture services according to your company’s guidelines and product instructions. A subspecialty, curly hair specialist, focuses on maintaining natural curl. </par></item><item ref="3" id="a0000000107">
+	  <plastex:arg name="term">Cutting specialist.</plastex:arg>
+<par id="49dbd12f84a0726db3b4b44b08e66fb6">
+This position requires a dedicated interest in learning various cutting styles and techniques. Mter perfecting your own skills and developing your own method of cutting (everyone develops his or her own cutting technique), you may want to study with other reputable haircutters to learn and adopt their systems and techniques. This training will allow you to perform top-quality haircutting in your own salon, as well as to coach those around you, helping them to hone their skills. </par></item></description></par><par id="fbce89cb83a35502e18f4ea3e12f878f">
+<figure id="a0000000108">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="c70726600889bd6d4b675d1f794c89ad">
+<center id="a0000000109">
+ <bgroup id="a0000000110">
+<bgroup id="a0000000111">
+<includegraphics style="width:297pt" id="1aea8856be3b397df84fc50ff9dba315">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'width': u'297pt', u'keepaspectratio': u'true'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-11_Cutting_Specialist.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.10" id="a0000000112">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">Cutting hair in a salon is one of the many choices open to you.</plastex:arg>
+</caption> </center></par></figure></par><par id="39c6ccabade057f16d79d3c6ed8e97ea">
+<description id="a0000000113">
+<item ref="1" id="a0000000114">
+	  <plastex:arg name="term">Salon trainer.</plastex:arg>
+<par id="81af4c4efc8f9884b1ccf8643236ce2b">
+Many companies, such as manufacturers and salon chains, hire experienced salon professionals and train them to train others. This kind of training can take many forms, from technical training to management and interpersonal relationship training. A salon trainer can work with small salons, as well as large organizations and trade associations, to help develop the beauty industry’s most valuable resource-salon staff and personnel. </par></item><item ref="2" id="a0000000115">
+	  <plastex:arg name="term">Distributor sales consultant.</plastex:arg>
+<par id="0422d09bb8372a1eb15b3ad3cb4ece8e">
+The salon industry depends heavily on its relationships with product distributors in order to stay abreast of what is occurring in the marketplace. Distributor sales consultants (DSCs) provide information about new products, new trends, and new techniques. This specialty provides an excellent opportunity for highly skilled and trained cosmetology professionals. The DSC is the salon and its staff’s link with the rest of the industry, and this relationship represents the most efficient method that outside companies use to reach the salon stylist. </par></item></description></par><par id="4d3efa974defe5dcc328b976b263ed3a">
+<sidebar id="a0000000116">
+<par id="f4eb7705431971af0702ac0149d3eecf">
+ <emph id="a0000000117">
+	  <plastex:arg name="self">did you know?</plastex:arg>
+</emph> Although cosmetologists who work in salons and spas do not have to join a union to be considered for work or to be entitled to certain benefits of employment, to work on films, television shows, and theater you may need to join a union. </par><par id="3edda436142d75ad558e330686038d6e">
+The unions have different names, one of the largest is the Makeup and Hairstylists Union, also known as the International Alliance of Theatrical Stage Employees, Moving Picture Technicians, Artist and Allied Crafts of the United States and Canada, AFL-CIO, CLC (lA). </par><par id="14062ae75daa349e177fe3503de8380e">
+You may also need to join the Makeup and Hairstylists Guild, or the Actor’s union. </par></sidebar> </par><par id="37e076bc5199ec6a76974e5922aaf037">
+<description id="a0000000118">
+<item ref="1" id="a0000000119">
+	  <plastex:arg name="term">Manufacturer educator.</plastex:arg>
+<par id="9329fabe8f988f7d8b53e701313e9912">
+Most manufacturers hire their own educators to train stylists and salon staff to understand and use the company’s hair care, haircolor, and chemical-service products. Mastery of the company’s product lines is a must for manufacturer educators. An accomplished educator who is a good public speaker ca:n advance to field educator, regional educator, or even platform educator, appearing on stage at shows in the U.S. and around the world. </par></item><item ref="2" id="a0000000120">
+	  <plastex:arg name="term">Cosmetology instructors.</plastex:arg>
+<par id="4858168590479f5d14033aeba2aaab65">
+Have you ever wondered how your instructor decided to start teaching? Many instructors had fantastic careers in salons before dedicating themselves to teaching new professionals the tricks of the trade. If this career path interests you, spend some time with your school’s instructors and ask them why they went into education. Educating new cosmetologists can be very trying, but it can also be very rewarding. </par></item><item ref="3" id="a0000000121">
+	  <plastex:arg name="term">Film or theatrical hairstylist and editorial stylist.</plastex:arg>
+<par id="af22c10a03ef15d747937496b1953f6b">
+Working behind the scenes at magazine and Internet photo shoots or backstage on movies and TV sets all starts with volunteering to assist. Even someone right out of school can volunteer by calling agencies, networking with photographers, or asking other hairdressers who work behind the scenes for advice. The days are long-up to eighteen hours on soap opera sets-but once you clock the specific number of hours required by your state of residence, you can join the local union, which opens many doors. All you need are persistence, networking skills, reliability, team spirit, and attention to detail. This field requires constant continuing education, particularly in working with wigs, hairpieces, and makeup. </par></item></description></par><par id="887a9912c1eda471a79808e7b8494854">
+<bgroup id="a0000000122">
+<bgroup id="a0000000123">
+<includegraphics style="height:200pt" id="10dd69a132c59e36e59bf0a687e7d3ae">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'keepaspectratio': u'true', u'height': u'200pt'}</plastex:arg>
+	  <plastex:arg name="file">Images/Woman_Figure.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> </par><par id="3dc58e9c292c7260a42c3a1acb62a2c7">
+<sidebar id="a0000000124">
+ <emph id="a0000000125">
+	  <plastex:arg name="self">ACTivity</plastex:arg>
+</emph> You may think you already know which area of cosmetology interests you most. But as you learn more, that can change. To help you determine the best area of specialty, interview a salon owner or a specialist in your area. Ask the following questions: <itemize id="a0000000126">
+<item ref="1" id="a0000000127">
+	  <plastex:arg name="term"/>
+<par id="7f3a8a9707b7120a176090272ae40d60">
+Why did you choose the specialty you did? </par></item><item ref="2" id="a0000000128">
+	  <plastex:arg name="term"/>
+<par id="20f383a8c5104d63f34bd6ca46d036d0">
+What special skills are required? </par></item><item ref="3" id="a0000000129">
+	  <plastex:arg name="term"/>
+<par id="254f9fda7247ce27e8a35676cc10b3af">
+What type of training was required to become a specialist? </par></item><item ref="4" id="a0000000130">
+	  <plastex:arg name="term"/>
+<par id="f7291a4ef662a59e7587f3dd8630cb52">
+How long did it take you to get really proficient? </par></item><item ref="5" id="a0000000131">
+	  <plastex:arg name="term"/>
+<par id="75125280e35f4bda6025b3e7a3bc8786">
+What’s the most exciting thing about your specialization? </par></item></itemize> To find someone to interview, ask your instructors for ideas, visit local salons, go to trade shows, or search the Internet for specialists in your area—or anywhere! Many salon owners, colorists, texture specialists, business experts, and educators can be found trhough social networks like Facebook, Myspace, LinkedIn, and many others. </sidebar> </par><par id="2aa5e54886ecebef30c8a94d80882896">
+These are but a few of the many career paths awaiting you on the road to a lifelong career in cosmetology. The wonderful thing about the professional beauty industry is_that there are truly no limits to what you can do if you have a sincere interest in learning and giving back to your industry. Keep developing your skills in the specialities that interest you, and you’ll soon be building and enjoying an extremely creative and unique career. </par><subsection ref="1.3.1" id="a0000000132">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">Salon Management</plastex:arg>
+<par id="9477aba681a4c0b40144f0808804fbf0">
+If business is your calling, you will find that management opportunities in the salon and spa industry are quite diverse. They include being an inventory manager, department head, educator, special events manager (promotions), assistant manager, and general manager. With experience, you can also add salon owner to this list of career possibilities. To ensure your success, it is wise to enroll in business classes to learn more about managing products, departments, and-above all-people. </par><par id="da72d92908dc0eefa18910fb24f5da35">
+Salon manager is a potential career path for a cosmetologist, but it requires a very different skill set. As a result, some managers oflarge operations are not cosmetologists. Salon managers must have an aptitude for math and accounting and be able to read documents such as profit and loss statements. They should understand marketing, including the roles of advertising, public relations and promotions, and what makes these programs successful. Much of management involves the business side of the salon-making it profitable-while keeping clients and employees happy. Titles and the accompanying responsibilities vary widely from salon to salon, and it is always possible to learn on the job. However, supplementing your experience with formal business education is the quickest path to success. </par><par id="73a7273f6e7d11fc32f9bf8d87818585">
+<sidebar id="a0000000133">
+ <emph id="a0000000134">
+	  <plastex:arg name="self">FYI</plastex:arg>
+</emph> The field of cosmetology has broadened to encompass areas of specialization, including esthetics and nail technology. As the cosmetology industry continues to grow, opportunities for professionals increase. According to a study by the National Accrediting Commission of Cosmetology Arts and Sciences (NACCAS), salons employed around 1,683,000 professionals in 2007, and 53 percent of salons had job openings. Nearly three-quarters of salon ownders with positions to fill could not find qualified applicants, even though about 38 percent of the jobs were for inexperienced professionals with less than a year on the job. While many factors, including the national economy, affect the industry, the salon business usually withstands recessions much better than other industries. To make each day in school positively impact your future, focu on your studies, read trade publications cover-to-cover, become a member of relevant trade associations, and attend workshops outside of school. Remember, your license will unlock countless doors, but it is your personal dedication and passion that ultimately determines how successful you become. </sidebar> </par><par id="2cd46c1f272595cbf99b3b0f5bb4e44a">
+Beyond choosing a specialty, you must decide on the type of facility where you will work. Many options are available: </par><par id="f4de3b41855cdabd25fd744d641a54f1">
+<itemize id="a0000000135">
+<item ref="1" id="a0000000136">
+	  <plastex:arg name="term"/>
+<par id="4f60250d8756d378e5fe80f502c3237e">
+Specialty salons </par></item><item ref="2" id="a0000000137">
+	  <plastex:arg name="term"/>
+<par id="6fd7b19f07a6a8be1f27e22f3597f27c">
+Full-service salons (offering hair, skin, and nail services) </par></item><item ref="3" id="a0000000138">
+	  <plastex:arg name="term"/>
+<par id="8e57b857a7fe0cbfcc5a7913be01841c">
+Photo, video, or film sets (preparing models and actors for camera appearances) </par></item><item ref="4" id="a0000000139">
+	  <plastex:arg name="term"/>
+<par id="9cc0abd38e69531e405032989b98c250">
+Day spas (offering services that emphasize both beauty and wellness) </par></item></itemize></par><par id="48eaba279673c59d4b08baa3df28c02b">
+<figure id="a0000000140">
+	  <plastex:arg name="loc">h</plastex:arg>
+<par id="7ff6e5525f53055a2ecc81f27e0ab299">
+<center id="a0000000141">
+ <bgroup id="a0000000142">
+<bgroup id="a0000000143">
+<includegraphics style="height:200pt" id="60fbdf5178b8c07fbbd0c12b92c89eb4">
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="options">{u'keepaspectratio': u'true', u'height': u'200pt'}</plastex:arg>
+	  <plastex:arg name="file">Images/Figure_1-12_Day_Spa.jpg</plastex:arg>
+</includegraphics></bgroup></bgroup> <caption ref="1.11" id="a0000000144">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="self">A day spa may offer nail, hair, body, and skin services.</plastex:arg>
+</caption> </center></par></figure></par><par id="2a6029dda0015556452e7f914b74a60f">
+To learn more about the various types of salon business models, see Chapter 32, The Salon Business. There you will find a wealth of choices, including national and regional chains and low- and high-end salon opportunities. </par><par id="f6d7db374df47776dc7589bfa5e178d6">
+<include id="a0000000145">
+	  <plastex:arg name="name">workbook_questions</plastex:arg>
+</include><newcommand id="a0000000146">
+	  <plastex:arg name="opt"/>
+	  <plastex:arg name="definition">[u'chapter', u'{', u'#', u'1', u'}']</plastex:arg>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="nargs">1</plastex:arg>
+	  <plastex:arg name="name">mathcountsyear</plastex:arg>
+</newcommand> <newcommand id="a0000000147">
+	  <plastex:arg name="opt"/>
+	  <plastex:arg name="definition">[u'section', u'{', u'#', u'1', u'}']</plastex:arg>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="nargs">2</plastex:arg>
+	  <plastex:arg name="name">mathcountsworksheet</plastex:arg>
+</newcommand> </par></subsection></section><mathcountsworksheet ref="1.4" id="tag:nextthought.com,2011-10:mathcounts-HTML-MN.2012.0">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="NTIID">tag:nextthought.com,2011-10:mathcounts-HTML-MN.2012.0</plastex:arg>
+	  <plastex:arg name="title">Workbook Questions</plastex:arg>
+<par id="b342b795259cc84f65b28632ce494edd">
+<quote id="a0000000148">
+<par id="cb1c31fe62b51913df07ccfb3cc80f86">
+<bgroup id="a0000000149">
+Remember, determination and enthusiasm triumph over talent and laziness every time. — Life’s Little Instruction Calendar</bgroup> </par></quote></par><subsection ref="1.4.1" id="a0000000150">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">WHY STUDY COSMETOLOGY HISTORY AND CAREER OPPORTUNITIES?</plastex:arg>
+<par id="dd2cc4af85be50a7d88541197431f61a">
+ <mathcountsquestion ref="<thequestionnum id="a0000000151"/>" id="a0000000152">
+	  <plastex:arg name="questionnum">1</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000153"/>" id="a0000000154">
+	  <plastex:arg name="probnum">1</plastex:arg>
+ In your own words, describe why you think it is important for you to learn about old and ancient techniques that were once used in cosmetology. </mathcountsproblem> </mathcountsquestion> </par><par id="962ad8b22e7351015dc12296e13719b6">
+<mathcountsquestion ref="<thequestionnum id="a0000000155"/>" id="a0000000156">
+	  <plastex:arg name="questionnum">2</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000157"/>" id="a0000000158">
+	  <plastex:arg name="probnum">2</plastex:arg>
+ Cosmetologists who know something about the history of their profession are better able to its ____________ future. </mathcountsproblem> </mathcountsquestion> </par></subsection><subsection ref="1.4.2" id="a0000000159">
+	  <plastex:arg name="toc"/>
+	  <plastex:arg name="*modifier*"/>
+	  <plastex:arg name="title">BRIEF HISTORY OF COSMETOLOGY</plastex:arg>
+<par id="a7cf9e4e8d813aae7f954a6a85f6efa6">
+<mathcountsquestion ref="<thequestionnum id="a0000000160"/>" id="a0000000161">
+	  <plastex:arg name="questionnum">3</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000162"/>" id="a0000000163">
+	  <plastex:arg name="probnum">3</plastex:arg>
+ The term used to encompass a broad range of specialty areas, including hairstyling, nail technology, and esthetics is </mathcountsproblem> </mathcountsquestion> </par><par id="0fe2390bb8e2513e83d19afa36ff7e14">
+<mathcountsquestion ref="<thequestionnum id="a0000000164"/>" id="a0000000165">
+	  <plastex:arg name="questionnum">4</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000166"/>" id="a0000000167">
+	  <plastex:arg name="probnum">4</plastex:arg>
+ Define cosmetology. </mathcountsproblem> </mathcountsquestion> </par><par id="33922227897c0437cd46864ae4c7b432">
+<mathcountsquestion ref="<thequestionnum id="a0000000168"/>" id="a0000000169">
+	  <plastex:arg name="questionnum">5</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000170"/>" id="a0000000171">
+	  <plastex:arg name="probnum">5</plastex:arg>
+ What Greek word is the term cosmetology derived from? What dos this term mean? </mathcountsproblem> </mathcountsquestion> </par><par id="38b8c782fd5b0dab6d0673d05db97a28">
+<mathcountsquestion ref="<thequestionnum id="a0000000172"/>" id="a0000000173">
+	  <plastex:arg name="questionnum">6</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000174"/>" id="a0000000175">
+	  <plastex:arg name="probnum">6</plastex:arg>
+ Archaeological studies reveal that haircutting and hairstyling were practiced in some form as early as the </mathcountsproblem> </mathcountsquestion> </par><par id="81b090be8430de20791ddf2373d24b8f">
+<mathcountsquestion ref="<thequestionnum id="a0000000176"/>" id="a0000000177">
+	  <plastex:arg name="questionnum">7</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000178"/>" id="a0000000179">
+	  <plastex:arg name="probnum">7</plastex:arg>
+ What ordinary items were used as implements and hair adornment during this time? </mathcountsproblem> </mathcountsquestion> </par><par id="4675d91b1781c78eecf2f7b8aa7a0265">
+<mathcountsquestion ref="<thequestionnum id="a0000000180"/>" id="a0000000181">
+	  <plastex:arg name="questionnum">8</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000182"/>" id="a0000000183">
+	  <plastex:arg name="probnum">8</plastex:arg>
+ What natural products did ancient people use for coloring matter and tattooing? </mathcountsproblem> </mathcountsquestion> </par><par id="db4ed61d1356f7bef1d74e372222502d">
+<mathcountsquestion ref="<thequestionnum id="a0000000184"/>" id="a0000000185">
+	  <plastex:arg name="questionnum">9</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000186"/>" id="a0000000187">
+	  <plastex:arg name="probnum">9</plastex:arg>
+ Who was the first civilized culture to cultivate beauty into an extravagant fashion? For what purposes did they use cosmetics? </mathcountsproblem> </mathcountsquestion> </par><par id="b5b99cdf01ecfa8db10a533a3d3d7489">
+<mathcountsquestion ref="<thequestionnum id="a0000000188"/>" id="a0000000189">
+	  <plastex:arg name="questionnum">10</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000190"/>" id="a0000000191">
+	  <plastex:arg name="probnum">10</plastex:arg>
+ When was the first evidence of cosmetics in Egypt recorded? <enumerate id="a0000000192">
+	  <plastex:arg name="type">a</plastex:arg>
+<item ref="1" id="a0000000193">
+	  <plastex:arg name="term"/>
+<par id="07498365b2adc0b07d81f1254975bdba">
+3000 BC </par></item><item ref="2" id="a0000000194">
+	  <plastex:arg name="term"/>
+<par id="363289224d3c7e006f8fa9a567562e08">
+2000 BC </par></item><item ref="3" id="a0000000195">
+	  <plastex:arg name="term"/>
+<par id="9e9d609230aa59cb64fb7be6d3000694">
+1500 BC </par></item><item ref="4" id="a0000000196">
+	  <plastex:arg name="term"/>
+<par id="459b6956132553d8d81877d711807736">
+1000 BC </par></item></enumerate> </mathcountsproblem> </mathcountsquestion> </par><par id="2c883220e1e55db89efa500bf360cbb6">
+<mathcountsquestion ref="<thequestionnum id="a0000000197"/>" id="a0000000198">
+	  <plastex:arg name="questionnum">11</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000199"/>" id="a0000000200">
+	  <plastex:arg name="probnum">11</plastex:arg>
+ ______ was an ancient queen who used custom-blended essential oils as her "signature" scents. </mathcountsproblem> </mathcountsquestion> </par><par id="15d9ea96634761974647fd32a79acc79">
+<mathcountsquestion ref="<thequestionnum id="a0000000201"/>" id="a0000000202">
+	  <plastex:arg name="questionnum">12</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000203"/>" id="a0000000204">
+	  <plastex:arg name="probnum">12</plastex:arg>
+ Which Egyptian queen had a personal cosmetics factory? </mathcountsproblem> </mathcountsquestion> </par><par id="2d1972c548e64d6028552afb445ba4e0">
+<mathcountsquestion ref="<thequestionnum id="a0000000205"/>" id="a0000000206">
+	  <plastex:arg name="questionnum">13</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000207"/>" id="a0000000208">
+	  <plastex:arg name="probnum">13</plastex:arg>
+ Men in ancient times sometimes stained their nails and lips. True/False </mathcountsproblem> </mathcountsquestion> </par><par id="3d88e8cf1993ff9b5be4944b8221c5a6">
+<mathcountsquestion ref="<thequestionnum id="a0000000209"/>" id="a0000000210">
+	  <plastex:arg name="questionnum">14</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000211"/>" id="a0000000212">
+	  <plastex:arg name="probnum">14</plastex:arg>
+ What did Chinese aristocrats rub onto their nails to turn them crimson or ebony? </mathcountsproblem> </mathcountsquestion> </par><par id="c1aa0114d2258e8f41e05f8b1de9b24b">
+<mathcountsquestion ref="<thequestionnum id="a0000000213"/>" id="a0000000214">
+	  <plastex:arg name="questionnum">15</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000215"/>" id="a0000000216">
+	  <plastex:arg name="probnum">15</plastex:arg>
+ During the Chou Dynasty, what might have happened to people who were not of noble birth if they were caught tinting their nails? </mathcountsproblem> </mathcountsquestion> </par><par id="d889155b258d1582df47628f65e39838">
+<mathcountsquestion ref="<thequestionnum id="a0000000217"/>" id="a0000000218">
+	  <plastex:arg name="questionnum">16</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000219"/>" id="a0000000220">
+	  <plastex:arg name="probnum">16</plastex:arg>
+ In 500 BC during the Golden Age of _ _ _ _ , hairstyling became a highly developed art. </mathcountsproblem> </mathcountsquestion> </par><par id="26233b2b7c0819b5799a857ed990bad4">
+<mathcountsquestion ref="<thequestionnum id="a0000000221"/>" id="a0000000222">
+	  <plastex:arg name="questionnum">17</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000223"/>" id="a0000000224">
+	  <plastex:arg name="probnum">17</plastex:arg>
+ Greek women applied preparations of on their faces, _ _ _ _ on their eyes, and on their cheeks and lips. </mathcountsproblem> </mathcountsquestion> </par><par id="45b049fcc4a5213e5de35367e3671009">
+<mathcountsquestion ref="<thequestionnum id="a0000000225"/>" id="a0000000226">
+	  <plastex:arg name="questionnum">18</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000227"/>" id="a0000000228">
+	  <plastex:arg name="probnum">18</plastex:arg>
+ How did the Greeks create the brilliant red pigment named vermillion? </mathcountsproblem> </mathcountsquestion> </par><par id="ef2ac1de940965a3f4e4b8de960f1e09">
+<mathcountsquestion ref="<thequestionnum id="a0000000229"/>" id="a0000000230">
+	  <plastex:arg name="questionnum">19</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000231"/>" id="a0000000232">
+	  <plastex:arg name="probnum">19</plastex:arg>
+ In Rome, women used hair color to indicate their class in society. Match the correct shade with its corresponding class: <tabular id="6c0856f595ec7a69bd43d1e84430fc6d">
+	  <plastex:arg name="colspec">[u'c', u'c']</plastex:arg>
+	  <plastex:arg name="pos"/>
+<ArrayRow id="a0000000233">
+<ArrayCell style="text-align:center" id="a0000000234">
+<par id="69c34050724f9ce56068b24fe4ca12df">
+ Noblewomen </par></ArrayCell><ArrayCell style="text-align:center" id="a0000000235">
+<par id="e90dfb84e30edf611e326eeb04d680de">
+ Black </par></ArrayCell></ArrayRow><ArrayRow id="a0000000236">
+<ArrayCell style="text-align:center" id="a0000000237">
+<par id="cbc5c02cdd7073bf5437996ebceb755f">
+Middle-class </par></ArrayCell><ArrayCell style="text-align:center" id="a0000000238">
+<par id="ee38e4d5dd68c4e440825018d549cb47">
+ Red </par></ArrayCell></ArrayRow><ArrayRow id="a0000000239">
+<ArrayCell style="text-align:center" id="a0000000240">
+<par id="ac2af89258dac60a1b906d954a48949c">
+Poor women </par></ArrayCell><ArrayCell style="text-align:center" id="a0000000241">
+<par id="40bcc7e70a1c21421003aadc0354d8d4">
+ Blond </par></ArrayCell></ArrayRow></tabular> </mathcountsproblem> </mathcountsquestion> </par><par id="b8aefae0f602610407e2eb090693f15b">
+<mathcountsquestion ref="<thequestionnum id="a0000000242"/>" id="a0000000243">
+	  <plastex:arg name="questionnum">20</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000244"/>" id="a0000000245">
+	  <plastex:arg name="probnum">20</plastex:arg>
+ During the Middle Ages, where did women not wear colored makeup? <enumerate id="a0000000246">
+	  <plastex:arg name="type">a</plastex:arg>
+<item ref="1" id="a0000000247">
+	  <plastex:arg name="term"/>
+<par id="26f8e24fe9bcb11f50476af1172c3679">
+Lips </par></item><item ref="2" id="a0000000248">
+	  <plastex:arg name="term"/>
+<par id="197d3fadfd93fe9b9be91791ffeb3a42">
+Cheeks </par></item><item ref="3" id="a0000000249">
+	  <plastex:arg name="term"/>
+<par id="ae6e9b63e87076a8c0188b659ab93a28">
+Eyes </par></item></enumerate> </mathcountsproblem> </mathcountsquestion> </par><par id="6af10a6e13319d6df45affc4b45a8b05">
+<mathcountsquestion ref="<thequestionnum id="a0000000250"/>" id="a0000000251">
+	  <plastex:arg name="questionnum">21</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000252"/>" id="a0000000253">
+	  <plastex:arg name="probnum">21</plastex:arg>
+ Which of the following techniques was originally developed by a physician during the Middle Ages? <enumerate id="a0000000254">
+	  <plastex:arg name="type">a</plastex:arg>
+<item ref="1" id="a0000000255">
+	  <plastex:arg name="term"/>
+<par id="5145a70a085949cae55de7996f3a3576">
+Croquignole wrapping technique </par></item><item ref="2" id="a0000000256">
+	  <plastex:arg name="term"/>
+<par id="8948b0043673f2a04e32589bc8313016">
+Steam distillation </par></item><item ref="3" id="a0000000257">
+	  <plastex:arg name="term"/>
+<par id="69d6e7acab267fb8ea5fa3996412df2e">
+Henna-based hair dyes </par></item><item ref="4" id="a0000000258">
+	  <plastex:arg name="term"/>
+<par id="1e71afe09630b8784ede8c9b535ac786">
+Cold waving </par></item></enumerate> </mathcountsproblem> </mathcountsquestion> </par><par id="29e1e32e230b8729ccc630a448ecdd91">
+<mathcountsquestion ref="<thequestionnum id="a0000000259"/>" id="a0000000260">
+	  <plastex:arg name="questionnum">22</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000261"/>" id="a0000000262">
+	  <plastex:arg name="probnum">22</plastex:arg>
+ What was discouraged during the Renaissance? </mathcountsproblem> </mathcountsquestion> </par><par id="47e2edd2c378d4616768dea6cfc6a829">
+<mathcountsquestion ref="<thequestionnum id="a0000000263"/>" id="a0000000264">
+	  <plastex:arg name="questionnum">23</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000265"/>" id="a0000000266">
+	  <plastex:arg name="probnum">23</plastex:arg>
+ During the Renaissance, women shaved their eyebrows and hairlines to appear ____ </mathcountsproblem> </mathcountsquestion> </par><par id="e6b84152fad8ed976129b34e8f931304">
+<mathcountsquestion ref="<thequestionnum id="a0000000267"/>" id="a0000000268">
+	  <plastex:arg name="questionnum">24</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000269"/>" id="a0000000270">
+	  <plastex:arg name="probnum">24</plastex:arg>
+ During the Victorian Age, what did women use to preserve the health and beauty of the skin? What were they made from? </mathcountsproblem> </mathcountsquestion> </par><par id="5bec51e4f4f3c6b9cbca6bcee80118c0">
+<mathcountsquestion ref="<thequestionnum id="a0000000271"/>" id="a0000000272">
+	  <plastex:arg name="questionnum">25</plastex:arg>
+ <mathcountsproblem ref="<theprobnum id="a0000000273"/>" id="a0000000274">
+	  <plastex:arg name="probnum">25</plastex:arg>
+ What did Victorian women do to induce natural color rather than use cosmetics? </mathcountsproblem> </mathcountsquestion> </par></subsection></mathcountsworksheet></chapter></document> </dom-document>
