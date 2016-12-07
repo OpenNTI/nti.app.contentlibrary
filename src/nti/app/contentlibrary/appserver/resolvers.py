@@ -17,7 +17,7 @@ from nti.appserver.interfaces import INTIIDRootResolver
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 @interface.implementer(INTIIDRootResolver)
-class DefaultNTIIDRootResolver(object):
+class _DefaultNTIIDRootResolver(object):
 
     def __init__(self, *args):
         pass
