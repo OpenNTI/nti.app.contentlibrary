@@ -206,7 +206,7 @@
 				for="nti.dataserver.interfaces.IUser" />
 
 	<!-- Query -->
-	<utility factory=".query._UserNTIIDContainers" />
+	<utility factory=".query._UserContainerQuerier" />
 		
 	<!-- Search pacakge resolvers -->
 	<utility factory=".search._DefaultRootPackageResolver" />
