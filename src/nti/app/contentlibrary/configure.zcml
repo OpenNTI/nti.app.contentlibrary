@@ -215,7 +215,11 @@
 	<subscriber factory=".search._ContentUnitSearchHitPredicate"
 				provides="nti.contentsearch.interfaces.ISearchHitPredicate"
 				for="nti.contentlibrary.interfaces.IContentUnit" />
-
+	
+	<subscriber factory=".search._SearchHitDecorator"
+				for="nti.contentsearch.interfaces.ISearchHit"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
+				
 	<!-- Resolving metadata, used in the implementation of links -->
 	<adapter factory=".resolvers.ContentMetadataFromContentUnit" />
 	

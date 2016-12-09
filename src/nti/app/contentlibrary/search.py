@@ -21,6 +21,7 @@ from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackageBundle 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
+from nti.contentsearch.interfaces import ISearchHit
 from nti.contentsearch.interfaces import ISearchHitPredicate
 from nti.contentsearch.interfaces import IRootPackageResolver
 from nti.contentsearch.interfaces import ISearchPackageResolver
@@ -29,12 +30,18 @@ from nti.contentsearch.predicates import DefaultSearchHitPredicate
 
 from nti.dataserver.authorization import ACT_READ
 
+from nti.externalization.interfaces import StandardExternalFields
+
+from nti.externalization.singleton import SingletonDecorator
+
 from nti.ntiids.ntiids import ROOT
 from nti.ntiids.ntiids import TYPE_OID
 from nti.ntiids.ntiids import is_ntiid_of_type
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.property.property import Lazy
+
+CONTAINER_ID = StandardExternalFields.CONTAINER_ID
 
 @interface.implementer(ISearchPackageResolver)
 class _DefaultSearchPacakgeResolver(object):
@@ -78,3 +85,17 @@ class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
 			return True
 		else:
 			return has_permission(ACT_READ, item, self.request)
+
+@component.adapter(ISearchHit)
+class _SearchHitDecorator(object):
+
+	__metaclass__ = SingletonDecorator
+
+	def decorateExternalObject(self, original, external):
+		if IContentUnit.providedBy(original.Target) and CONTAINER_ID not in external:
+			context = original.Target
+			parent_key = getattr(context.__parent__, 'key', None)
+			if parent_key is not None and parent_key == context.key:
+				external[CONTAINER_ID] = context.__parent__.ntiid
+			else:
+				external[CONTAINER_ID] = context.ntiid
