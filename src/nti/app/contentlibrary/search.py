@@ -21,9 +21,9 @@ from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackageBundle 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
-from nti.contentsearch.interfaces import ISearchHit
 from nti.contentsearch.interfaces import ISearchHitPredicate
 from nti.contentsearch.interfaces import IRootPackageResolver
+from nti.contentsearch.interfaces import IContentUnitSearchHit
 from nti.contentsearch.interfaces import ISearchPackageResolver
 
 from nti.contentsearch.predicates import DefaultSearchHitPredicate
@@ -86,13 +86,13 @@ class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
 		else:
 			return has_permission(ACT_READ, item, self.request)
 
-@component.adapter(ISearchHit)
+@component.adapter(IContentUnitSearchHit)
 class _SearchHitDecorator(object):
 
 	__metaclass__ = SingletonDecorator
 
 	def decorateExternalObject(self, original, external):
-		if IContentUnit.providedBy(original.Target) and CONTAINER_ID not in external:
+		if CONTAINER_ID not in external:
 			context = original.Target
 			parent_key = getattr(context.__parent__, 'key', None)
 			if parent_key is not None and parent_key == context.key:
