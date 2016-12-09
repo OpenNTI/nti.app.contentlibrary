@@ -217,7 +217,7 @@
 				for="nti.contentlibrary.interfaces.IContentUnit" />
 	
 	<subscriber factory=".search._SearchHitDecorator"
-				for="nti.contentsearch.interfaces.ISearchHit"
+				for="nti.contentsearch.interfaces.IContentUnitSearchHit"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 				
 	<!-- Resolving metadata, used in the implementation of links -->
