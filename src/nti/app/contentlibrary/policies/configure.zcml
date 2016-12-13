@@ -19,4 +19,5 @@
 		<adapter factory=".censoring.user_filesystem_censor_policy" />
 	-->
 
+	<utility factory=".sites._RequestSiteNames" />
 </configure>
