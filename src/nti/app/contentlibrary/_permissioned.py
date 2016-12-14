@@ -52,7 +52,7 @@ def _get_user_ticket(user, client):
 		if client != None:
 			key = _get_user_ticket_key(user)
 			result = client.get(key)
-	except:
+	except Exception:
 		result = None
 	return result or 0
 
@@ -61,7 +61,7 @@ def _set_user_ticket(user, client):
 		if client != None:
 			key = _get_user_ticket_key(user)
 			client.set(key, random.randint(0, 10000), time=EXP_TIME)
-	except:
+	except Exception:
 		pass
 
 def _get_base_key(username, ntiid):
