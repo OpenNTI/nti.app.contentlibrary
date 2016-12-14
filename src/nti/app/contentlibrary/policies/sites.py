@@ -20,3 +20,4 @@ class _RequestSiteNames(object):
 
 	def sites(self, key):
 		return get_possible_site_names()
+	names = sites
