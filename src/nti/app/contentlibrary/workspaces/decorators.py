@@ -15,6 +15,8 @@ from zope.location.interfaces import ILocation
 
 from nti.app.contentlibrary.interfaces import IContentUnitInfo
 
+from nti.app.links.externalization import render_link
+
 # make sure we use nti.dataserver.traversal to find the root site
 from nti.dataserver.traversal import find_nearest_site as ds_find_nearest_site
 
@@ -22,8 +24,6 @@ from nti.externalization.singleton import SingletonDecorator
 from nti.externalization.interfaces import IExternalMappingDecorator
 
 from nti.links import links
-
-from nti.links.externalization import render_link
 
 @component.adapter(IContentUnitInfo)
 @interface.implementer(IExternalMappingDecorator)
