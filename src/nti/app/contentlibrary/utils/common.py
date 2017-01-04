@@ -54,10 +54,8 @@ MIMETYPE = StandardExternalFields.MIMETYPE
 
 def _package_assets(package):
     result = []
-    intids = component.getUtility(IIntIds)
 
     def recur(unit):
-        __traceback_info__ = unit, intids.queryId(unit)
         for child in unit.children or ():
             recur(child)
         container = IPresentationAssetContainer(unit)
