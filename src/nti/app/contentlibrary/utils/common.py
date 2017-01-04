@@ -15,8 +15,6 @@ from zope.interface.adapter import _lookupAll as zopeLookupAll  # Private func
 
 from zope.intid.interfaces import IIntIds
 
-from ZODB.POSException import POSError
-
 from nti.app.contentlibrary.utils import yield_content_packages
 
 from nti.contentlibrary.indexed_data import get_library_catalog
@@ -56,22 +54,18 @@ MIMETYPE = StandardExternalFields.MIMETYPE
 
 def _package_assets(package):
     result = []
-    __traceback_info__ = package
+    intids = component.getUtility(IIntIds)
 
     def recur(unit):
+        __traceback_info__ = unit, intids.queryId(unit)
         for child in unit.children or ():
             recur(child)
-        try:
-            container = IPresentationAssetContainer(unit)
-            for key, value in container.items():
-                provided = iface_of_asset(value)
-                if provided in PACKAGE_CONTAINER_INTERFACES:
-                    result.append((key, value, container))
-        except POSError:
-            intids = component.getUtility(IIntIds)
-            logger.exception("Could not get assets for unit %s,%s", unit.ntiid,
-                             intids.queryId(unit))
-            raise
+        container = IPresentationAssetContainer(unit)
+        for key, value in container.items():
+            provided = iface_of_asset(value)
+            if provided in PACKAGE_CONTAINER_INTERFACES:
+                result.append((key, value, container))
+
     recur(package)
     return result
 
