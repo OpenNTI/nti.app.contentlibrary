@@ -16,6 +16,10 @@
 	<include package=".appserver" />
 	<include package=".content_unit_preferences" />
 
+	<utility factory=".generations.install._SchemaManager"
+			 name="nti.dataserver-app-contentlibrary"
+			 provides="zope.generations.interfaces.IInstallableSchemaManager" />
+
 	<!-- Events -->
 	<subscriber handler=".logon._on_openid_user_created" />
 
