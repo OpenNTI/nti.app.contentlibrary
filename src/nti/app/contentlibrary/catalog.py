@@ -24,12 +24,7 @@ from nti.contentlibrary.indexed_data.interfaces import ISlideDeckAdapter
 from nti.contentlibrary.indexed_data.interfaces import IContainersAdapter
 from nti.contentlibrary.indexed_data.interfaces import IContainedTypeAdapter
 
-from nti.contenttypes.courses.interfaces import ICourseInstance
-from nti.contenttypes.courses.interfaces import ICourseOutlineNode
 from nti.contenttypes.courses.interfaces import ICourseCatalogEntry
-
-from nti.contenttypes.courses.utils import get_course_subinstances
-from nti.contenttypes.courses.utils import get_courses_for_packages
 
 from nti.contenttypes.presentation import iface_of_asset
 
@@ -72,13 +67,23 @@ class _Namespace(object):
         self.namespace = namespace
 
 
+def _course_outline_namespace(context):
+    try:
+        from nti.contenttypes.courses.interfaces import ICourseOutlineNode
+        node = find_interface(context, ICourseOutlineNode, strict=False)
+        if node is not None:
+            return getattr(node, 'src', None)
+    except ImportError:
+        pass
+    return None
+
+
 @interface.implementer(INamespaceAdapter)
 @component.adapter(IPresentationAsset)
 def _asset_to_namespace(context):
-    node = find_interface(context, ICourseOutlineNode, strict=False)
-    if node is not None:
-        source = getattr(node, 'src', None)
-        result = _Namespace(source) if source else None
+    source = _course_outline_namespace(context)
+    if source:
+        result = _Namespace(source)
     else:
         package = find_interface(context, IContentPackage, strict=False)
         result = _Namespace(package.ntiid) if package is not None else None
@@ -141,17 +146,47 @@ def _package_lineage_to_containers(context):
 
 
 def _course_lineage_to_containers(context):
-    result = set()
-    for location in lineage(context):
-        if IPresentationAsset.providedBy(location):
-            result.add(location.ntiid)
-        if ICourseInstance.providedBy(location):
-            course = location
-            entry = ICourseCatalogEntry(course, None)
+    try:
+        from nti.contenttypes.courses.interfaces import ICourseInstance
+        from nti.contenttypes.courses.interfaces import ICourseCatalogEntry
+        from nti.contenttypes.courses.utils import get_course_subinstances
+
+        course = None
+        result = set()
+        for location in lineage(context):
+            if context is location:
+                continue
+            if IPresentationAsset.providedBy(location):
+                result.add(location.ntiid)
+            if ICourseInstance.providedBy(location):
+                course = location
+                entry = ICourseCatalogEntry(course, None)
+                result.add(getattr(entry, 'ntiid', None))
+                break
+        # include subinstances
+        for instance in get_course_subinstances(course):
+            entry = ICourseCatalogEntry(instance, None)
             result.add(getattr(entry, 'ntiid', None))
-            break
+        result.discard(None)
+        return result
+    except ImportError:
+        return ()
+
+
+def _courses_for_pacakge(context, package):
+    result = set()
+    try:
+        from nti.contenttypes.courses.utils import get_courses_for_packages
+        folder = find_interface(context, IHostPolicyFolder, strict=False)
+        if folder is not None:
+            courses = get_courses_for_packages(folder.__name__, package.ntiid)
+            for course in courses:
+                entry = ICourseCatalogEntry(course, None)
+                result.add(getattr(entry, 'ntiid', None))
+    except ImportError:
+        pass
     result.discard(None)
-    return result
+    return tuple(result)
 
 
 @component.adapter(IPresentationAsset)
@@ -161,24 +196,15 @@ def _asset_to_containers(context):
     package = find_interface(context, IContentPackage, strict=False)
     if package is not None:  # package asset
         containers.update(_package_lineage_to_containers(context))
-        folder = find_interface(context, IHostPolicyFolder, strict=False)
-        if folder is not None:
-            courses = get_courses_for_packages(folder.__name__, package.ntiid)
-            for course in courses:
-                entry = ICourseCatalogEntry(course, None)
-                containers.add(getattr(entry, 'ntiid', None))
+        containers.update(_courses_for_pacakge(context, package))
     else:  # course asset
         containers.update(_course_lineage_to_containers(context))
-        course = find_interface(context, ICourseInstance, strict=False)
-        for instance in get_course_subinstances(course):
-            entry = ICourseCatalogEntry(instance, None)
-            containers.add(getattr(entry, 'ntiid', None))
 
     # check for slides and slidevideos
-    if    (    INTISlide.providedBy(context) 
-         or INTISlideVideo.providedBy(context)) \
-        and context.__parent__ is not None \
-        and context.__parent__.ntiid:
+    if (   INTISlide.providedBy(context)
+        or INTISlideVideo.providedBy(context)) \
+            and context.__parent__ is not None \
+            and context.__parent__.ntiid:
         containers.add(context.__parent__.ntiid)
 
     containers.discard(None)
