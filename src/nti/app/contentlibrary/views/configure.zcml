@@ -9,6 +9,11 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 
+	<adapter name="Library"
+			 for="nti.dataserver.interfaces.IDataserverFolder pyramid.interfaces.IRequest"
+			 factory=".LibraryPathAdapter"
+			 provides="zope.traversing.interfaces.IPathAdapter" />
+
 	<!-- Content card resolution -->
 	<utility factory=".card_views._ContentCardResolver" name="NTICard" />
 	<utility factory=".card_views._ContentCardResolver" name="nticard" />
