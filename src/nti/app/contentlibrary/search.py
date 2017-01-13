@@ -18,7 +18,7 @@ from pyramid.threadlocal import get_current_request
 from nti.appserver.pyramid_authorization import has_permission
 
 from nti.contentlibrary.interfaces import IContentUnit
-from nti.contentlibrary.interfaces import IContentPackageBundle 
+from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 from nti.contentsearch.interfaces import ISearchHitPredicate

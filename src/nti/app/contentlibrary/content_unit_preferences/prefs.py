@@ -12,6 +12,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from ZODB.interfaces import IBroken
+
 from nti.app.contentlibrary.content_unit_preferences.interfaces import IContentUnitPreferences
 
 from nti.contentlibrary.interfaces import IContentUnit
@@ -25,7 +27,8 @@ def prefs_present(prefs):
 	of targets is a valid preference; a None value removes the
 	preference.
 	"""
-	return prefs and prefs.sharedWith is not None
+	return  not IBroken.providedBy( prefs ) \
+		and prefs and prefs.sharedWith is not None
 
 def find_prefs_for_content_and_user(starting_content_unit, remote_user):
 	"""
