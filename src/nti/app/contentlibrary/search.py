@@ -43,59 +43,69 @@ from nti.property.property import Lazy
 
 CONTAINER_ID = StandardExternalFields.CONTAINER_ID
 
+
 @interface.implementer(ISearchPackageResolver)
 class _DefaultSearchPacakgeResolver(object):
 
-	def __init__(self, *args):
-		pass
+    def __init__(self, *args):
+        pass
 
-	def resolve(self, user, ntiid=None):
-		result = set()
-		if ntiid != ROOT:
-			if bool(is_ntiid_of_type(ntiid, TYPE_OID)):
-				obj = find_object_with_ntiid(ntiid)
-				bundle = IContentPackageBundle(obj, None)
-				if bundle is not None and bundle.ContentPackages:
-					result = tuple(x.ntiid for x in bundle.ContentPackages)
-			else:
-				result = (ntiid,)
-		return result
+    def resolve(self, user, ntiid=None):
+        result = ()
+        if ntiid != ROOT:
+            if bool(is_ntiid_of_type(ntiid, TYPE_OID)):
+                obj = find_object_with_ntiid(ntiid)
+                bundle = IContentPackageBundle(obj, None)
+                if bundle is not None and bundle.ContentPackages:
+                    result = tuple(x.ntiid for x in bundle.ContentPackages)
+            else:
+                result = (ntiid,)
+        else:
+            request = get_current_request()
+            library = component.queryUtility(IContentPackageLibrary)
+            library = component.queryMultiAdapter((library, request),
+                                                  IContentPackageLibrary)
+            if library is not None:
+                result = tuple(x.ntiid for x in library.contentPackages)
+        return result
+
 
 @interface.implementer(IRootPackageResolver)
 class _DefaultRootPackageResolver(object):
 
-	def __init__(self, *args):
-		pass
+    def __init__(self, *args):
+        pass
 
-	def resolve(self, ntiid):
-		library = component.queryUtility(IContentPackageLibrary)
-		paths = library.pathToNTIID(ntiid) if library is not None else None
-		return paths[0] if paths else None
+    def resolve(self, ntiid):
+        library = component.queryUtility(IContentPackageLibrary)
+        paths = library.pathToNTIID(ntiid) if library is not None else None
+        return paths[0] if paths else None
+
 
 @component.adapter(IContentUnit)
 @interface.implementer(ISearchHitPredicate)
 class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
 
-	@Lazy
-	def request(self):
-		return get_current_request()
+    @Lazy
+    def request(self):
+        return get_current_request()
 
-	def allow(self, item, score, query):
-		if self.principal is None:
-			return True
-		else:
-			return has_permission(ACT_READ, item, self.request)
+    def allow(self, item, score, query):
+        if self.principal is None:
+            return True
+        return has_permission(ACT_READ, item, self.request)
+
 
 @component.adapter(IContentUnitSearchHit)
 class _SearchHitDecorator(object):
 
-	__metaclass__ = SingletonDecorator
+    __metaclass__ = SingletonDecorator
 
-	def decorateExternalObject(self, original, external):
-		if CONTAINER_ID not in external:
-			context = original.Target
-			parent_key = getattr(context.__parent__, 'key', None)
-			if parent_key is not None and parent_key == context.key:
-				external[CONTAINER_ID] = context.__parent__.ntiid
-			else:
-				external[CONTAINER_ID] = context.ntiid
+    def decorateExternalObject(self, original, external):
+        if CONTAINER_ID not in external:
+            context = original.Target
+            parent_key = getattr(context.__parent__, 'key', None)
+            if parent_key is not None and parent_key == context.key:
+                external[CONTAINER_ID] = context.__parent__.ntiid
+            else:
+                external[CONTAINER_ID] = context.ntiid
