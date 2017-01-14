@@ -55,7 +55,7 @@ class _PermissionedContentPackageLibrary(ProxyBase,
 	def __init__(self, base, request):
 		ProxyBase.__init__(self, base)
 		self.library = base
-		self.request = request
+		self._v_request = request
 		self._v_contentPackages = None
 
 	@property

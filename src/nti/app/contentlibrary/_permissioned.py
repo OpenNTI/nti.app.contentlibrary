@@ -46,7 +46,7 @@ def _last_synchronized():
 def _get_user_ticket_key(user):
 	result = '/contentlibrary/%s/ticket' % getattr(user, 'username', user)
 	return result.lower()
-	
+
 def _get_user_ticket(user, client):
 	try:
 		if client != None:
@@ -69,13 +69,13 @@ def _get_base_key(username, ntiid):
 	lastSync = _last_synchronized()
 	result = _encode_keys(cur_site.__name__, username, ntiid, lastSync)
 	return result
-	
+
 def _get_user_content_package_key(user, content_package, client):
 	ticket = _get_user_ticket(user, client)
 	base = _get_base_key(user.username, content_package.ntiid)
 	result = "/contentlibrary/%s/%s" % (base, ticket)
 	return result.lower()
-	
+
 class _PermissionedContentPackageMixin(object):
 
 	@Lazy
@@ -84,7 +84,7 @@ class _PermissionedContentPackageMixin(object):
 
 	def _test_and_cache(self, content_package):
 		# test readability
-		request = self.request
+		request = self._v_request
 		if is_readable(content_package, request):
 			result = True
 		else:
