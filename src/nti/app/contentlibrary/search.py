@@ -86,6 +86,8 @@ class _DefaultRootPackageResolver(object):
 @interface.implementer(ISearchHitPredicate)
 class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
 
+    __name__ = 'ContentUnit'
+
     @Lazy
     def request(self):
         return get_current_request()
