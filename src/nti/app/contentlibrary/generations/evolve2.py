@@ -80,9 +80,8 @@ def do_evolve(context):
                         delattr(library, name)
                     except AttributeError:
                         pass
-
-        logger.info('Dataserver evolution %s done.', generation)
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
+    logger.info('Dataserver evolution %s done.', generation)
 
 
 def evolve(context):
