@@ -33,71 +33,70 @@ from nti.contentlibrary.synchronize import SynchronizationResults
 from nti.site.hostpolicy import run_job_in_all_host_sites
 from nti.site.hostpolicy import synchronize_host_policies
 
-def _do_synchronize(method, sleep=None, site=None, ntiids=(), allowRemoval=True):
-	results = SynchronizationResults()
-	params = SynchronizationParams(ntiids=ntiids or (), allowRemoval=allowRemoval)
 
-	# notify
-	notify(AllContentPackageLibrariesWillSyncEvent(params))
+def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True):
+    results = SynchronizationResults()
+    params = SynchronizationParams(ntiids=ntiids or (), 
+                                   allowRemoval=allowRemoval)
 
-	# First, synchronize the policies, make sure everything is all nice and installed.
-	synchronize_host_policies()
+    # notify
+    notify(AllContentPackageLibrariesWillSyncEvent(params))
 
-	# Next, the libraries.
-	# NOTE: We do not synchronize the global library; it is not
-	# expected to be persistent and is not shared across
-	# instances, so synchronizing it now will actually cause
-	# things to be /out/ of sync.
-	# We just keep track of it to make sure we don't.
-	seen = set()
-	seen.add(None)
-	global_lib = component.getGlobalSiteManager().queryUtility(IContentPackageLibrary)
-	seen.add(global_lib)
+    # First, synchronize the policies, make sure everything is all nice and
+    # installed.
+    synchronize_host_policies()
 
-	def sync_site_library():
-		# Mostly for testing, if we started up with a different library
-		# that could not provide valid site libraries, install
-		# one if we can get there now.
-		site_manager = component.getSiteManager()
-		site_name = site_manager.__parent__.__name__
-		site_lib = install_site_content_library(site_manager)
-		if site_lib in seen:
-			return
+    # Next, the libraries.
+    # NOTE: We do not synchronize the global library; it is not
+    # expected to be persistent and is not shared across
+    # instances, so synchronizing it now will actually cause
+    # things to be /out/ of sync.
+    # We just keep track of it to make sure we don't.
+    seen = set()
+    seen.add(None)
+    gsm = component.getGlobalSiteManager()
+    global_lib = gsm.queryUtility(IContentPackageLibrary)
+    seen.add(global_lib)
 
-		seen.add(site_lib)
-		if site and site_name != site:
-			return
+    def sync_site_library():
+        # Mostly for testing, if we started up with a different library
+        # that could not provide valid site libraries, install
+        # one if we can get there now.
+        site_manager = component.getSiteManager()
+        site_name = site_manager.__parent__.__name__
+        site_lib = install_site_content_library(site_manager)
+        if site_lib in seen:
+            return
 
-		if sleep:
-			gevent.sleep()
+        seen.add(site_lib)
+        if site and site_name != site:
+            return
 
-		syncer = ISyncableContentPackageLibrary(site_lib, None)
-		if syncer is not None:
-			logger.info("Sync library %s", site_lib)
-			executable = getattr(site_lib, method)
-			executable(params, results)
-			return True
-		return False
+        if sleep:
+            gevent.sleep()
 
-	# sync
-	run_job_in_all_host_sites(sync_site_library)
+        syncer = ISyncableContentPackageLibrary(site_lib, None)
+        if syncer is not None:
+            logger.info("Sync library %s", site_lib)
+            site_lib.syncContentPackages(params, results)
+            return True
+        return False
 
-	# mark sync time
-	hostsites = component.getUtility(IEtcNamespace, name='hostsites')
-	hostsites.lastSynchronized = time.time()
+    # sync
+    run_job_in_all_host_sites(sync_site_library)
 
-	# clean up
-	gc.collect()
+    # mark sync time
+    hostsites = component.getUtility(IEtcNamespace, name='hostsites')
+    hostsites.lastSynchronized = time.time()
 
-	# notify
-	notify(AllContentPackageLibrariesDidSyncEvent(params, results))
-	return params, results
+    # clean up
+    gc.collect()
+
+    # notify
+    notify(AllContentPackageLibrariesDidSyncEvent(params, results))
+    return params, results
+
 
 def syncContentPackages(sleep=None, allowRemoval=True, site=None, ntiids=()):
-	result = _do_synchronize("syncContentPackages", sleep, site, ntiids, allowRemoval)
-	return result
+    return _do_synchronize(sleep, site, ntiids, allowRemoval)
 synchronize = syncContentPackages
-
-def addRemoveContentPackages(sleep=None, site=None):
-	result = _do_synchronize("addRemoveContentPackages", sleep, site)
-	return result
