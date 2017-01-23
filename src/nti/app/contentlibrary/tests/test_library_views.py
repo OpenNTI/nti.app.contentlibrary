@@ -16,6 +16,8 @@ from hamcrest import has_entries
 from hamcrest import assert_that
 from hamcrest import has_property
 
+from urllib import unquote as UQ
+
 from zope import component
 from zope import interface
 
@@ -134,8 +136,8 @@ class TestApplicationBundles(ApplicationLayerTest):
 
 		package = res.json_body['titles'][0]
 		assert_that(package, has_entry('ContentPackages', contains(has_entry('Class', 'ContentPackage'))))
-		assert_that( self.require_link_href_with_rel(package, 'DiscussionBoard'),
-					 is_('/dataserver2/%2B%2Betc%2B%2Bbundles/bundles/tag%3Anextthought.com%2C2011-10%3ANTI-Bundle-ABundle/DiscussionBoard'))
+		assert_that( UQ(self.require_link_href_with_rel(package, 'DiscussionBoard')),
+					 is_(UQ('/dataserver2/%2B%2Betc%2B%2Bbundles/bundles/tag%3Anextthought.com%2C2011-10%3ANTI-Bundle-ABundle/DiscussionBoard')))
 
 	@WithSharedApplicationMockDS(users=True,testapp=True)
 	def test_ipad_hack(self):

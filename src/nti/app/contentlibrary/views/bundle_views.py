@@ -17,17 +17,18 @@ from nti.contentlibrary.interfaces import IContentPackageBundle
 
 from nti.dataserver.authorization import ACT_READ
 
-@view_config(route_name='objects.generic.traversal',
-			 renderer='rest',
-			 request_method='POST',
-			 context=IContentPackageBundle,
-			 permission=ACT_READ,
-			 name='Pages')
-class ContentBundlePagesView(ContainerContextUGDPostView):
-	"""
-	A pages view on the course.  We subclass ``ContainerContextUGDPostView``
-	in order to intervene and annotate our ``IContainerContext``
-	object with the content bundle context.
 
-	Reading/Editing/Deleting will remain the same.
-	"""
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             request_method='POST',
+             context=IContentPackageBundle,
+             permission=ACT_READ,
+             name='Pages')
+class ContentBundlePagesView(ContainerContextUGDPostView):
+    """
+    A pages view on the course.  We subclass ``ContainerContextUGDPostView``
+    in order to intervene and annotate our ``IContainerContext``
+    object with the content bundle context.
+
+    Reading/Editing/Deleting will remain the same.
+    """
