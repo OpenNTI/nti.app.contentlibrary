@@ -16,7 +16,8 @@ from hamcrest import has_entries
 from hamcrest import assert_that
 from hamcrest import has_property
 
-from urllib import unquote as UQ
+from urllib import quote
+from urllib import unquote
 
 from zope import component
 from zope import interface
@@ -58,8 +59,6 @@ class NIDMapper(object):
 
 		self.href = href
 
-from urllib import quote
-
 from nti.app.contentlibrary.tests import ContentLibraryApplicationTestLayer
 
 from nti.app.testing.decorators import WithSharedApplicationMockDS
@@ -78,7 +77,7 @@ class TestApplication(ApplicationLayerTest):
 		library_ws, = [x for x in service_res.json_body['Items'] if x['Title'] == 'Library']
 		assert_that( library_ws, has_entry( 'Items', has_length(1)))
 		main_col = library_ws['Items'][0]
-		assert_that( main_col, has_entry( 'href', quote(href) ))
+		assert_that( main_col, has_entry( 'href',  unquote(href) ))
 
 		res = self.testapp.get( href )
 		assert_that( res.cache_control, has_property( 'max_age', 0 ) )
@@ -136,8 +135,10 @@ class TestApplicationBundles(ApplicationLayerTest):
 
 		package = res.json_body['titles'][0]
 		assert_that(package, has_entry('ContentPackages', contains(has_entry('Class', 'ContentPackage'))))
-		assert_that( UQ(self.require_link_href_with_rel(package, 'DiscussionBoard')),
-					 is_(UQ('/dataserver2/%2B%2Betc%2B%2Bbundles/bundles/tag%3Anextthought.com%2C2011-10%3ANTI-Bundle-ABundle/DiscussionBoard')))
+		
+		expected = unquote('/dataserver2/%2B%2Betc%2B%2Bbundles/bundles/tag%3Anextthought.com%2C2011-10%3ANTI-Bundle-ABundle/DiscussionBoard')
+		assert_that( unquote(self.require_link_href_with_rel(package, 'DiscussionBoard')),
+					 is_(expected))
 
 	@WithSharedApplicationMockDS(users=True,testapp=True)
 	def test_ipad_hack(self):
