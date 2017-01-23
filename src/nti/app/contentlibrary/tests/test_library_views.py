@@ -16,7 +16,6 @@ from hamcrest import has_entries
 from hamcrest import assert_that
 from hamcrest import has_property
 
-from urllib import quote
 from urllib import unquote
 
 from zope import component
@@ -126,7 +125,7 @@ class TestApplicationBundles(ApplicationLayerTest):
 		library_ws, = [x for x in service_res.json_body['Items'] if x['Title'] == 'ContentBundles']
 		assert_that( library_ws, has_entry( 'Items', has_length(1)))
 		main_col = library_ws['Items'][0]
-		assert_that( main_col, has_entry( 'href', quote(href) ))
+		assert_that( main_col, has_entry( 'href', unquote(href) ))
 
 		res = self.testapp.get( href )
 		assert_that( res.cache_control, has_property( 'max_age', 0 ) )
