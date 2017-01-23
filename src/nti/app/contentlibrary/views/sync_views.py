@@ -255,8 +255,7 @@ class _SyncContentPackagesMixin(_AbstractSyncAllLibrariesView):
         # from being broadcast (specifically topic creations). We've seen such
         # changes end up causing conflict issues when managing sessions. These
         # retries cause syncs to take much longer to perform.
-        result = self._do_sync(site=site)
-        return result
+        return self._do_sync(site=site)
 
 
 @view_config(permission=ACT_SYNC_LIBRARY)
@@ -287,7 +286,7 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
         site = values.get('site')
         allowRemoval = values.get('allowRemoval') or u''
         allowRemoval = allowRemoval.lower() in TRUE_VALUES
-        # things to sync (package and courses)
+        # things to sync
         for name in ('ntiids', 'ntiid', 'packages', 'package'):
             ntiids = values.get(name)
             if ntiids:
