@@ -38,7 +38,7 @@ from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.dataserver import authorization as nauth
 
 HTML = u'HTML'
-
+RST_MIMETYPE = u'text/x-rst'
 
 @view_config(context=LibraryPathAdapter)
 @view_defaults(route_name='objects.generic.traversal',
