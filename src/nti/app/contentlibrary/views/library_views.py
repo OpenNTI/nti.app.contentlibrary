@@ -122,8 +122,8 @@ def _create_page_info(request, href, ntiid, last_modified=0, jsonp_href=None):
     if href:
         info.extra_links = (Link(href, rel='content'),)  # TODO: The rel?
     if jsonp_href:
-        link = Link(jsonp_href, 
-                    rel='jsonp_content', 
+        link = Link(jsonp_href,
+                    rel='jsonp_content',
                     target_mime_type='application/json')
         info.extra_links = info.extra_links + (link,)  # TODO: The rel?
 
@@ -185,14 +185,14 @@ class _LibraryTOCRedirectClassView(object):
         lastModified = request.context.lastModified
         # But the ToC is important too, so we take the newest
         # of all these that we can find
-        root_package = traversal.find_interface(request.context, 
+        root_package = traversal.find_interface(request.context,
                                                 IContentPackage)
         lastModified = max(lastModified,
                            getattr(root_package, 'lastModified', 0),
                            getattr(root_package, 'index_last_modified', 0))
         return lastModified
 
-    link_mimeType = nti_mimetype_with_class('link')
+    link_mimeType = link_mt = nti_mimetype_with_class('link')
     link_mt_json = link_mimeType + '+json'
     link_mts = (link_mimeType, link_mt_json)
 
@@ -269,7 +269,7 @@ class _LibraryTOCRedirectClassView(object):
             return _create_page_info(request,
                                      href,
                                      request.context.ntiid,
-                                     last_modified=lastModified, 
+                                     last_modified=lastModified,
                                      jsonp_href=jsonp_href)
 
         # ...send a 302. Return rather than raise so that webtest works better
