@@ -12,7 +12,6 @@ logger = __import__('logging').getLogger(__name__)
 # import six
 
 from zope import component
-# from zope import interface
 # from zope import lifecycleevent
 
 from pyramid import httpexceptions as hexc
@@ -45,14 +44,16 @@ from nti.dataserver import authorization as nauth
 
 from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
 
+from nti.externalization.interfaces import StandardExternalFields
+
 HTML = u'HTML'
 RST_MIMETYPE = u'text/x-rst'
-
+MIME_TYPE = StandardExternalFields.MIMETYPE
 
 class ContentPackageMixin(object):
 
     ALLOWED_KEYS = tuple(IDCOptionalDescriptiveProperties.names()) + \
-        ('icon', 'thumbnail', 'data', 'content')
+        ('icon', 'thumbnail', 'data', 'content', MIME_TYPE)
 
     def _clean_input(self, ext_obj):
         for name in list(ext_obj.keys()):
@@ -95,8 +96,7 @@ class LibraryPostView(AbstractAuthenticatedView,
     content_predicate = IEditableContentPackage
 
     def readInput(self, value=None):
-        result = ModeledContentUploadRequestUtilsMixin.readInput(
-            self, value=value)
+        result = super(LibraryPostView, self).readInput(self, value=value)
         return self._clean_input(result)
 
     def _do_call(self):
