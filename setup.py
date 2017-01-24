@@ -40,6 +40,7 @@ setup(
     namespace_packages=['nti', 'nti.app'],
     install_requires=[
         'setuptools',
+        'docutils',
         'nti.contentlibrary'
     ],
     entry_points=entry_points,
