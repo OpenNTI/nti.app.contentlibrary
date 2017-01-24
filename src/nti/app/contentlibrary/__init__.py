@@ -9,6 +9,9 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import zope.i18nmessageid
+MessageFactory = zope.i18nmessageid.MessageFactory(__name__)
+
 from nti.app.contentlibrary.utils import PAGE_INFO_MT
 from nti.app.contentlibrary.utils import PAGE_INFO_MT_JSON
 

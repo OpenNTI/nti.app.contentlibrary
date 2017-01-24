@@ -35,7 +35,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import datetime
-from cStringIO import StringIO
+from six import StringIO
 
 from zope import component
 from zope import interface
@@ -68,86 +68,99 @@ from nti.dictserver.interfaces import IDictionaryTermDataStorage
 
 from nti.dictserver.storage import TrivialExcelCSVDataStorage
 
+
 @interface.implementer(INamedLinkPathAdapter, ITraversable)
 class _GlossaryPathAdapter(Contained):
-	"""
-	A path adapter that we can traverse to in order to get
-	to the glossary.
+    """
+    A path adapter that we can traverse to in order to get
+    to the glossary.
 
-	Because we consume the sub-path in the glossary view itself,
-	we let traversal continue through us to keep returning us.
-	"""
+    Because we consume the sub-path in the glossary view itself,
+    we let traversal continue through us to keep returning us.
+    """
 
-	__name__ = 'Glossary'
+    __name__ = 'Glossary'
 
-	term = None
+    term = None
 
-	def __init__(self, context, request):
-		self.context = self.__parent__ = context
-		self.request = request
-		self.ntiid = context.ntiid
+    def __init__(self, context, request):
+        self.context = self.__parent__ = context
+        self.request = request
+        self.ntiid = context.ntiid
 
-	def traverse(self, key, remaining_path):
-		# Only one layer
-		if self.term:
-			raise LocationError(key)
-		self.term = key
-		return self
+    def traverse(self, key, remaining_path):
+        # Only one layer
+        if self.term:
+            raise LocationError(key)
+        self.term = key
+        return self
+
 
 @view_config(route_name='objects.generic.traversal',
-			 context=_GlossaryPathAdapter,
-			 request_method='GET',
-			 permission=nauth.ACT_READ,
-			 http_cache=datetime.timedelta(days=1))
+             context=_GlossaryPathAdapter,
+             request_method='GET',
+             permission=nauth.ACT_READ,
+             http_cache=datetime.timedelta(days=1))
 @interface.implementer(INamedLinkView)
 class GlossaryView(object):
-	"""
-	Primary reading glossary view.
-	"""
-	def __init__(self, request):
-		self.request = request
+    """
+    Primary reading glossary view.
+    """
 
-	def __call__(self):
-		request = self.request
-		term = request.context.term
+    def __init__(self, request):
+        self.request = request
 
-		ntiid = request.context.ntiid
+    def __call__(self):
+        request = self.request
+        term = request.context.term
 
-		# Currently, we only support merging in content-specific glossary values
-		library = request.registry.queryUtility(IContentPackageLibrary)
-		if library:
-			path = library.pathToNTIID(ntiid) or ()
-		else:
-			path = ()
+        ntiid = request.context.ntiid
 
-		# Collect all the dictionaries, from most specific to global
-		dictionaries = []
-		for unit in path:
-			unit_dict = request.registry.queryUtility(IDictionaryTermDataStorage, name=unit.ntiid)
-			dictionaries.append(unit_dict)
-		dictionaries.append(request.registry.queryUtility(IDictionaryTermDataStorage))
+        # Currently, we only support merging in content-specific glossary
+        # values
+        library = request.registry.queryUtility(IContentPackageLibrary)
+        if library:
+            path = library.pathToNTIID(ntiid) or ()
+        else:
+            path = ()
 
-		info = term
-		for dictionary in dictionaries:
-			if dictionary is not None:
-				info = lookup(info, dictionary=dictionary)
+        # Collect all the dictionaries, from most specific to global
+        dictionaries = []
+        for unit in path:
+            unit_dict = request.registry.queryUtility(IDictionaryTermDataStorage, 
+                                                      name=unit.ntiid)
+            dictionaries.append(unit_dict)
+        registry = request.registry
+        dictionaries.append(registry.queryUtility(IDictionaryTermDataStorage))
 
-		if info is term:
-			# No dictionaries at all were found
-			raise hexc.HTTPNotFound()
+        info = term
+        for dictionary in dictionaries:
+            if dictionary is not None:
+                info = lookup(info, dictionary=dictionary)
 
-		# Save a unicode string into the body
-		request.response.text = info.toXMLString(encoding=None)
-		request.response.content_type = b'text/xml'
-		# Let the web layer encode to utf-8 (the default for XML)
-		request.response.charset = b'utf-8'
-		request.response.status_int = 200
-		return request.response
+        if info is term:
+            # No dictionaries at all were found
+            raise hexc.HTTPNotFound()
+
+        # Save a unicode string into the body
+        request.response.text = info.toXMLString(encoding=None)
+        request.response.content_type = b'text/xml'
+        # Let the web layer encode to utf-8 (the default for XML)
+        request.response.charset = b'utf-8'
+        request.response.status_int = 200
+        return request.response
+
 
 @component.adapter(IContentPackage, IObjectCreatedEvent)
 def add_main_glossary_from_new_content(title, event):
-	glossary_source = title.read_contents_of_sibling_entry(MAIN_CSV_CONTENT_GLOSSARY_FILENAME)
-	if glossary_source:
-		logger.info("Adding content-glossary from %s at %s", title, title.ntiid)
-		csv_dict = TrivialExcelCSVDataStorage(StringIO(glossary_source))
-		component.provideUtility(csv_dict, name=title.ntiid)
+    try:
+        glossary_source = title.read_contents_of_sibling_entry(
+            MAIN_CSV_CONTENT_GLOSSARY_FILENAME)
+        if glossary_source:
+            logger.info("Adding content-glossary from %s at %s",
+                         title, title.ntiid)
+            csv_dict = TrivialExcelCSVDataStorage(StringIO(glossary_source))
+            component.provideUtility(csv_dict, name=title.ntiid)
+    except AttributeError:
+        pass
+

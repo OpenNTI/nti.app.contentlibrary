@@ -15,6 +15,8 @@ from zope.container.contained import Contained
 
 from zope.traversing.interfaces import IPathAdapter
 
+from nti.app.contentlibrary import MessageFactory
+
 
 @interface.implementer(IPathAdapter)
 class LibraryPathAdapter(Contained):
