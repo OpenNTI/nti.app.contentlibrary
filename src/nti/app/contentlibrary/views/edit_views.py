@@ -22,7 +22,11 @@ from pyramid.view import view_defaults
 
 # from nti.app.contentlibrary import MessageFactory as _
 
+# from nti.app.base.abstract_views import get_all_sources
+
 from nti.app.base.abstract_views import AbstractAuthenticatedView
+
+from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
 from nti.app.contentlibrary.views import LibraryPathAdapter
 
@@ -30,34 +34,48 @@ from nti.app.publishing import VIEW_PUBLISH
 from nti.app.publishing import VIEW_UNPUBLISH
 
 from nti.appserver.ugd_edit_views import UGDPutView
-from nti.appserver.ugd_edit_views import UGDPostView
 from nti.appserver.ugd_edit_views import UGDDeleteView
 
 from nti.contentlibrary.interfaces import IEditableContentPackage
 
 from nti.dataserver import authorization as nauth
 
+from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
+
 HTML = u'HTML'
 RST_MIMETYPE = u'text/x-rst'
+
+
+class ContentPackageMixin(object):
+
+    ALLOWED_KEYS = tuple(IDCOptionalDescriptiveProperties.names()) + \
+        ('icon', 'thumbnail', 'data', 'content')
+
+    def _clean_input(self, ext_obj):
+        for name in list(ext_obj.keys()):
+            if name not in self.ALLOWED_KEYS:
+                ext_obj.pop(name, None)
+        return ext_obj
+
 
 @view_config(context=LibraryPathAdapter)
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
                request_method='GET',
                permission=nauth.ACT_CONTENT_EDIT)
-class LibraryPostView(AbstractAuthenticatedView):
+class LibraryPostView(AbstractAuthenticatedView,
+                      ModeledContentUploadRequestUtilsMixin,
+                      ContentPackageMixin):
 
-    def __call__(self):
+    content_predicate = IEditableContentPackage
+
+    def readInput(self, value=None):
+        result = ModeledContentUploadRequestUtilsMixin.readInput(
+            self, value=value)
+        return self._clean_input(result)
+
+    def _do_call(self):
         pass
-
-
-@view_config(context=IEditableContentPackage)
-@view_defaults(route_name='objects.generic.traversal',
-               renderer='rest',
-               request_method='POST',
-               permission=nauth.ACT_CONTENT_EDIT)
-class ContentPackagePostView(UGDPostView):
-    pass
 
 
 @view_config(context=IEditableContentPackage)
