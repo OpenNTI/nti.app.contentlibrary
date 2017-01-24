@@ -11,20 +11,22 @@ logger = __import__('logging').getLogger(__name__)
 
 # import six
 
-# from zope import component
+from zope import component
 # from zope import interface
 # from zope import lifecycleevent
 
-# from pyramid import httpexceptions as hexc
+from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 
 # from nti.app.contentlibrary import MessageFactory as _
 
-# from nti.app.base.abstract_views import get_all_sources
+from nti.app.base.abstract_views import get_all_sources
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
+
+from nti.app.externalization.error import raise_json_error
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
@@ -36,6 +38,7 @@ from nti.app.publishing import VIEW_UNPUBLISH
 from nti.appserver.ugd_edit_views import UGDPutView
 from nti.appserver.ugd_edit_views import UGDDeleteView
 
+from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentPackage
 
 from nti.dataserver import authorization as nauth
@@ -56,6 +59,28 @@ class ContentPackageMixin(object):
             if name not in self.ALLOWED_KEYS:
                 ext_obj.pop(name, None)
         return ext_obj
+
+    def _get_source(self, request):
+        sources = get_all_sources(request, RST_MIMETYPE)
+        if sources:
+            if len(sources) == 1:
+                return iter(sources.values()).next()
+            return sources.get('data') \
+                or sources.get('content')
+        return None
+
+    def _validate(self, content, contentType=RST_MIMETYPE):
+        validator = component.queryUtility(IContentValidator,
+                                           name=contentType)
+        if validator is None:
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                u'message': _("Cannot find content validator."),
+                                u'code': 'CannotFindContentValidator',
+                             },
+                             None)
+        validator.validate(content)
 
 
 @view_config(context=LibraryPathAdapter)
@@ -83,8 +108,11 @@ class LibraryPostView(AbstractAuthenticatedView,
                renderer='rest',
                request_method='PUT',
                permission=nauth.ACT_CONTENT_EDIT)
-class ContentPackagePutView(UGDPutView):
-    pass
+class ContentPackagePutView(UGDPutView, ContentPackageMixin):
+
+    def readInput(self, value=None):
+        result = UGDPutView.readInput(self, value=value)
+        return self._clean_input(result)
 
 
 @view_config(context=IEditableContentPackage)
