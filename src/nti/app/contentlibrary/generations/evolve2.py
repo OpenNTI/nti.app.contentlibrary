@@ -60,10 +60,14 @@ def do_evolve(context):
                 library = component.queryUtility(IContentPackageLibrary)
                 if library is None:
                     continue
+                last_modified = 0
                 contentPackages = OOBTree()
                 contentUnitsByNTIID = OOBTree()
+                
                 for package in library._contentPackages or ():
                     contentPackages[package.ntiid] = package
+                    index_lm = getattr(package, 'index_last_modified', None)
+                    last_modified = max(last_modified, index_lm or -1)
 
                 def _recur(unit):
                     contentUnitsByNTIID[unit.ntiid] = unit
@@ -72,6 +76,7 @@ def do_evolve(context):
                 for package in library._contentPackages or ():
                     _recur(package)
 
+                library._last_modified = last_modified
                 library._contentPackages = contentPackages
                 library._contentUnitsByNTIID = contentUnitsByNTIID
 
