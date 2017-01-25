@@ -39,6 +39,7 @@ from nti.appserver.ugd_edit_views import UGDDeleteView
 
 from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentPackage
+from nti.contentlibrary.interfaces import IEditableContentPackageLibrary
 
 from nti.dataserver import authorization as nauth
 
@@ -100,8 +101,15 @@ class LibraryPostView(AbstractAuthenticatedView,
         return self._clean_input(result)
 
     def _do_call(self):
-        pass
-
+        library = component.queryUtility(IEditableContentPackageLibrary)
+        if library is None:
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                u'message': _("Library not available."),
+                                u'code': 'LibraryNotAvailable',
+                             },
+                             None)
 
 @view_config(context=IEditableContentPackage)
 @view_defaults(route_name='objects.generic.traversal',
