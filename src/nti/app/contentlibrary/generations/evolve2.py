@@ -62,14 +62,14 @@ def do_evolve(context):
                     continue
                 contentPackages = OOBTree()
                 contentUnitsByNTIID = OOBTree()
-                for package in library.contentPackages or ():
+                for package in library._contentPackages or ():
                     contentPackages[package.ntiid] = package
 
                 def _recur(unit):
                     contentUnitsByNTIID[unit.ntiid] = unit
                     for child in unit.children:
                         _recur(child)
-                for package in library.contentPackages or ():
+                for package in library._contentPackages or ():
                     _recur(package)
 
                 library._contentPackages = contentPackages
@@ -88,4 +88,4 @@ def evolve(context):
     """
     Evolve to gen 2 by installing the new library asset catalog.
     """
-    # do_evolve(context) DON"T Install YET
+    do_evolve(context)
