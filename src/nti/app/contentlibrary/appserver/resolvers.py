@@ -17,6 +17,7 @@ from nti.appserver.interfaces import IContainerRootResolver
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
+
 class _DefaultContainerPathResolver(object):
 
     index = None
@@ -30,9 +31,11 @@ class _DefaultContainerPathResolver(object):
         paths = library.pathToNTIID(ntiid) if library is not None else None
         return paths[cls.index] if paths else None
 
+
 @interface.implementer(IContainerLeafResolver)
 class _DefaultContainerLeafResolver(_DefaultContainerPathResolver):
     index = -1
+
 
 @interface.implementer(IContainerRootResolver)
 class _DefaultContainerRootResolver(_DefaultContainerPathResolver):
