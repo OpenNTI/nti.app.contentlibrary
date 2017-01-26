@@ -22,6 +22,8 @@ from nti.app.authentication import get_remote_user
 
 from nti.appserver.pyramid_authorization import is_readable
 
+from nti.contentlibrary.interfaces import INoAutoSync
+
 from nti.dataserver.interfaces import IMemcacheClient
 
 from nti.property.property import Lazy
@@ -101,13 +103,16 @@ class _PermissionedContentPackageMixin(object):
             result = any((is_readable(x, request)
                           for x in content_package.children or ()))
 
+        # don't cache
+        if INoAutoSync.providedBy(content_package):
+            return result
         try:
             # cache if possible
             client = self._client
             user = get_remote_user()
             if client != None and user != None:
                 key = _get_user_content_package_key(user,
-                                                    content_package, 
+                                                    content_package,
                                                     client)
                 client.set(key, bool(result), time=EXP_TIME)
         except Exception as e:
@@ -119,7 +124,7 @@ class _PermissionedContentPackageMixin(object):
             client = self._client
             user = get_remote_user()
             if client != None and user != None:
-                key = _get_user_content_package_key(user, 
+                key = _get_user_content_package_key(user,
                                                     content_package,
                                                     client)
                 result = client.get(key)

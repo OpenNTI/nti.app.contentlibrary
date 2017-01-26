@@ -21,16 +21,19 @@ from nti.app.contentlibrary._permissioned import _memcached_client
 
 from nti.contenttypes.courses.interfaces import ICourseInstanceEnrollmentRecord
 
+
 def _on_operation_on_scope_membership(record, event):
-	principal = record.Principal
-	if principal != None:
-		pid = IPrincipal(principal).id
-		_set_user_ticket(pid, _memcached_client())
+    principal = record.Principal
+    if principal != None:
+        pid = IPrincipal(principal).id
+        _set_user_ticket(pid, _memcached_client())
+
 
 @component.adapter(ICourseInstanceEnrollmentRecord, IObjectAddedEvent)
 def _on_enroll_record(record, event):
-	_on_operation_on_scope_membership(record , event)
+    _on_operation_on_scope_membership(record, event)
+
 
 @component.adapter(ICourseInstanceEnrollmentRecord, IObjectRemovedEvent)
 def _on_unenroll_record(record, event):
-	_on_operation_on_scope_membership(record , event)
+    _on_operation_on_scope_membership(record, event)
