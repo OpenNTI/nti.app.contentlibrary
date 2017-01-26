@@ -180,7 +180,7 @@ class LibraryCollection(object):
 
     @property
     def accepts(self):
-        # Cannot add to library
+        # TODO: Add mimetypes
         return ()
 
 
