@@ -18,7 +18,7 @@ from zope.component.hooks import setHooks
 
 from zope.intid.interfaces import IIntIds
 
-from nti.contentlibrary.indexed_data.catalog import install_library_catalog
+from nti.contentlibrary.indexed_data.catalog import install_assets_library_catalog
 
 def do_evolve(context):
     setHooks()
@@ -33,7 +33,7 @@ def do_evolve(context):
         lsm = ds_folder.getSiteManager()
         intids = lsm.getUtility(IIntIds)
 
-        install_library_catalog(ds_folder, intids)
+        install_assets_library_catalog(ds_folder, intids)
         logger.info('Dataserver evolution %s done.', generation)
 
 
