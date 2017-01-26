@@ -53,7 +53,7 @@ def do_evolve(context):
 
     with site(ds_folder):
         assert  component.getSiteManager() == ds_folder.getSiteManager(), \
-            "Hooks not installed?"
+                "Hooks not installed?"
 
         for current_site in get_all_host_sites():
             with site(current_site):

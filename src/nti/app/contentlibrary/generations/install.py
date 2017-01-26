@@ -19,7 +19,10 @@ from zope.generations.interfaces import IInstallableSchemaManager
 
 from zope.intid.interfaces import IIntIds
 
+from nti.contentlibrary.index import install_library_catalog
+
 from nti.contentlibrary.indexed_data.index import install_container_catalog
+
 
 @interface.implementer(IInstallableSchemaManager)
 class _SchemaManager(BaseSchemaManager):
@@ -29,18 +32,20 @@ class _SchemaManager(BaseSchemaManager):
 
     def __init__(self):
         super(_SchemaManager, self).__init__(
-                generation=generation,
-                minimum_generation=generation,
-                package_name='nti.app.contentlibrary.generations')
+            generation=generation,
+            minimum_generation=generation,
+            package_name='nti.app.contentlibrary.generations')
 
     def install(self, context):
         evolve(context)
 
 
 def evolve(context):
-    install_catalog(context)
+    install_library_catalog(context)
+    install_old_assets_catalog(context)
 
-def install_catalog(context):
+
+def install_old_assets_catalog(context):
     conn = context.connection
     root = conn.root()
     dataserver_folder = root['nti.dataserver']
