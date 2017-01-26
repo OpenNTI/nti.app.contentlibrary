@@ -51,6 +51,7 @@ HTML = u'HTML'
 RST_MIMETYPE = u'text/x-rst'
 MIME_TYPE = StandardExternalFields.MIMETYPE
 
+
 class ContentPackageMixin(object):
 
     ALLOWED_KEYS = tuple(IDCOptionalDescriptiveProperties.names()) + \
@@ -78,11 +79,23 @@ class ContentPackageMixin(object):
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
                              {
-                                u'message': _("Cannot find content validator."),
-                                u'code': 'CannotFindContentValidator',
+                                 u'message': _("Cannot find content validator."),
+                                 u'code': 'CannotFindContentValidator',
                              },
                              None)
         validator.validate(content)
+
+    def _libray(self):
+        library = component.queryUtility(IEditableContentPackageLibrary)
+        if library is None:
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                 u'message': _("Library not available."),
+                                 u'code': 'LibraryNotAvailable',
+                             },
+                             None)
+        return library
 
 
 @view_config(context=LibraryPathAdapter)
@@ -101,15 +114,8 @@ class LibraryPostView(AbstractAuthenticatedView,
         return self._clean_input(result)
 
     def _do_call(self):
-        library = component.queryUtility(IEditableContentPackageLibrary)
-        if library is None:
-            raise_json_error(self.request,
-                             hexc.HTTPUnprocessableEntity,
-                             {
-                                u'message': _("Library not available."),
-                                u'code': 'LibraryNotAvailable',
-                             },
-                             None)
+        pass
+
 
 @view_config(context=IEditableContentPackage)
 @view_defaults(route_name='objects.generic.traversal',
