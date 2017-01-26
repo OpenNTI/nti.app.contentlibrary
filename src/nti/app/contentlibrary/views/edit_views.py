@@ -9,17 +9,17 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-# import six
+import time
+import uuid
 
 from zope import component
-# from zope import lifecycleevent
 
 from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 
-# from nti.app.contentlibrary import MessageFactory as _
+from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.base.abstract_views import get_all_sources
 
@@ -41,11 +41,22 @@ from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IEditableContentPackageLibrary
 
+from nti.coremetadata.interfaces import SYSTEM_USER_NAME
+
 from nti.dataserver import authorization as nauth
 
 from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
 
 from nti.externalization.interfaces import StandardExternalFields
+
+from nti.ntiids.ntiids import make_ntiid
+from nti.ntiids.ntiids import get_provider
+from nti.ntiids.ntiids import get_specific
+from nti.ntiids.ntiids import make_specific_safe
+
+from nti.property.property import Lazy
+
+from nti.zodb.containers import time_to_64bit_int
 
 HTML = u'HTML'
 RST_MIMETYPE = u'text/x-rst'
@@ -56,6 +67,10 @@ class ContentPackageMixin(object):
 
     ALLOWED_KEYS = tuple(IDCOptionalDescriptiveProperties.names()) + \
         ('icon', 'thumbnail', 'data', 'content', MIME_TYPE)
+
+    @Lazy
+    def _extra(self):
+        return str(uuid.uuid4()).split('-')[0].upper()
 
     def _clean_input(self, ext_obj):
         for name in list(ext_obj.keys()):
@@ -85,6 +100,7 @@ class ContentPackageMixin(object):
                              None)
         validator.validate(content)
 
+    @Lazy
     def _libray(self):
         library = component.queryUtility(IEditableContentPackageLibrary)
         if library is None:
@@ -96,6 +112,29 @@ class ContentPackageMixin(object):
                              },
                              None)
         return library
+
+    @classmethod
+    def make_pacakge_ntiid(cls, provider=None, base=None, extra=None):
+        creator = SYSTEM_USER_NAME
+        current_time = time_to_64bit_int(time.time())
+        provider = provider \
+                or (get_provider(base) or 'NTI' if base else 'NTI')
+
+        specific_base = get_specific(base) if base else None
+        if specific_base:
+            specific_base += '.%s.%s' % (creator, current_time)
+        else:
+            specific_base = '%s.%s' % (creator, current_time)
+
+        if extra:
+            specific_base = specific_base + ".%s" % extra
+        specific = make_specific_safe(specific_base)
+
+        ntiid = make_ntiid(nttype=HTML,
+                           base=base,
+                           provider=provider,
+                           specific=specific)
+        return ntiid
 
 
 @view_config(context=LibraryPathAdapter)
