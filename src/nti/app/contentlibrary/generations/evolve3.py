@@ -61,6 +61,10 @@ def do_evolve(context):
         lsm = ds_folder.getSiteManager()
         intids = lsm.getUtility(IIntIds)
 
+        library = component.queryUtility(IContentPackageLibrary)
+        if library is not None:
+            library.syncContentPackages()
+                
         catalog = install_library_catalog(ds_folder, intids)
         for current_site in get_all_host_sites():
             with site(current_site):
@@ -81,7 +85,7 @@ def do_evolve(context):
                         seen.add(package.ntiid)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
-    logger.info('Dataserver evolution %s done.', generation)
+    logger.info('Dataserver evolution %s done. %s objects indexed', generation)
 
 
 def evolve(context):

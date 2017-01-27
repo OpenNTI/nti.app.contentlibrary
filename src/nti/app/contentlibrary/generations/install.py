@@ -9,7 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-generation = 2
+generation = 3
 
 from zope import interface
 
