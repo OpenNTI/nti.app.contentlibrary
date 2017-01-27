@@ -19,6 +19,7 @@ from zope.traversing.interfaces import IPathAdapter
 
 from pyramid import httpexceptions as hexc
 
+from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import MessageFactory
 
 from nti.contentlibrary.interfaces import IContentUnit

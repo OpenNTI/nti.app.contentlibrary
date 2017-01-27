@@ -15,6 +15,9 @@ MessageFactory = zope.i18nmessageid.MessageFactory(__name__)
 from nti.app.contentlibrary.utils import PAGE_INFO_MT
 from nti.app.contentlibrary.utils import PAGE_INFO_MT_JSON
 
+#: Contents
+VIEW_CONTENTS = 'contents'
+
 #: Library Path (GET) View
 LIBRARY_PATH_GET_VIEW = 'LibraryPath'
 
