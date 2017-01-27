@@ -23,11 +23,11 @@ from pyramid import httpexceptions as hexc
 from pyramid.view import view_config
 from pyramid.view import view_defaults
 
-from nti.app.contentlibrary import MessageFactory as _
-
 from nti.app.base.abstract_views import get_all_sources
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
+
+from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.externalization.error import raise_json_error
 
