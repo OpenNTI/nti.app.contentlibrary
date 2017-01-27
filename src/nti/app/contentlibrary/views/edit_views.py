@@ -38,6 +38,7 @@ from nti.appserver.ugd_edit_views import UGDPutView
 from nti.appserver.ugd_edit_views import UGDDeleteView
 
 from nti.contentlibrary.interfaces import IContentValidator
+from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IEditableContentPackageLibrary
 
@@ -156,12 +157,12 @@ class LibraryPostView(AbstractAuthenticatedView,
         pass
 
 
-@view_config(context=IEditableContentPackage)
+@view_config(context=IEditableContentUnit)
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
                request_method='PUT',
                permission=nauth.ACT_CONTENT_EDIT)
-class ContentPackagePutView(UGDPutView, ContentPackageMixin):
+class ContentUnitPutView(UGDPutView, ContentPackageMixin):
 
     def readInput(self, value=None):
         result = UGDPutView.readInput(self, value=value)
