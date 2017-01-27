@@ -79,7 +79,8 @@ class ContentPackageMixin(object):
                 ext_obj.pop(name, None)
         return ext_obj
 
-    def _get_content(self, ext_obj):
+    @classmethod
+    def _get_content(cls, ext_obj):
         return ext_obj.get('data') or ext_obj.get('content')
 
     def _get_source(self, request=None):
@@ -105,6 +106,18 @@ class ContentPackageMixin(object):
                              None)
         validator.validate(content)
 
+    def _check_content(self, context, ext_obj):
+        contentType = RST_MIMETYPE
+        content = self._get_content(ext_obj)
+        if not content:
+            source = self._get_source(self.request)
+            if source is not None:
+                content = source.read()
+                contentType = source.contentType or RST_MIMETYPE
+        if content:
+            self._validate(content, contentType)
+        return content, contentType
+            
     @Lazy
     def _libray(self):
         library = component.queryUtility(IEditableContentPackageLibrary)
@@ -165,15 +178,8 @@ class LibraryPostView(AbstractAuthenticatedView,
                                                      search_owner=False,
                                                      externalValue=externalValue)
         package.ntiid = ntiid
-        contentType = RST_MIMETYPE
-        content = self._get_content(externalValue)
-        if not content:
-            source = self._get_source(self.request)
-            if source is not None:
-                content = source.read()
-                contentType = source.contentType or RST_MIMETYPE
+        content, contentType = self._check_content(package, externalValue)
         if content:
-            self._validate(content, contentType)
             package.write_contents(content, contentType)
         library.add(package, event=False)
         self.request.response.status_int = 201
@@ -189,7 +195,24 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
     def readInput(self, value=None):
         result = UGDPutView.readInput(self, value=value)
         return self._clean_input(result)
+    
+    def updateContentObject(self, contentObject, externalValue, set_id=False, 
+                            notify=True, pre_hook=None, object_hook=None):
+        result = UGDPutView.updateContentObject(self,
+                                                contentObject,
+                                                externalValue,
+                                                set_id=set_id, 
+                                                notify=notify, 
+                                                pre_hook=pre_hook, 
+                                                object_hook=object_hook)
+        content, contentType = self._check_content(contentObject, externalValue)
+        if content:
+            contentObject.write_contents(content, contentType)
+        return result
 
+    def __call__(self):
+        result = UGDPutView.__call__(self)
+        return result
 
 @view_config(context=IEditableContentPackage)
 @view_defaults(route_name='objects.generic.traversal',
