@@ -11,8 +11,12 @@ logger = __import__('logging').getLogger(__name__)
 
 import time
 import uuid
+import mimetypes
 
 from zope import component
+from zope import lifecycleevent
+
+from zope.file.download import getHeaders
 
 from pyramid import httpexceptions as hexc
 
@@ -29,6 +33,7 @@ from nti.app.externalization.error import raise_json_error
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
+from nti.app.contentlibrary.views import VIEW_CONTENTS
 from nti.app.contentlibrary.views import LibraryPathAdapter
 
 from nti.app.publishing import VIEW_PUBLISH
@@ -106,9 +111,9 @@ class ContentPackageMixin(object):
                              None)
         validator.validate(content)
 
-    def _check_content(self, context, ext_obj):
+    def _check_content(self, ext_obj=None):
         contentType = RST_MIMETYPE
-        content = self._get_content(ext_obj)
+        content = self._get_content(ext_obj) if ext_obj else None
         if not content:
             source = self._get_source(self.request)
             if source is not None:
@@ -117,7 +122,7 @@ class ContentPackageMixin(object):
         if content:
             self._validate(content, contentType)
         return content, contentType
-            
+
     @Lazy
     def _libray(self):
         library = component.queryUtility(IEditableContentPackageLibrary)
@@ -136,7 +141,7 @@ class ContentPackageMixin(object):
         creator = SYSTEM_USER_NAME
         current_time = time_to_64bit_int(time.time())
         provider = provider \
-                or (get_provider(base) or 'NTI' if base else 'NTI')
+            or (get_provider(base) or 'NTI' if base else 'NTI')
 
         specific_base = get_specific(base) if base else None
         if specific_base:
@@ -178,13 +183,13 @@ class LibraryPostView(AbstractAuthenticatedView,
                                                      search_owner=False,
                                                      externalValue=externalValue)
         package.ntiid = ntiid
-        content, contentType = self._check_content(package, externalValue)
-        if content:
-            package.write_contents(content, contentType)
+        content, contentType = self._check_content(externalValue)
+        package.write_contents(content, contentType)
         library.add(package, event=False)
         self.request.response.status_int = 201
         return package
-    
+
+
 @view_config(context=IEditableContentUnit)
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
@@ -195,24 +200,39 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
     def readInput(self, value=None):
         result = UGDPutView.readInput(self, value=value)
         return self._clean_input(result)
-    
-    def updateContentObject(self, contentObject, externalValue, set_id=False, 
+
+    def updateContentObject(self, contentObject, externalValue, set_id=False,
                             notify=True, pre_hook=None, object_hook=None):
         result = UGDPutView.updateContentObject(self,
                                                 contentObject,
                                                 externalValue,
-                                                set_id=set_id, 
-                                                notify=notify, 
-                                                pre_hook=pre_hook, 
+                                                set_id=set_id,
+                                                notify=notify,
+                                                pre_hook=pre_hook,
                                                 object_hook=object_hook)
-        content, contentType = self._check_content(contentObject, externalValue)
-        if content:
-            contentObject.write_contents(content, contentType)
+        content, contentType = self._check_content(externalValue)
+        contentObject.write_contents(content, contentType)
         return result
 
     def __call__(self):
         result = UGDPutView.__call__(self)
         return result
+
+
+@view_config(context=IEditableContentUnit)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='PUT',
+               name=VIEW_CONTENTS,
+               permission=nauth.ACT_CONTENT_EDIT)
+class ContentUnitContentsPutView(AbstractAuthenticatedView, ContentPackageMixin):
+
+    def __call__(self):
+        content, contentType = self._check_content()
+        self.context.write_contents(content, contentType)
+        lifecycleevent.modified(self.context)
+        return self.context
+
 
 @view_config(context=IEditableContentPackage)
 @view_defaults(route_name='objects.generic.traversal',
@@ -220,7 +240,22 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
                request_method='DELETE',
                permission=nauth.ACT_CONTENT_EDIT)
 class ContentPackageDeleteView(UGDDeleteView):
-    pass
+
+    def __call__(self):
+        response = self.request.response
+        content = self.context.content or b''
+        contentType = self.context.contentType or RST_MIMETYPE
+        ext = mimetypes.guess_extension(RST_MIMETYPE) or ".rst"
+        downloadName = "contents%s" % ext
+        headers = getHeaders(self.context,
+                             contentType=contentType,
+                             downloadName=downloadName,
+                             contentLength=len(content),
+                             contentDisposition="attachment")
+        for k, v in headers:
+            response.setHeader(k, v)
+        response.body = content
+        return response
 
 
 @view_config(context=IEditableContentPackage)
