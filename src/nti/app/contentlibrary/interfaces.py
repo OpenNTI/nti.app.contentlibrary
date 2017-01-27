@@ -82,15 +82,6 @@ class IContentCommentPost(IGeneralForumComment):
     containers(IContentHeadlineTopic)  # Adds __parent__ as required
     __parent__.required = False
 
-# Links
-
-
-class IContentUnitLinks(interface.Interface):
-    """
-    Marker interface for subscribers that return object that are linked to
-    a particular content unit
-    """
-    pass
 
 # External client preferences
 
