@@ -13,6 +13,7 @@ from nti.app.contentlibrary.utils import update_users_content_roles
 
 from nti.dataserver.users.interfaces import IOpenIDUserCreatedEvent
 
+
 @component.adapter(IOpenIDUserCreatedEvent)
 def _on_openid_user_created(event):
     idurl = event.idurl

@@ -20,15 +20,16 @@ from nti.dataserver.interfaces import ACLLocationProxy
 
 from nti.ntiids.interfaces import INTIIDResolver
 
+
 @interface.implementer(INTIIDResolver)
 class _ContentResolver(object):
 
-	def resolve(self, key):
-		result = None
-		library = component.queryUtility(IContentPackageLibrary)
-		path = library.pathToNTIID(key) if library else None
-		if path:
-			result = path[-1]
-			result = ACLLocationProxy(result, result.__parent__,
-									  result.__name__, nacl.ACL(result))
-		return result
+    def resolve(self, key):
+        result = None
+        library = component.queryUtility(IContentPackageLibrary)
+        path = library.pathToNTIID(key) if library else None
+        if path:
+            result = path[-1]
+            result = ACLLocationProxy(result, result.__parent__,
+                                      result.__name__, nacl.ACL(result))
+        return result
