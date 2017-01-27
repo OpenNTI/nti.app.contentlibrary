@@ -41,8 +41,17 @@ class _SchemaManager(BaseSchemaManager):
 
 
 def evolve(context):
-    install_library_catalog(context)
+    install_new_library_catalog(context)
     install_old_assets_catalog(context)
+
+
+def install_new_library_catalog(context):
+    conn = context.connection
+    root = conn.root()
+    dataserver_folder = root['nti.dataserver']
+    lsm = dataserver_folder.getSiteManager()
+    intids = lsm.getUtility(IIntIds)
+    install_library_catalog(dataserver_folder, intids)
 
 
 def install_old_assets_catalog(context):
