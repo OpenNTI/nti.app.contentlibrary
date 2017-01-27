@@ -79,7 +79,11 @@ class ContentPackageMixin(object):
                 ext_obj.pop(name, None)
         return ext_obj
 
-    def _get_source(self, request):
+    def _get_content(self, ext_obj):
+        return ext_obj.get('data') or ext_obj.get('content')
+
+    def _get_source(self, request=None):
+        request = self.request if not request else request
         sources = get_all_sources(request, RST_MIMETYPE)
         if sources:
             if len(sources) == 1:
@@ -154,9 +158,27 @@ class LibraryPostView(AbstractAuthenticatedView,
         return self._clean_input(result)
 
     def _do_call(self):
-        pass
-
-
+        library = self._libray
+        externalValue = self.readInput()
+        ntiid = self.make_pacakge_ntiid(extra=self._extra)
+        package = self.readCreateUpdateContentObject(self.remoteUser,
+                                                     search_owner=False,
+                                                     externalValue=externalValue)
+        package.ntiid = ntiid
+        contentType = RST_MIMETYPE
+        content = self._get_content(externalValue)
+        if not content:
+            source = self._get_source(self.request)
+            if source is not None:
+                content = source.read()
+                contentType = source.contentType or RST_MIMETYPE
+        if content:
+            self._validate(content, contentType)
+            package.write_contents(content, contentType)
+        library.add(package, event=False)
+        self.request.response.status_int = 201
+        return package
+    
 @view_config(context=IEditableContentUnit)
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
