@@ -40,7 +40,6 @@ from nti.app.publishing import VIEW_PUBLISH
 from nti.app.publishing import VIEW_UNPUBLISH
 
 from nti.appserver.ugd_edit_views import UGDPutView
-from nti.appserver.ugd_edit_views import UGDDeleteView
 
 from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
@@ -237,9 +236,10 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView, ContentPackageMixin)
 @view_config(context=IEditableContentPackage)
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
-               request_method='DELETE',
+               request_method='GET',
+               name=VIEW_CONTENTS,
                permission=nauth.ACT_CONTENT_EDIT)
-class ContentPackageDeleteView(UGDDeleteView):
+class ContentPackageContentsGetView(AbstractAuthenticatedView, ContentPackageMixin):
 
     def __call__(self):
         response = self.request.response
@@ -256,6 +256,21 @@ class ContentPackageDeleteView(UGDDeleteView):
             response.setHeader(k, v)
         response.body = content
         return response
+
+@view_config(context=IEditableContentPackage)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='DELETE',
+               permission=nauth.ACT_CONTENT_EDIT)
+class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
+
+    def _do_delete_object(self, theObject, event=False):
+        library = self._libray
+        library.remove(theObject, event=event)
+        return theObject
+
+    def __call__(self):
+        pass
 
 
 @view_config(context=IEditableContentPackage)
