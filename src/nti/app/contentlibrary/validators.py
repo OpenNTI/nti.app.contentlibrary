@@ -40,7 +40,7 @@ class ReStructuredTextValidator(object):
 
     def _do_validate(self, content):
         try:
-            parser = Parser()  # XXX: NTI directives should included
+            parser = Parser()  # XXX: NTI directives should be included
             reporter = new_reporter("contents", self.settings)
             document = nodes.document(self.settings, reporter, source='contents')
             parser.parse(content, document)
