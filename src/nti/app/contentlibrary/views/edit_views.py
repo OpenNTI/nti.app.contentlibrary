@@ -60,7 +60,7 @@ from nti.property.property import Lazy
 from nti.zodb.containers import time_to_64bit_int
 
 HTML = u'HTML'
-RST_MIMETYPE = u'text/x-rst'
+RST_MIMETYPE = b'text/x-rst'
 
 
 class ContentPackageMixin(object):
