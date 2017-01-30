@@ -50,10 +50,6 @@ from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.dataserver import authorization as nauth
 
-from nti.dublincore.interfaces import IDCOptionalDescriptiveProperties
-
-from nti.externalization.interfaces import StandardExternalFields
-
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import get_provider
 from nti.ntiids.ntiids import get_specific
@@ -65,23 +61,13 @@ from nti.zodb.containers import time_to_64bit_int
 
 HTML = u'HTML'
 RST_MIMETYPE = u'text/x-rst'
-MIME_TYPE = StandardExternalFields.MIMETYPE
 
 
 class ContentPackageMixin(object):
 
-    ALLOWED_KEYS = tuple(IDCOptionalDescriptiveProperties.names()) + \
-        ('icon', 'thumbnail', 'data', 'content', MIME_TYPE)
-
     @Lazy
     def _extra(self):
         return str(uuid.uuid4()).split('-')[0].upper()
-
-    def _clean_input(self, ext_obj):
-        for name in list(ext_obj.keys()):
-            if name not in self.ALLOWED_KEYS:
-                ext_obj.pop(name, None)
-        return ext_obj
 
     @classmethod
     def _get_content(cls, ext_obj):
@@ -170,10 +156,6 @@ class LibraryPostView(AbstractAuthenticatedView,
 
     content_predicate = IEditableContentPackage
 
-    def readInput(self, value=None):
-        result = super(LibraryPostView, self).readInput(self, value=value)
-        return self._clean_input(result)
-
     def _do_call(self):
         library = self._libray
         externalValue = self.readInput()
@@ -195,10 +177,6 @@ class LibraryPostView(AbstractAuthenticatedView,
                request_method='PUT',
                permission=nauth.ACT_CONTENT_EDIT)
 class ContentUnitPutView(UGDPutView, ContentPackageMixin):
-
-    def readInput(self, value=None):
-        result = UGDPutView.readInput(self, value=value)
-        return self._clean_input(result)
 
     def updateContentObject(self, contentObject, externalValue, set_id=False,
                             notify=True, pre_hook=None, object_hook=None):
@@ -256,6 +234,7 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView, ContentPackageMix
             response.setHeader(k, v)
         response.body = content
         return response
+
 
 @view_config(context=IEditableContentPackage)
 @view_defaults(route_name='objects.generic.traversal',
