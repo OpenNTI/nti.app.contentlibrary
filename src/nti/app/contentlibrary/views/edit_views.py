@@ -249,7 +249,9 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
         return theObject
 
     def __call__(self):
-        pass
+        if not self.context.is_published():
+            self._do_delete_object(self.context, event=False)
+        return self.context
 
 
 @view_config(context=IEditableContentPackage)
