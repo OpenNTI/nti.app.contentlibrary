@@ -15,9 +15,10 @@ from nti.appserver.policies.site_policies import get_possible_site_names
 
 from nti.contentlibrary.interfaces import IRequestSiteNames
 
+
 @interface.implementer(IRequestSiteNames)
 class _RequestSiteNames(object):
 
-	def sites(self, key):
-		return get_possible_site_names()
-	names = sites
+    def sites(self, key):
+        return get_possible_site_names()
+    names = sites
