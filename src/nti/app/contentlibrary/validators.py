@@ -40,8 +40,7 @@ class ReStructuredTextValidator(object):
 
     def _do_validate(self, content):
         try:
-            # TODO: Include NTI directives
-            parser = Parser()
+            parser = Parser()  # XXX: NTI directives should included
             reporter = new_reporter("contents", self.settings)
             document = nodes.document(self.settings, reporter, source='contents')
             parser.parse(content, document)
@@ -51,7 +50,7 @@ class ReStructuredTextValidator(object):
             raise_json_error(request,
                              hexc.HTTPUnprocessableEntity,
                              {
-                                 u'message': _("Cannot parse reStructuredText'."),
+                                 u'message': _("Cannot parse reStructuredText."),
                                  u'code': 'CannotParseReStructuredText',
                              },
                              exc_info[2])
