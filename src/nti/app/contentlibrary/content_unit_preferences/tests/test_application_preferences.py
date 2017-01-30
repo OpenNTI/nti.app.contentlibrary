@@ -28,24 +28,25 @@ from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 from nti.testing.matchers import verifiably_provides
 
+
 class TestAppFilesystem(ContentlibraryLayerTest):
-	layer = AppTestLayer
+    layer = AppTestLayer
 
-	def test_adapter_prefs(self):
+    def test_adapter_prefs(self):
 
-		unit = filesystem.FilesystemContentPackage(
-			# filename='prealgebra/index.html',
-			href='index.html',
-			# root = 'prealgebra',
-			# icon = 'icons/The%20Icon.png'
-		)
+        unit = filesystem.FilesystemContentPackage(
+            # filename='prealgebra/index.html',
+            href='index.html',
+            # root = 'prealgebra',
+            # icon = 'icons/The%20Icon.png'
+        )
 
-		assert_that(IPrefs(unit, None), is_(none()))
+        assert_that(IPrefs(unit, None), is_(none()))
 
-		unit.sharedWith = ['foo']
+        unit.sharedWith = ['foo']
 
-		assert_that(IPrefs(unit), verifiably_provides(IPrefs))
-		assert_that(IPrefs(unit), has_property('__parent__', unit))
+        assert_that(IPrefs(unit), verifiably_provides(IPrefs))
+        assert_that(IPrefs(unit), has_property('__parent__', unit))
 
 import anyjson as json
 
@@ -58,6 +59,9 @@ from pyramid import traversal
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 
+from nti.app.contentlibrary.content_unit_preferences.views import _ContentUnitPreferencesPutView
+from nti.app.contentlibrary.content_unit_preferences.decorators import _ContentUnitPreferencesDecorator
+
 from nti.contentlibrary import interfaces as lib_interfaces
 
 from nti.dataserver import users
@@ -66,255 +70,280 @@ from nti.dataserver.contenttypes import Note
 
 from nti.ntiids import ntiids
 
-from nti.app.contentlibrary.content_unit_preferences.views import _ContentUnitPreferencesPutView
-from nti.app.contentlibrary.content_unit_preferences.decorators import _ContentUnitPreferencesDecorator
-
 from nti.app.testing.layers import NewRequestLayerTest
 from nti.app.testing.layers import NewRequestSharedConfiguringTestLayer
 
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
+
 class _SecurityPolicyNewRequestSharedConfiguringTestLayer(NewRequestSharedConfiguringTestLayer):
 
-	rem_username = 'foo@bar'
+    rem_username = 'foo@bar'
 
-	@classmethod
-	def setUp(cls):
-		config = getattr(NewRequestSharedConfiguringTestLayer, 'config')
-		cls.__old_author = config.registry.queryUtility(IAuthorizationPolicy)
-		cls.__old_authen = config.registry.queryUtility(IAuthenticationPolicy)
-		cls.__new_policy = config.testing_securitypolicy(cls.rem_username)
+    @classmethod
+    def setUp(cls):
+        config = getattr(NewRequestSharedConfiguringTestLayer, 'config')
+        cls.__old_author = config.registry.queryUtility(IAuthorizationPolicy)
+        cls.__old_authen = config.registry.queryUtility(IAuthenticationPolicy)
+        cls.__new_policy = config.testing_securitypolicy(cls.rem_username)
 
-	@classmethod
-	def tearDown(cls):
-		config = getattr(NewRequestSharedConfiguringTestLayer, 'config')
-		config.registry.unregisterUtility(cls.__new_policy, IAuthorizationPolicy)
-		config.registry.unregisterUtility(cls.__new_policy, IAuthenticationPolicy)
-		if cls.__old_author:
-			config.registry.registerUtility(cls.__old_author, IAuthorizationPolicy)
-		if cls.__old_authen:
-			config.registry.registerUtility(cls.__old_authen, IAuthenticationPolicy)
+    @classmethod
+    def tearDown(cls):
+        config = getattr(NewRequestSharedConfiguringTestLayer, 'config')
+        config.registry.unregisterUtility(cls.__new_policy,
+										  IAuthorizationPolicy)
+        config.registry.unregisterUtility(cls.__new_policy, 
+										  IAuthenticationPolicy)
+        if cls.__old_author:
+            config.registry.registerUtility(cls.__old_author,
+										    IAuthorizationPolicy)
+        if cls.__old_authen:
+            config.registry.registerUtility(cls.__old_authen, 
+										    IAuthenticationPolicy)
 
-	@classmethod
-	def testSetUp(cls):
-		pass
+    @classmethod
+    def testSetUp(cls):
+        pass
 
-	@classmethod
-	def testTearDown(cls):
-		pass
+    @classmethod
+    def testTearDown(cls):
+        pass
+
 
 @interface.implementer(lib_interfaces.IContentUnit)
 class ContentUnit(object):
-	href = 'prealgebra'
-	ntiid = None
-	__parent__ = None
-	lastModified = 0
+    href = 'prealgebra'
+    ntiid = None
+    __parent__ = None
+    lastModified = 0
 
-	def does_sibling_entry_exist(self, sib_name):
-		return None
+    def does_sibling_entry_exist(self, sib_name):
+        return None
 
-	def __conform__(self, iface):
-		if iface == lib_interfaces.IContentUnitHrefMapper:
-			return NIDMapper(self)
+    def __conform__(self, iface):
+        if iface == lib_interfaces.IContentUnitHrefMapper:
+            return NIDMapper(self)
+
 
 @interface.implementer(lib_interfaces.IContentUnitHrefMapper)
 class NIDMapper(object):
-	def __init__(self, context):
-		href = context.href
-		root_package = traversal.find_interface(context, lib_interfaces.IContentPackage)
-		if root_package:
-			href = root_package.root + '/' + context.href
-		href = href.replace('//', '/')
-		if not href.startswith('/'):
-			href = '/' + href
 
-		self.href = href
+    def __init__(self, context):
+        href = context.href
+        root_package = traversal.find_interface(
+            context, lib_interfaces.IContentPackage)
+        if root_package:
+            href = root_package.root + '/' + context.href
+        href = href.replace('//', '/')
+        if not href.startswith('/'):
+            href = '/' + href
+
+        self.href = href
+
 
 class ContentUnitInfo(object):
-	contentUnit = None
-	lastModified = 0
+    contentUnit = None
+    lastModified = 0
 
 from pyramid.threadlocal import get_current_request
 
+
 class TestContainerPrefs(NewRequestLayerTest):
 
-	layer = _SecurityPolicyNewRequestSharedConfiguringTestLayer
+    layer = _SecurityPolicyNewRequestSharedConfiguringTestLayer
 
-	rem_username = layer.rem_username
+    rem_username = layer.rem_username
 
-	def _do_check_root_inherited(self, ntiid=None, sharedWith=None, state='inherited', provenance=ntiids.ROOT):
-		unit = ContentUnit()
-		unit.ntiid = ntiid
-		# Notice that the root is missing from the lineage
+    def _do_check_root_inherited(self, ntiid=None, sharedWith=None, state='inherited', provenance=ntiids.ROOT):
+        unit = ContentUnit()
+        unit.ntiid = ntiid
+        # Notice that the root is missing from the lineage
 
-		info = ContentUnitInfo()
-		info.contentUnit = unit
-		decorator = _ContentUnitPreferencesDecorator(info, get_current_request())
-		result_map = {}
+        info = ContentUnitInfo()
+        info.contentUnit = unit
+        decorator = _ContentUnitPreferencesDecorator(
+            info, get_current_request())
+        result_map = {}
 
-		decorator.decorateExternalMapping(info, result_map)
+        decorator.decorateExternalMapping(info, result_map)
 
-		assert_that(result_map, has_entry('sharingPreference',
-											has_entry('State', state)))
+        assert_that(result_map, has_entry('sharingPreference',
+                                          has_entry('State', state)))
 
-		assert_that(result_map, has_entry('sharingPreference',
-											has_entry('Provenance', provenance)))
-		assert_that(result_map, has_entry('sharingPreference',
-											has_entry('sharedWith', sharedWith)))
-		if sharedWith:
-			assert_that(result_map, has_key('Last Modified'))
-			assert_that(info, has_property('lastModified', greater_than(0)))
+        assert_that(result_map, has_entry('sharingPreference',
+                                          has_entry('Provenance', provenance)))
 
-	@WithMockDSTrans
-	def test_decorate_inherit(self):
-		user = users.User.create_user(username=self.rem_username)
+        assert_that(result_map, has_entry('sharingPreference',
+                                          has_entry('sharedWith', sharedWith)))
+        if sharedWith:
+            assert_that(result_map, has_key('Last Modified'))
+            assert_that(info, has_property('lastModified', greater_than(0)))
 
-		cid = "tag:nextthought.com:foo,bar"
-		root_cid = ''
+    @WithMockDSTrans
+    def test_decorate_inherit(self):
+        user = users.User.create_user(username=self.rem_username)
 
-		# Create the containers
-		for c in (cid, root_cid):
-			user.containers.getOrCreateContainer(c)
+        cid = "tag:nextthought.com:foo,bar"
+        root_cid = ''
 
-		# Add sharing prefs to the root
-		prefs = IContentUnitPreferences(user.getContainer(root_cid))
-		prefs.sharedWith = ['a@b']
+        # Create the containers
+        for c in (cid, root_cid):
+            user.containers.getOrCreateContainer(c)
 
-		self._do_check_root_inherited(ntiid=cid, sharedWith=['a@b'])
+        # Add sharing prefs to the root
+        prefs = IContentUnitPreferences(user.getContainer(root_cid))
+        prefs.sharedWith = ['a@b']
 
-		# Now, if we set something at the leaf node, then it trumps
-		cid_prefs = IContentUnitPreferences(user.getContainer(cid))
-		cid_prefs.sharedWith = ['leaf']
+        self._do_check_root_inherited(ntiid=cid, sharedWith=['a@b'])
 
-		self._do_check_root_inherited(ntiid=cid, sharedWith=['leaf'], state='set', provenance=cid)
+        # Now, if we set something at the leaf node, then it trumps
+        cid_prefs = IContentUnitPreferences(user.getContainer(cid))
+        cid_prefs.sharedWith = ['leaf']
 
-		# Even setting something blank at the leaf trumps
-		cid_prefs.sharedWith = []
+        self._do_check_root_inherited(ntiid=cid,
+									  sharedWith=['leaf'], 
+									  state='set',
+									  provenance=cid)
 
-		self._do_check_root_inherited(ntiid=cid, sharedWith=[], state='set', provenance=cid)
+        # Even setting something blank at the leaf trumps
+        cid_prefs.sharedWith = []
 
-		# But if we delete it from the leaf, we're back to the root
-		cid_prefs.sharedWith = None
-		self._do_check_root_inherited(ntiid=cid, sharedWith=['a@b'])
+        self._do_check_root_inherited(ntiid=cid, 
+									  sharedWith=[],
+									  state='set', 
+									  provenance=cid)
 
-	@WithMockDSTrans
-	def test_traverse_container_to_prefs(self):
-		user = users.User.create_user(username="foo@bar")
+        # But if we delete it from the leaf, we're back to the root
+        cid_prefs.sharedWith = None
+        self._do_check_root_inherited(ntiid=cid, sharedWith=['a@b'])
 
-		cont_obj = Note()
-		cont_obj.containerId = "tag:nextthought.com:foo,bar"
+    @WithMockDSTrans
+    def test_traverse_container_to_prefs(self):
+        user = users.User.create_user(username="foo@bar")
 
-		user.addContainedObject(cont_obj)
+        cont_obj = Note()
+        cont_obj.containerId = "tag:nextthought.com:foo,bar"
 
-		container = user.getContainer(cont_obj.containerId)
-		prefs = traverse(container, "++fields++sharingPreference")
-		assert_that(prefs, verifiably_provides(IContentUnitPreferences))
+        user.addContainedObject(cont_obj)
 
-	@WithMockDSTrans
-	def test_traverse_content_unit_to_prefs(self):
-		user = users.User.create_user(username=self.rem_username)
+        container = user.getContainer(cont_obj.containerId)
+        prefs = traverse(container, "++fields++sharingPreference")
+        assert_that(prefs, verifiably_provides(IContentUnitPreferences))
 
-		cont_obj = Note()
-		cont_obj.containerId = "tag:nextthought.com:foo,bar"
+    @WithMockDSTrans
+    def test_traverse_content_unit_to_prefs(self):
+        user = users.User.create_user(username=self.rem_username)
 
-		user.addContainedObject(cont_obj)
+        cont_obj = Note()
+        cont_obj.containerId = "tag:nextthought.com:foo,bar"
 
-		content_unit = ContentUnit()
-		content_unit.ntiid = cont_obj.containerId
+        user.addContainedObject(cont_obj)
 
-		prefs = traverse(content_unit, "++fields++sharingPreference", request=self.request)
-		assert_that(prefs, verifiably_provides(IContentUnitPreferences))
+        content_unit = ContentUnit()
+        content_unit.ntiid = cont_obj.containerId
 
-	def _do_update_prefs(self, content_unit, sharedWith=None):
-		self.request.method = 'PUT'
-		prefs = traverse(content_unit, "++fields++sharingPreference", request=self.request)
-		assert_that(prefs, verifiably_provides(IContentUnitPreferences))
+        prefs = traverse(content_unit,
+                         "++fields++sharingPreference", 
+                         request=self.request)
+        assert_that(prefs, verifiably_provides(IContentUnitPreferences))
 
-		self.request.context = prefs
-		self.request.body = json.dumps({"sharedWith": sharedWith })
-		self.request.content_type = 'application/json'
+    def _do_update_prefs(self, content_unit, sharedWith=None):
+        self.request.method = 'PUT'
+        prefs = traverse(content_unit, 
+                         "++fields++sharingPreference",
+                         request=self.request)
+        assert_that(prefs, verifiably_provides(IContentUnitPreferences))
 
-		class Accept(object):
-			def best_match(self, *args): return 'application/json'
+        self.request.context = prefs
+        self.request.body = json.dumps({"sharedWith": sharedWith})
+        self.request.content_type = 'application/json'
 
-		self.request.accept = Accept()
+        class Accept(object):
 
-		@interface.implementer(lib_interfaces.IContentPackageLibrary)
-		class Lib(object):
-			titles = ()
-			def pathToNTIID(self, ntiid):
-				return [content_unit]
+            def best_match(self, *args): 
+                return 'application/json'
 
-		self.request.registry.registerUtility(Lib(), lib_interfaces.IContentPackageLibrary)
+        self.request.accept = Accept()
 
-		result = _ContentUnitPreferencesPutView(self.request)()
+        @interface.implementer(lib_interfaces.IContentPackageLibrary)
+        class Lib(object):
+            titles = ()
 
-		assert_that(prefs, has_property('sharedWith', sharedWith))
-		assert_that(result, verifiably_provides(IContentUnitInfo))
+            def pathToNTIID(self, ntiid):
+                return [content_unit]
 
-	@WithMockDSTrans
-	def test_update_shared_with_in_preexisting_container(self):
+        self.request.registry.registerUtility(Lib(),
+                                              lib_interfaces.IContentPackageLibrary)
 
-		user = users.User.create_user(username=self.rem_username)
-		# Make the container exist
-		cont_obj = Note()
-		cont_obj.containerId = "tag:nextthought.com:foo,bar"
-		user.addContainedObject(cont_obj)
+        result = _ContentUnitPreferencesPutView(self.request)()
 
-		content_unit = ContentUnit()
-		content_unit.ntiid = cont_obj.containerId
+        assert_that(prefs, has_property('sharedWith', sharedWith))
+        assert_that(result, verifiably_provides(IContentUnitInfo))
 
-		self._do_update_prefs(content_unit, sharedWith=['a', 'b'])
+    @WithMockDSTrans
+    def test_update_shared_with_in_preexisting_container(self):
 
-	@WithMockDSTrans
-	def test_update_shared_with_in_non_existing_container(self):
+        user = users.User.create_user(username=self.rem_username)
+        # Make the container exist
+        cont_obj = Note()
+        cont_obj.containerId = "tag:nextthought.com:foo,bar"
+        user.addContainedObject(cont_obj)
 
-		_ = users.User.create_user(username=self.rem_username)
-		# Note the container does not exist
-		containerId = "tag:nextthought.com:foo,bar"
+        content_unit = ContentUnit()
+        content_unit.ntiid = cont_obj.containerId
 
-		content_unit = ContentUnit()
-		content_unit.ntiid = containerId
+        self._do_update_prefs(content_unit, sharedWith=['a', 'b'])
 
-		# The magic actually happens during traversal
-		# That's why the method must be 'PUT' before traversal
-		self._do_update_prefs(content_unit, sharedWith=['a', 'b'])
+    @WithMockDSTrans
+    def test_update_shared_with_in_non_existing_container(self):
 
-	@WithMockDSTrans
-	def test_update_shared_with_in_root_inherits(self):
+        _ = users.User.create_user(username=self.rem_username)
+        # Note the container does not exist
+        containerId = "tag:nextthought.com:foo,bar"
 
-		_ = users.User.create_user(username=self.rem_username)
-		# Note the container does not exist
-		containerId = "tag:nextthought.com:foo,bar"
+        content_unit = ContentUnit()
+        content_unit.ntiid = containerId
 
-		content_unit = ContentUnit()
-		content_unit.ntiid = ntiids.ROOT
+        # The magic actually happens during traversal
+        # That's why the method must be 'PUT' before traversal
+        self._do_update_prefs(content_unit, sharedWith=['a', 'b'])
 
-		self._do_update_prefs(content_unit, sharedWith=['a', 'b'])
+    @WithMockDSTrans
+    def test_update_shared_with_in_root_inherits(self):
 
-		self._do_check_root_inherited(ntiid=containerId, sharedWith=['a', 'b'])
+        _ = users.User.create_user(username=self.rem_username)
+        # Note the container does not exist
+        containerId = "tag:nextthought.com:foo,bar"
 
-	@WithMockDSTrans
-	def test_prefs_from_content_unit(self):
-		_ = users.User.create_user(username=self.rem_username)
-		# Note the container does not exist
-		# containerId = "tag:nextthought.com:foo,bar"
+        content_unit = ContentUnit()
+        content_unit.ntiid = ntiids.ROOT
 
-		content_unit = ContentUnit()
-		content_unit.ntiid = ntiids.ROOT
+        self._do_update_prefs(content_unit, sharedWith=['a', 'b'])
 
-		interface.alsoProvides(content_unit, IContentUnitPreferences)
-		content_unit.sharedWith = ['2@3']
+        self._do_check_root_inherited(ntiid=containerId, sharedWith=['a', 'b'])
 
-		info = ContentUnitInfo()
-		info.contentUnit = content_unit
-		decorator = _ContentUnitPreferencesDecorator(info, get_current_request())
-		result_map = {}
+    @WithMockDSTrans
+    def test_prefs_from_content_unit(self):
+        _ = users.User.create_user(username=self.rem_username)
+        # Note the container does not exist
+        # containerId = "tag:nextthought.com:foo,bar"
 
-		decorator.decorateExternalMapping(info, result_map)
+        content_unit = ContentUnit()
+        content_unit.ntiid = ntiids.ROOT
 
-		assert_that(result_map, has_entry('sharingPreference',
-										  has_entry('State', 'set')))
+        interface.alsoProvides(content_unit, IContentUnitPreferences)
+        content_unit.sharedWith = ['2@3']
 
-		assert_that(result_map, has_entry('sharingPreference',
-										  has_entry('sharedWith', ['2@3'])))
+        info = ContentUnitInfo()
+        info.contentUnit = content_unit
+        decorator = _ContentUnitPreferencesDecorator(
+            info, get_current_request())
+        result_map = {}
+
+        decorator.decorateExternalMapping(info, result_map)
+
+        assert_that(result_map, has_entry('sharingPreference',
+                                          has_entry('State', 'set')))
+
+        assert_that(result_map, has_entry('sharingPreference',
+                                          has_entry('sharedWith', ['2@3'])))

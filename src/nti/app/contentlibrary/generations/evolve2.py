@@ -53,7 +53,7 @@ def do_evolve(context):
 
     with site(ds_folder):
         assert  component.getSiteManager() == ds_folder.getSiteManager(), \
-                "Hooks not installed?"
+            "Hooks not installed?"
 
         for current_site in get_all_host_sites():
             with site(current_site):
@@ -63,7 +63,7 @@ def do_evolve(context):
                 last_modified = 0
                 contentPackages = OOBTree()
                 contentUnitsByNTIID = OOBTree()
-                
+
                 for package in library._contentPackages or ():
                     contentPackages[package.ntiid] = package
                     index_lm = getattr(package, 'index_last_modified', None)
@@ -85,12 +85,13 @@ def do_evolve(context):
                         delattr(library, name)
                     except AttributeError:
                         pass
+
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
     logger.info('Dataserver evolution %s done.', generation)
 
 
 def evolve(context):
     """
-    Evolve to gen 2 by installing the new library asset catalog.
+    Evolve to gen 2 by migrating content pacakge storage in libraries
     """
     do_evolve(context)

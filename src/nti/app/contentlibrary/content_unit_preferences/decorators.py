@@ -30,32 +30,39 @@ CLASS = StandardExternalFields.CLASS
 MIMETYPE = StandardExternalFields.MIMETYPE
 LAST_MODIFIED = StandardExternalFields.LAST_MODIFIED
 
+
 @interface.implementer(IExternalMappingDecorator)
 @component.adapter(IContentUnitInfo, IRequest)
 class _ContentUnitPreferencesDecorator(AbstractAuthenticatedRequestAwareDecorator):
-	"""
-	Decorates the mapping with the sharing preferences
-	"""
+    """
+    Decorates the mapping with the sharing preferences
+    """
 
-	def _predicate(self, context, result):
-		return self._is_authenticated and context.contentUnit is not None
+    CLASS = 'SharingPagePreference'
+    MIME_TYPE = u'application/vnd.nextthought.sharingpagepreference'
 
-	def _do_decorate_external(self, context, result):
-		prefs, provenance, contentUnit = \
-					find_prefs_for_content_and_user(context.contentUnit, self.remoteUser)
+    def _predicate(self, context, result):
+        return self._is_authenticated and context.contentUnit is not None
 
-		if prefs_present(prefs):
-			ext_obj = {}
-			ext_obj['State'] = 'set' if contentUnit is context.contentUnit else 'inherited'
-			ext_obj['Provenance'] = provenance
-			ext_obj['sharedWith'] = prefs.sharedWith
-			ext_obj[CLASS] = 'SharingPagePreference'
-			ext_obj[MIMETYPE] = 'application/vnd.nextthought.sharingpagepreference'
-			result['sharingPreference'] = ext_obj
+    def find_prefs(self, contentUnit):
+        return find_prefs_for_content_and_user(contentUnit, self.remoteUser)
 
-		if prefs:
-			# We found one, but it specified no sharing settings.
-			# we still want to copy its last modified
-			if prefs.lastModified > context.lastModified:
-				result[LAST_MODIFIED] = prefs.lastModified
-				context.lastModified = prefs.lastModified
+    def _do_decorate_external(self, context, result):
+        startUnit = context.contentUnit
+        prefs, provenance, contentUnit = self.find_prefs(startUnit)
+
+        if prefs_present(prefs):
+            ext_obj = {}
+            ext_obj['State'] = 'set' if contentUnit is startUnit else 'inherited'
+            ext_obj['Provenance'] = provenance
+            ext_obj['sharedWith'] = prefs.sharedWith
+            ext_obj[CLASS] = self.CLASS
+            ext_obj[MIMETYPE] = self.MIME_TYPE
+            result['sharingPreference'] = ext_obj
+
+        if prefs:
+            # We found one, but it specified no sharing settings.
+            # we still want to copy its last modified
+            if prefs.lastModified > context.lastModified:
+                result[LAST_MODIFIED] = prefs.lastModified
+                context.lastModified = prefs.lastModified

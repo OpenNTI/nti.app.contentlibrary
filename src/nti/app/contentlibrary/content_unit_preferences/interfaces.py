@@ -16,11 +16,12 @@ from nti.dataserver.interfaces import ILastModified
 from nti.schema.field import List
 from nti.schema.field import Object
 
+
 class IContentUnitPreferences(ILocation, ILastModified):
-	"""
-	Storage location for preferences related to a content unit.
-	"""
-	# NOTE: This can actually be None in some cases, which makes it
-	# impossible to validate this schema.
-	sharedWith = List( value_type=Object(IUnicode),
-					   title="List of usernames to share with" )
+    """
+    Storage location for preferences related to a content unit.
+    """
+    # NOTE: This can actually be None in some cases, which makes it
+    # impossible to validate this schema.
+    sharedWith = List(value_type=Object(IUnicode),
+                      title="List of usernames to share with")
