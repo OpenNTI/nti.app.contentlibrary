@@ -36,10 +36,17 @@
 	<adapter factory=".acl._TestingLibraryTOCEntryACLProvider"
 			 zcml:condition="have testmode" />
 
-	<!-- permissions cache -->
+	
 	<configure zcml:condition="installed nti.contenttypes.courses">
+		<!-- Permissions cache -->
 		<subscriber handler="._courses._on_enroll_record" />
 		<subscriber handler="._courses._on_unenroll_record" />
+		
+		<!-- Catalog -->
+		<subscriber factory="._courses._CourseContentUnitAssociations"
+					provides="nti.contentlibrary.interfaces.IContentUnitAssociations"
+					for="nti.contentlibrary.interfaces.IContentUnit" />
+
 	</configure>
 
 	<!-- Workspaces/collections -->
@@ -127,24 +134,6 @@
 					 pyramid.interfaces.IRequest"
 				zcml:condition="installed nti.app.products.courseware"/>
 
-	<configure zcml:condition="installed nti.contenttypes.courses">
-		<!-- Catalog -->
-		<!-- Type -->
-		<adapter factory=".catalog._asset_to_contained_type" />
-	
-		<!-- Namespace -->
-		<adapter factory=".catalog._asset_to_namespace" />
-	
-		<!-- NTIID -->
-		<adapter factory=".catalog._asset_to_ntiid" />
-		
-		<!-- Containers -->
-		<adapter factory=".catalog._asset_to_containers" />	
-		
-		<!-- Target -->
-		<adapter factory=".catalog._asset_to_target" />	
-	</configure>
-
 	<!-- Adapters & Subscribers -->
 	<adapter factory=".renderers._ContentUnitInfoCacheController" />
 		
@@ -227,6 +216,13 @@
 	<!-- Resolving metadata, used in the implementation of links -->
 	<adapter factory=".resolvers.ContentMetadataFromContentUnit" />
 	
+	<!-- Catalog -->
+	<adapter factory=".catalog._asset_to_ntiid" />
+	<adapter factory=".catalog._asset_to_target" />	
+	<adapter factory=".catalog._asset_to_namespace" />
+	<adapter factory=".catalog._asset_to_containers" />	
+	<adapter factory=".catalog._asset_to_contained_type" />
+		
 	<!-- Validators -->
 	<utility factory=".validators.ReStructuredTextValidator" />
 	<utility factory=".validators.ReStructuredTextValidator" name="text/x-rst" />
