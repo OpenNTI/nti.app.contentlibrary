@@ -16,6 +16,8 @@ import time
 import traceback
 from six import string_types
 
+from requests.structures import CaseInsensitiveDict
+
 import transaction
 try:
     from transaction._compat import get_thread_ident
@@ -47,8 +49,6 @@ from nti.app.externalization.error import raise_json_error
 from nti.app.externalization.internalization import read_body_as_external_object
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
-
-from nti.common.maps import CaseInsensitiveDict
 
 from nti.common.string import TRUE_VALUES
 
@@ -92,8 +92,9 @@ class _IsSyncInProgressView(AbstractAuthenticatedView):
         return component.getUtility(IRedisClient)
 
     def acquire(self):
-        lock = self.redis.lock(
-            SYNC_LOCK_NAME, LOCK_TIMEOUT, blocking_timeout=1)
+        lock = self.redis.lock(SYNC_LOCK_NAME,
+                               LOCK_TIMEOUT,
+                               blocking_timeout=1)
         acquired = lock.acquire(blocking=False)
         return (lock, acquired)
 
@@ -148,9 +149,11 @@ class _SetSyncLockView(AbstractAuthenticatedView):
 class _LastSyncTimeView(AbstractAuthenticatedView):
 
     def __call__(self):
-        hostsites = component.getUtility(IEtcNamespace, name='hostsites')
-        result = getattr(hostsites, 'lastSynchronized', 0)
-        return result
+        try:
+            hostsites = component.getUtility(IEtcNamespace, name='hostsites')
+            return hostsites.lastSynchronized or 0
+        except AttributeError:
+            return 0
 
 
 class _AbstractSyncAllLibrariesView(_SetSyncLockView,
@@ -296,6 +299,6 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
         ntiids = list(ntiids) if ntiids else ()
         # execute
         result = self._do_sync(site=site,
-							   ntiids=ntiids,
-							   allowRemoval=allowRemoval)
+                               ntiids=ntiids,
+                               allowRemoval=allowRemoval)
         return result
