@@ -45,6 +45,7 @@ from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IEditableContentPackageLibrary
+from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
@@ -251,6 +252,9 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
     def __call__(self):
         if not self.context.is_published():
             self._do_delete_object(self.context, event=False)
+        associations = resolve_content_unit_associations(self.context)
+        if not associations:
+            self._do_delete_object(self.context, event=True)
         return self.context
 
 
