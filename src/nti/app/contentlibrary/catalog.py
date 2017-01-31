@@ -24,8 +24,6 @@ from nti.contentlibrary.indexed_data.interfaces import ISlideDeckAdapter
 from nti.contentlibrary.indexed_data.interfaces import IContainersAdapter
 from nti.contentlibrary.indexed_data.interfaces import IContainedTypeAdapter
 
-from nti.contenttypes.courses.interfaces import ICourseCatalogEntry
-
 from nti.contenttypes.presentation import iface_of_asset
 
 from nti.contenttypes.presentation.interfaces import IPointer
@@ -176,6 +174,7 @@ def _course_lineage_to_containers(context):
 def _courses_for_pacakge(context, package):
     result = set()
     try:
+        from nti.contenttypes.courses.interfaces import ICourseCatalogEntry
         from nti.contenttypes.courses.utils import get_courses_for_packages
         folder = find_interface(context, IHostPolicyFolder, strict=False)
         if folder is not None:
