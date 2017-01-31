@@ -10,10 +10,6 @@ __docformat__ = "restructuredtext en"
 # disable: too many ancestors
 # pylint: disable=I0011,R0901
 
-# If passing strings, they require bytes, NOT unicode, or they fail
-
-from zope import interface
-
 from zope.container.constraints import contains
 from zope.container.constraints import containers
 
