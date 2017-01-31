@@ -97,42 +97,8 @@
 
 	<ext:registerMimeFactories module=".forum" />
 
-	<subscriber factory=".decorators._ContentUnitInfoDecorator"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-				for=".interfaces.IContentUnitInfo
-					 pyramid.interfaces.IRequest"/>
-
-	<subscriber factory=".decorators._ContentUnitInfoTitleDecorator"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-				for=".interfaces.IContentUnitInfo
-					 pyramid.interfaces.IRequest"/>
-
-	<subscriber factory=".decorators._ContentBundlePagesLinkDecorator"
-				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
-
-	<subscriber factory=".decorators._IPad120BundleContentPackagesAdjuster"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-				for="nti.contentlibrary.interfaces.IContentPackageBundle
-					 pyramid.interfaces.IRequest"/>
-
-	<subscriber factory=".decorators._UGDLibraryPathLinkDecorator"
-				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
-
-	<subscriber factory=".decorators._PostLibraryPathLinkDecorator"
-				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
-
-	<subscriber factory=".decorators._TopicLibraryPathLinkDecorator"
-				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
-
-	<subscriber factory=".decorators._ForumLibraryPathLinkDecorator"
-				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
-
-	<!-- this thing is not a real IBundle -->
-	<subscriber factory=".decorators._IPad120BundleContentPackagesAdjuster"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-				for="nti.app.products.courseware.legacy_course._LegacyCommunityBasedCourseInstanceFakeBundle
-					 pyramid.interfaces.IRequest"
-				zcml:condition="installed nti.app.products.courseware"/>
+	<!-- Decorators -->
+	<include package=".decorators" />
 
 	<!-- Adapters & Subscribers -->
 	<adapter factory=".renderers._ContentUnitInfoCacheController" />

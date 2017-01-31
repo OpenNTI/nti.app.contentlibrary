@@ -1,0 +1,37 @@
+<!-- -*- mode: nxml -*- -->
+<configure	xmlns="http://namespaces.zope.org/zope"
+			xmlns:i18n="http://namespaces.zope.org/i18n"
+			xmlns:ext="http://nextthought.com/ntp/ext"
+			xmlns:zcml="http://namespaces.zope.org/zcml">
+
+	<subscriber factory=".ipad._IPad120BundleContentPackagesAdjuster"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+				for="nti.contentlibrary.interfaces.IContentPackageBundle
+					 pyramid.interfaces.IRequest"/>
+
+	<subscriber factory=".forum._PostLibraryPathLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<subscriber factory=".forum._TopicLibraryPathLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<subscriber factory=".forum._ForumLibraryPathLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<subscriber factory=".userdata._UGDLibraryPathLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<subscriber factory=".contentunit._ContentUnitInfoDecorator"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+				for="..interfaces.IContentUnitInfo
+					 pyramid.interfaces.IRequest"/>
+
+	<subscriber factory=".contentunit._ContentUnitInfoTitleDecorator"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+				for="..interfaces.IContentUnitInfo
+					 pyramid.interfaces.IRequest"/>
+
+	<subscriber factory=".contentunit._ContentBundlePagesLinkDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+</configure>
