@@ -230,7 +230,7 @@ class ContentPackageContentsGetView(
     def __call__(self):
         response = self.request.response
         content = self.context.content or b''
-        contentType = self.context.contentType or RST_MIMETYPE
+        contentType = bytes(self.context.contentType or RST_MIMETYPE)
         ext = mimetypes.guess_extension(RST_MIMETYPE) or ".rst"
         downloadName = "contents%s" % ext
         headers = getHeaders(self.context,
