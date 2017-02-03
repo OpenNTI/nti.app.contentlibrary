@@ -14,7 +14,6 @@ import uuid
 import mimetypes
 
 from zope import component
-from zope import lifecycleevent
 
 from zope.file.download import getHeaders
 
@@ -50,6 +49,8 @@ from nti.contentlibrary.interfaces import resolve_content_unit_associations
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.dataserver import authorization as nauth
+
+from nti.externalization.internalization import notify_modified
 
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import get_provider
@@ -203,12 +204,17 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
                request_method='PUT',
                name=VIEW_CONTENTS,
                permission=nauth.ACT_CONTENT_EDIT)
-class ContentUnitContentsPutView(AbstractAuthenticatedView, ContentPackageMixin):
+class ContentUnitContentsPutView(
+        AbstractAuthenticatedView, ContentPackageMixin):
 
     def __call__(self):
         content, contentType = self._check_content()
         self.context.write_contents(content, contentType)
-        lifecycleevent.modified(self.context)
+        notify_modified(self.context,
+                        {
+                            'contents': content,
+                            'contentType': contentType
+                        })
         return self.context
 
 
@@ -218,7 +224,8 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView, ContentPackageMixin)
                request_method='GET',
                name=VIEW_CONTENTS,
                permission=nauth.ACT_CONTENT_EDIT)
-class ContentPackageContentsGetView(AbstractAuthenticatedView, ContentPackageMixin):
+class ContentPackageContentsGetView(
+        AbstractAuthenticatedView, ContentPackageMixin):
 
     def __call__(self):
         response = self.request.response
