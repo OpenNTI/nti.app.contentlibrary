@@ -128,7 +128,7 @@ class ContentPackageMixin(object):
         creator = SYSTEM_USER_NAME
         current_time = time_to_64bit_int(time.time())
         provider = provider \
-            or (get_provider(base) or 'NTI' if base else 'NTI')
+                or (get_provider(base) or 'NTI' if base else 'NTI')
 
         specific_base = get_specific(base) if base else None
         if specific_base:
@@ -166,8 +166,9 @@ class LibraryPostView(AbstractAuthenticatedView,
                                                      search_owner=False,
                                                      externalValue=externalValue)
         package.ntiid = ntiid
-        content, contentType = self._check_content(externalValue)
-        package.write_contents(content, contentType)
+        contents, contentType = self._check_content(externalValue)
+        package.contents = contents
+        package.contentType = contentType
         library.add(package, event=False)
         self.request.response.status_int = 201
         return package
@@ -189,8 +190,9 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
                                                 notify=notify,
                                                 pre_hook=pre_hook,
                                                 object_hook=object_hook)
-        content, contentType = self._check_content(externalValue)
-        contentObject.write_contents(content, contentType)
+        contents, contentType = self._check_content(externalValue)
+        contentObject.contents = contents
+        contentObject.contentType = contentType
         return result
 
     def __call__(self):
@@ -204,8 +206,8 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
                request_method='PUT',
                name=VIEW_CONTENTS,
                permission=nauth.ACT_CONTENT_EDIT)
-class ContentUnitContentsPutView(
-        AbstractAuthenticatedView, ContentPackageMixin):
+class ContentUnitContentsPutView(AbstractAuthenticatedView, 
+                                 ContentPackageMixin):
 
     def __call__(self):
         content, contentType = self._check_content()
@@ -224,23 +226,23 @@ class ContentUnitContentsPutView(
                request_method='GET',
                name=VIEW_CONTENTS,
                permission=nauth.ACT_CONTENT_EDIT)
-class ContentPackageContentsGetView(
-        AbstractAuthenticatedView, ContentPackageMixin):
+class ContentPackageContentsGetView(AbstractAuthenticatedView,
+                                    ContentPackageMixin):
 
     def __call__(self):
         response = self.request.response
-        content = self.context.content or b''
+        contents = self.context.contents or b''
         contentType = bytes(self.context.contentType or RST_MIMETYPE)
         ext = mimetypes.guess_extension(RST_MIMETYPE) or ".rst"
         downloadName = "contents%s" % ext
         headers = getHeaders(self.context,
                              contentType=contentType,
                              downloadName=downloadName,
-                             contentLength=len(content),
+                             contentLength=len(contents),
                              contentDisposition="attachment")
         for k, v in headers:
             response.setHeader(k, v)
-        response.body = content
+        response.body = contents
         return response
 
 
