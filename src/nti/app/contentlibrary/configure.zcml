@@ -188,10 +188,5 @@
 	<adapter factory=".catalog._asset_to_namespace" />
 	<adapter factory=".catalog._asset_to_containers" />	
 	<adapter factory=".catalog._asset_to_contained_type" />
-		
-	<!-- Validators -->
-	<utility factory=".validators.ReStructuredTextValidator" />
-	<utility factory=".validators.ReStructuredTextValidator" name="text/x-rst" />
-	<utility factory=".validators.ReStructuredTextValidator" name="reStructuredText" />
-	
+
 </configure>

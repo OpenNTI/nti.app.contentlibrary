@@ -86,15 +86,8 @@ class ContentPackageMixin(object):
     def _validate(self, content, contentType=RST_MIMETYPE):
         validator = component.queryUtility(IContentValidator,
                                            name=contentType)
-        if validator is None:
-            raise_json_error(self.request,
-                             hexc.HTTPUnprocessableEntity,
-                             {
-                                 u'message': _("Cannot find content validator."),
-                                 u'code': 'CannotFindContentValidator',
-                             },
-                             None)
-        validator.validate(content)
+        if validator is not None:
+            validator.validate(content)
 
     def _check_content(self, ext_obj=None):
         contentType = RST_MIMETYPE
