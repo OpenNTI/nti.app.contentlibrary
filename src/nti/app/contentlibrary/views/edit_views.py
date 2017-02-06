@@ -35,9 +35,6 @@ from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtils
 from nti.app.contentlibrary.views import VIEW_CONTENTS
 from nti.app.contentlibrary.views import LibraryPathAdapter
 
-from nti.app.publishing import VIEW_PUBLISH
-from nti.app.publishing import VIEW_UNPUBLISH
-
 from nti.appserver.ugd_edit_views import UGDPutView
 
 from nti.contentlibrary.interfaces import IContentValidator
