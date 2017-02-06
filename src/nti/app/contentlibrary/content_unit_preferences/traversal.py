@@ -42,11 +42,11 @@ def _with_acl(prefs):
         return prefs
     # TODO: Replace this with a real ACL provider
     return ACLLocationProxy(
-	        prefs,
-	        prefs.__parent__,
-	        prefs.__name__,
-	        nacl.acl_from_aces(nacl.ace_allowing(user.username,
-	                                             ALL_PERMISSIONS)))
+            prefs,
+            prefs.__parent__,
+            prefs.__name__,
+            nacl.acl_from_aces(nacl.ace_allowing(user.username,
+                                                 ALL_PERMISSIONS)))
 
 
 @interface.implementer(ITraversable)

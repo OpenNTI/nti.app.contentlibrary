@@ -28,7 +28,7 @@ def prefs_present(prefs):
     of targets is a valid preference; a None value removes the
     preference.
     """
-    return  not IBroken.providedBy( prefs ) \
+    return  not IBroken.providedBy(prefs) \
         and prefs and prefs.sharedWith is not None
 
 
