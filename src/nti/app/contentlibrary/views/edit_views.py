@@ -39,6 +39,7 @@ from nti.appserver.ugd_edit_views import UGDPutView
 
 from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
+from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IEditableContentPackageLibrary
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
@@ -155,14 +156,19 @@ class LibraryPostView(AbstractAuthenticatedView,
 
     content_predicate = IEditableContentPackage
 
+    def _set_ntiid(self, context):
+        if not IRenderableContentUnit.providedBy(context):
+            ntiid = self.make_pacakge_ntiid(extra=self._extra)
+            context.ntiid = ntiid
+
     def _do_call(self):
         library = self._libray
         externalValue = self.readInput()
-        ntiid = self.make_pacakge_ntiid(extra=self._extra)
         package = self.readCreateUpdateContentObject(self.remoteUser,
                                                      search_owner=False,
                                                      externalValue=externalValue)
-        package.ntiid = ntiid
+       
+        self._set_ntiid(package)
         contents, contentType = self._check_content(externalValue)
         package.contents = contents
         package.contentType = contentType
