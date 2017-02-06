@@ -265,23 +265,3 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
         if not associations:
             self._do_delete_object(self.context, event=True)
         return self.context
-
-
-@view_config(context=IEditableContentPackage)
-@view_defaults(route_name='objects.generic.traversal',
-               renderer='rest',
-               request_method='POST',
-               name=VIEW_PUBLISH,
-               permission=nauth.ACT_CONTENT_EDIT)
-class ContentPackagePublishView(AbstractAuthenticatedView):
-    pass
-
-
-@view_config(context=IEditableContentPackage)
-@view_defaults(route_name='objects.generic.traversal',
-               renderer='rest',
-               request_method='POST',
-               name=VIEW_UNPUBLISH,
-               permission=nauth.ACT_CONTENT_EDIT)
-class ContentPackageUnpublishView(AbstractAuthenticatedView):
-    pass
