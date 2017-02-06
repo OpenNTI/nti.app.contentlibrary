@@ -11,6 +11,8 @@ logger = __import__('logging').getLogger(__name__)
 
 import six
 
+from requests.structures import CaseInsensitiveDict
+
 from zope import component
 
 from zope.component.hooks import site as current_site
@@ -38,8 +40,6 @@ from nti.app.contentlibrary.views.sync_views import _AbstractSyncAllLibrariesVie
 from nti.app.externalization.internalization import read_body_as_external_object
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
-
-from nti.common.maps import CaseInsensitiveDict
 
 from nti.common.string import is_true
 
@@ -164,7 +164,7 @@ class ResetPackagePresentationAssetsView(_AbstractSyncAllLibrariesView):
                 registry = folder.getSiteManager()
                 # remove using catalog
                 removed.extend(clear_content_package_assets(package,
-														    force=force))
+                                                            force=force))
                 # remove anything left in containters
                 for ntiid, item, container in self._unit_assets(package):
                     if can_be_removed(item, force=force):
