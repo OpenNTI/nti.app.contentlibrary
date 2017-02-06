@@ -13,6 +13,8 @@ logger = __import__('logging').getLogger(__name__)
 
 from urllib import quote as UQ
 
+from requests.structures import CaseInsensitiveDict
+
 from zope import component
 from zope import interface
 
@@ -53,8 +55,6 @@ from nti.appserver.interfaces import ILibraryPathLastModifiedProvider
 from nti.appserver.pyramid_authorization import is_readable
 
 from nti.appserver.workspaces.interfaces import IService
-
-from nti.common.maps import CaseInsensitiveDict
 
 from nti.contentlibrary.indexed_data import get_catalog
 
