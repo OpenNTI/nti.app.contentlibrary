@@ -41,7 +41,7 @@ from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
-from nti.contentlibrary.interfaces import IEditableContentPackageLibrary
+from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
@@ -103,7 +103,7 @@ class ContentPackageMixin(object):
 
     @Lazy
     def _libray(self):
-        library = component.queryUtility(IEditableContentPackageLibrary)
+        library = component.queryUtility(IContentPackageLibrary)
         if library is None:
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
@@ -155,6 +155,7 @@ class LibraryPostView(AbstractAuthenticatedView,
             context.ntiid = ntiid
 
     def _do_call(self):
+        from IPython.core.debugger import Tracer; Tracer()()
         library = self._libray
         externalValue = self.readInput()
         package = self.readCreateUpdateContentObject(self.remoteUser,
@@ -163,8 +164,10 @@ class LibraryPostView(AbstractAuthenticatedView,
        
         self._set_ntiid(package)
         contents, contentType = self._check_content(externalValue)
-        package.contents = contents
-        package.contentType = contentType
+        if contents:
+            package.contents = contents
+        if contentType:
+            package.contentType = contentType
         library.add(package, event=False)
         self.request.response.status_int = 201
         return package
@@ -187,8 +190,10 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
                                                 pre_hook=pre_hook,
                                                 object_hook=object_hook)
         contents, contentType = self._check_content(externalValue)
-        contentObject.contents = contents
-        contentObject.contentType = contentType
+        if contents:
+            contentObject.contents = contents
+        if contentType:
+            contentObject.contentType = contentType
         return result
 
     def __call__(self):

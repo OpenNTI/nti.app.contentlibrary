@@ -24,7 +24,17 @@ from nti.app.contentlibrary import MessageFactory
 
 from nti.contentlibrary.interfaces import IContentUnit
 
+from nti.dataserver.authorization import ROLE_ADMIN
+from nti.dataserver.authorization import ROLE_CONTENT_ADMIN
+
+from nti.dataserver.authorization_acl import ace_allowing
+from nti.dataserver.authorization_acl import acl_from_aces
+
+from nti.dataserver.interfaces import ALL_PERMISSIONS
+
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.property.property import Lazy
 
 
 @interface.implementer(IPathAdapter)
@@ -45,3 +55,9 @@ class LibraryPathAdapter(Contained):
         if IContentUnit.providedBy(result):
             return result
         raise KeyError(ntiid)
+
+    @Lazy
+    def __acl__(self):
+        aces = [ace_allowing(ROLE_ADMIN, ALL_PERMISSIONS, type(self)),
+                ace_allowing(ROLE_CONTENT_ADMIN, ALL_PERMISSIONS, type(self))]
+        return acl_from_aces(aces)
