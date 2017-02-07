@@ -16,7 +16,7 @@ from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.externalization.externalization import to_external_object
 
-from nti.app.contentlibrary.tests import ContentLibraryApplicationTestLayer
+from nti.app.contentlibrary.tests import PersistentApplicationTestLayer
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
@@ -25,7 +25,8 @@ from nti.app.testing.decorators import WithSharedApplicationMockDS
 
 class TestEditViews(ApplicationLayerTest):
 
-    layer = ContentLibraryApplicationTestLayer
+    layer = PersistentApplicationTestLayer
+    default_origin = b'http://platform.ou.edu'
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_create_package(self):
@@ -36,5 +37,5 @@ class TestEditViews(ApplicationLayerTest):
         ext_obj.pop('NTIID', None)
         ext_obj.pop('ntiid', None)
 
-        #res = self.testapp.post_json(href, ext_obj, status=201)
-        #assert_that(res.json_body, has_entry('NTIID', is_not(none())))
+        res = self.testapp.post_json(href, ext_obj, status=201)
+        assert_that(res.json_body, has_entry('NTIID', is_not(none())))
