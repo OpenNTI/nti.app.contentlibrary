@@ -19,6 +19,7 @@ from pyramid.interfaces import IRequest
 from nti.app.contentlibrary.interfaces import IContentUnitInfo
 
 from nti.app.publishing import VIEW_PUBLISH
+from nti.app.publishing import VIEW_UNPUBLISH
 
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
@@ -122,16 +123,24 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
 
     def _predicate(self, context, result):
         result =    self._is_authenticated \
-                and has_permission(ACT_CONTENT_EDIT, context, self.request) \
-                and not context.is_published() \
-                and (context.lastModified or 0) > (context.publishLastModified or 0)
+                and has_permission(ACT_CONTENT_EDIT, context, self.request)
         return result
 
     def _do_decorate_external(self, context, result):
+        if not context.is_published():
+            rels = (VIEW_PUBLISH,)
+        elif (context.lastModified or 0) > (context.publishLastModified or 0):
+            # Published with recent modifications, give user the option to publish
+            # and render again.
+            rels = (VIEW_UNPUBLISH, VIEW_PUBLISH)
+        else:
+            rels = (VIEW_UNPUBLISH,)
+        ds2 = self.request.path_info_peek()
+        path = '%s/Library/%s' % (ds2, context.ntiid)
         _links = result.setdefault(LINKS, [])
-        # TODO: Use library path
-        link = Link(context, rel=VIEW_PUBLISH, elements=(VIEW_PUBLISH,))
-        interface.alsoProvides(link, ILocation)
-        link.__name__ = ''
-        link.__parent__ = context
-        _links.append(link)
+        for rel in rels:
+            link = Link(path, rel=rel, elements=(rel,))
+            interface.alsoProvides(link, ILocation)
+            link.__name__ = ''
+            link.__parent__ = context
+            _links.append(link)
