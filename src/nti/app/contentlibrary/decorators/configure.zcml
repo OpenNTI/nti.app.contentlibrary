@@ -36,7 +36,7 @@
 
 	<subscriber factory=".contentunit.RenderablePackagePublishLinkDecorator"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-				for="..interfaces.IRenderableContentPackage
+				for="nti.contentlibrary.interfaces.IRenderableContentPackage
 					 pyramid.interfaces.IRequest"/>
 
 </configure>
