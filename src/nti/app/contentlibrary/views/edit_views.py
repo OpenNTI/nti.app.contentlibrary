@@ -41,9 +41,9 @@ from nti.appserver.ugd_edit_views import UGDPutView
 
 from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
+from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
-from nti.contentlibrary.interfaces import IEditableContentPackageLibrary
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
@@ -105,7 +105,7 @@ class ContentPackageMixin(object):
 
     @Lazy
     def _libray(self):
-        library = component.queryUtility(IEditableContentPackageLibrary)
+        library = component.queryUtility(IContentPackageLibrary)
         if library is None:
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
