@@ -14,6 +14,7 @@ import uuid
 import mimetypes
 
 from zope import component
+from zope import lifecycleevent
 
 from zope.file.download import getHeaders
 
@@ -172,7 +173,8 @@ class LibraryPostView(AbstractAuthenticatedView,
             package.contents = contents
         if contentType and contents:
             package.contentType = contentType
-        # add; should do lifecycleevent.created
+        # add to library
+        lifecycleevent.created(package)
         library.add(package, event=False)
         self.request.response.status_int = 201
         return package
