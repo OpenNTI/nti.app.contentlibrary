@@ -15,6 +15,7 @@ import shutil
 import tempfile
 
 from zope import component
+from zope import interface
 
 try:
 	from nti.appserver.pyramid_authorization import ZopeACLAuthorizationPolicy as ACLAuthorizationPolicy
@@ -25,6 +26,8 @@ from nti.contentlibrary.contentunit import _clear_caches
 
 from nti.contentlibrary.filesystem import FilesystemContentUnit
 from nti.contentlibrary.filesystem import FilesystemContentPackage
+
+from nti.contentlibrary.interfaces import IFilesystemKey
 
 from nti.dataserver import authorization as auth
 
@@ -43,6 +46,8 @@ class TestLibraryEntryAclProvider(ApplicationLayerTest):
 		super(TestLibraryEntryAclProvider, cls).setUpClass()
 		cls.temp_dir = tempfile.mkdtemp()
 		cls.library_entry = FilesystemContentPackage()
+		
+		@interface.implementer(IFilesystemKey)
 		class Key(object):
 			absolute_path = None
 			bucket = None
@@ -55,13 +60,22 @@ class TestLibraryEntryAclProvider(ApplicationLayerTest):
 						return f.read()
 				except IOError:
 					return None
+				
+		def _make_sibling_key(k):
+			return Key(name=os.path.join(cls.temp_dir, k))
+		
+		def _read_contents_of_sibling_entry(k):
+			return _make_sibling_key(k).readContents()
+
 		cls.library_entry.key = Key(name=os.path.join(cls.temp_dir, 'index.html'))
 		cls.library_entry.children = []
-		cls.library_entry.make_sibling_key = lambda k: Key(name=os.path.join(cls.temp_dir, k))
-
+		cls.library_entry.make_sibling_key = _make_sibling_key
+		cls.library_entry.read_contents_of_sibling_entry = _read_contents_of_sibling_entry
+		
 		child = FilesystemContentUnit()
 		child.key = Key(name=os.path.join(cls.temp_dir, 'child.html'))
-		child.make_sibling_key = lambda k: Key(name=os.path.join(cls.temp_dir, k))
+		child.make_sibling_key = _make_sibling_key
+		child.read_contents_of_sibling_entry = _read_contents_of_sibling_entry
 		child.__parent__ = cls.library_entry
 		child.ordinal = 1
 		cls.library_entry.children.append(child)
