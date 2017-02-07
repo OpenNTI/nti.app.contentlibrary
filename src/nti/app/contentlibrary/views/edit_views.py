@@ -141,7 +141,7 @@ class ContentPackageMixin(object):
 @view_config(context=LibraryPathAdapter)
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
-               request_method='GET',
+               request_method='POST',
                permission=nauth.ACT_CONTENT_EDIT)
 class LibraryPostView(AbstractAuthenticatedView,
                       ModeledContentUploadRequestUtilsMixin,
