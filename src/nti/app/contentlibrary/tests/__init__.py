@@ -230,7 +230,7 @@ class ExLibraryApplicationTestLayer(ApplicationTestLayer):
 # persistent site library
 
 
-def publish_ou_entries():
+def load_global_library():
     lib = component.getGlobalSiteManager().queryUtility(IContentPackageLibrary)
     if lib is None:
         return
@@ -251,12 +251,10 @@ def _do_then_enumerate_library(do=None, sync_libs=True):
         with mock_db_trans():
             if do is not None:
                 do()
-            publish_ou_entries()
+            load_global_library()
             if sync_libs:
-                from nti.app.contentlibrary.views.sync_views import _SyncAllLibrariesView
-                view = _SyncAllLibrariesView(None)
-                view._SLEEP = False  # see comments in the view class
-                view()
+                from nti.app.contentlibrary.synchronize import syncContentPackages
+                syncContentPackages()
     _create()
 
 
@@ -284,10 +282,9 @@ class PersistentApplicationTestLayer(ApplicationTestLayer):
     @staticmethod
     def _setup_library(layer, *args, **kwargs):
         from nti.contentlibrary.filesystem import CachedNotifyingStaticFilesystemLibrary as Library
-        return FileLibrary(
-						os.path.join(
-							os.path.dirname(__file__),
-							layer._library_path))
+        return FileLibrary(os.path.join(
+							    os.path.dirname(__file__),
+							    layer._library_path))
 
     @staticmethod
     def _install_library(layer, *args, **kwargs):
