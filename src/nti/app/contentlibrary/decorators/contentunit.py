@@ -18,10 +18,17 @@ from pyramid.interfaces import IRequest
 
 from nti.app.contentlibrary.interfaces import IContentUnitInfo
 
+from nti.app.publishing import VIEW_PUBLISH
+
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
+
+from nti.appserver.pyramid_authorization import has_permission
 
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IRenderableContentPackage
+
+from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
@@ -72,14 +79,14 @@ class _ContentUnitInfoDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
 @component.adapter(IContentUnitInfo, IRequest)
 @interface.implementer(IExternalMappingDecorator)
-class _ContentUnitInfoTitleDecorator(AbstractAuthenticatedRequestAwareDecorator):
+class _ContentUnitInfoTitleDecorator(
+        AbstractAuthenticatedRequestAwareDecorator):
     """
     Decorates context with ContentPackage title.
     """
 
     def _predicate(self, context, result):
-        result = bool(
-            self._is_authenticated and context.contentUnit is not None)
+        result = self._is_authenticated and context.contentUnit is not None
         if result:
             try:
                 context.contentUnit.title
@@ -103,6 +110,27 @@ class _ContentBundlePagesLinkDecorator(object):
     def decorateExternalMapping(self, context, result):
         _links = result.setdefault(LINKS, [])
         link = Link(context, rel='Pages', elements=('Pages',))
+        interface.alsoProvides(link, ILocation)
+        link.__name__ = ''
+        link.__parent__ = context
+        _links.append(link)
+
+
+@interface.implementer(IExternalMappingDecorator)
+@component.adapter(IRenderableContentPackage, IRequest)
+class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDecorator):
+
+    def _predicate(self, context, result):
+        result =    self._is_authenticated \
+                and has_permission(ACT_CONTENT_EDIT, context, self.request) \
+                and not context.is_published() \
+                and (context.lastModified or 0) > (context.publishLastModified or 0)
+        return result
+
+    def _do_decorate_external(self, context, result):
+        _links = result.setdefault(LINKS, [])
+        # TODO: Use library path
+        link = Link(context, rel=VIEW_PUBLISH, elements=(VIEW_PUBLISH,))
         interface.alsoProvides(link, ILocation)
         link.__name__ = ''
         link.__parent__ = context
