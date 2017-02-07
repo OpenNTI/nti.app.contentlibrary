@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, unicode_literals, absolute_import, division2
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -80,8 +80,7 @@ class _ContentUnitInfoDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
 @component.adapter(IContentUnitInfo, IRequest)
 @interface.implementer(IExternalMappingDecorator)
-class _ContentUnitInfoTitleDecorator(
-        AbstractAuthenticatedRequestAwareDecorator):
+class _ContentUnitInfoTitleDecorator(AbstractAuthenticatedRequestAwareDecorator):
     """
     Decorates context with ContentPackage title.
     """
@@ -136,11 +135,11 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
         else:
             rels = (VIEW_UNPUBLISH,)
         ds2 = self.request.path_info_peek()
-        path = '%s/Library/%s' % (ds2, context.ntiid)
+        path = '/%s/Library/%s' % (ds2, context.ntiid)
         _links = result.setdefault(LINKS, [])
         for rel in rels:
-            link = Link(path, rel=rel, elements=(rel,))
-            interface.alsoProvides(link, ILocation)
+            link = Link(path, rel=rel, elements=(rel,),
+                        ignore_properties_of_target=True)
             link.__name__ = ''
             link.__parent__ = context
             _links.append(link)
