@@ -17,6 +17,8 @@ from zope import component
 
 from zope.file.download import getHeaders
 
+from ZODB.interfaces import IConnection
+
 from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
@@ -41,7 +43,7 @@ from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
-from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IEditableContentPackageLibrary
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
@@ -90,7 +92,7 @@ class ContentPackageMixin(object):
             validator.validate(content)
 
     def _check_content(self, ext_obj=None):
-        contentType = RST_MIMETYPE
+        contentType = None
         content = self._get_content(ext_obj) if ext_obj else None
         if not content:
             source = self._get_source(self.request)
@@ -103,7 +105,7 @@ class ContentPackageMixin(object):
 
     @Lazy
     def _libray(self):
-        library = component.queryUtility(IContentPackageLibrary)
+        library = component.queryUtility(IEditableContentPackageLibrary)
         if library is None:
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
@@ -119,7 +121,7 @@ class ContentPackageMixin(object):
         creator = SYSTEM_USER_NAME
         current_time = time_to_64bit_int(time.time())
         provider = provider \
-                or (get_provider(base) or 'NTI' if base else 'NTI')
+            or (get_provider(base) or 'NTI' if base else 'NTI')
 
         specific_base = get_specific(base) if base else None
         if specific_base:
@@ -155,19 +157,22 @@ class LibraryPostView(AbstractAuthenticatedView,
             context.ntiid = ntiid
 
     def _do_call(self):
-        from IPython.core.debugger import Tracer; Tracer()()
         library = self._libray
         externalValue = self.readInput()
         package = self.readCreateUpdateContentObject(self.remoteUser,
                                                      search_owner=False,
                                                      externalValue=externalValue)
-       
+        # add to connection
+        IConnection(library).add(package)
+        # set ntiid according to package class
         self._set_ntiid(package)
+        # read content
         contents, contentType = self._check_content(externalValue)
         if contents:
             package.contents = contents
-        if contentType:
+        if contentType and contents:
             package.contentType = contentType
+        # add; should do lifecycleevent.created
         library.add(package, event=False)
         self.request.response.status_int = 201
         return package
@@ -196,10 +201,6 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
             contentObject.contentType = contentType
         return result
 
-    def __call__(self):
-        result = UGDPutView.__call__(self)
-        return result
-
 
 @view_config(context=IEditableContentUnit)
 @view_defaults(route_name='objects.generic.traversal',
@@ -207,7 +208,7 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
                request_method='PUT',
                name=VIEW_CONTENTS,
                permission=nauth.ACT_CONTENT_EDIT)
-class ContentUnitContentsPutView(AbstractAuthenticatedView, 
+class ContentUnitContentsPutView(AbstractAuthenticatedView,
                                  ContentPackageMixin):
 
     def __call__(self):
