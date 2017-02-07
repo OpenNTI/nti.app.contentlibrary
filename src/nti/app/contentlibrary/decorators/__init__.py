@@ -5,6 +5,7 @@
 """
 
 from __future__ import print_function, unicode_literals, absolute_import, division
+
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -12,6 +13,8 @@ logger = __import__('logging').getLogger(__name__)
 from zope import interface
 
 from zope.location.interfaces import ILocation
+
+from pyramid.threadlocal import get_current_request
 
 from nti.app.contentlibrary import LIBRARY_PATH_GET_VIEW
 
@@ -40,3 +43,14 @@ class AbstractLibraryPathLinkDecorator(object):
         link.__name__ = ''
         link.__parent__ = context
         _links.append(link)
+
+
+def get_ds2(request=None):
+    request = request if request else get_current_request()
+    try:
+        # e.g. /dataserver2
+        result = request.path_info_peek() if request else None
+    except AttributeError:  # in unit test we may see this
+        result = None
+    return result or u"dataserver2"
+get_path_info = get_ds2

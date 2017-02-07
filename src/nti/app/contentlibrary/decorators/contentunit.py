@@ -16,6 +16,8 @@ from zope.location.interfaces import ILocation
 
 from pyramid.interfaces import IRequest
 
+from nti.app.contentlibrary.decorators import get_ds2
+
 from nti.app.contentlibrary.interfaces import IContentUnitInfo
 
 from nti.app.publishing import VIEW_PUBLISH
@@ -134,8 +136,7 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
             rels = (VIEW_UNPUBLISH, VIEW_PUBLISH)
         else:
             rels = (VIEW_UNPUBLISH,)
-        ds2 = self.request.path_info_peek()
-        path = '/%s/Library/%s' % (ds2, context.ntiid)
+        path = '/%s/Library/%s' % (get_ds2(self.request), context.ntiid)
         _links = result.setdefault(LINKS, [])
         for rel in rels:
             link = Link(path, rel=rel, elements=(rel,),

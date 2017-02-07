@@ -282,9 +282,9 @@ class PersistentApplicationTestLayer(ApplicationTestLayer):
     @staticmethod
     def _setup_library(layer, *args, **kwargs):
         from nti.contentlibrary.filesystem import CachedNotifyingStaticFilesystemLibrary as Library
-        return FileLibrary(os.path.join(
-							    os.path.dirname(__file__),
-							    layer._library_path))
+        path = os.path.join(os.path.dirname(__file__),
+                            layer._library_path)
+        return Library(paths=(path,))
 
     @staticmethod
     def _install_library(layer, *args, **kwargs):
@@ -323,6 +323,6 @@ class PersistentApplicationTestLayer(ApplicationTestLayer):
         def cleanup():
             cls._uninstall_library(cls)
 
-        _do_then_enumerate_library(cleanup)
+        _do_then_enumerate_library(cleanup, sync_libs=False)
 
     testSetUp = testTearDown = classmethod(lambda cls: None)
