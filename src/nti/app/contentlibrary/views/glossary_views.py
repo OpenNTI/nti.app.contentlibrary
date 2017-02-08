@@ -127,7 +127,7 @@ class GlossaryView(object):
         # Collect all the dictionaries, from most specific to global
         dictionaries = []
         for unit in path:
-            unit_dict = request.registry.queryUtility(IDictionaryTermDataStorage, 
+            unit_dict = request.registry.queryUtility(IDictionaryTermDataStorage,
                                                       name=unit.ntiid)
             dictionaries.append(unit_dict)
         registry = request.registry
@@ -158,9 +158,8 @@ def add_main_glossary_from_new_content(title, event):
             MAIN_CSV_CONTENT_GLOSSARY_FILENAME)
         if glossary_source:
             logger.info("Adding content-glossary from %s at %s",
-                         title, title.ntiid)
+                        title, title.ntiid)
             csv_dict = TrivialExcelCSVDataStorage(StringIO(glossary_source))
             component.provideUtility(csv_dict, name=title.ntiid)
     except AttributeError:
         pass
-
