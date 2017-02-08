@@ -18,8 +18,9 @@ from zope import interface
 
 from zope.container.contained import Contained
 
-from pyramid.view import view_config
 from pyramid import httpexceptions as hexc
+
+from pyramid.view import view_config
 
 from nti.app.contentlibrary import PAGE_INFO_MT_JSON
 
@@ -111,7 +112,7 @@ def get_card_view(request):
     object_elm = None
     for node in nodes:
         if      node.tag == 'object' \
-        	and node.attrib.get('data-ntiid') == request.context.__name__:
+            and node.attrib.get('data-ntiid') == request.context.__name__:
             object_elm = node
             break
 
