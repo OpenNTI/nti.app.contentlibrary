@@ -62,6 +62,7 @@ class _CourseContentUnitAssociations(object):
         if package is not None:
             courses = get_courses_for_packages(packages=(package.ntiid,))
             for course in courses or ():
+                # favor catalog entries
                 entry = ICourseCatalogEntry(course, None)
                 if entry is not None:
                     result.append(entry)
