@@ -181,7 +181,7 @@ class LibraryPostView(AbstractAuthenticatedView,
         if contentType and contents:
             package.contentType = contentType
         # set creator
-        package.creator = self.remoteUser().username
+        package.creator = self.remoteUser.username
         # add to library
         lifecycleevent.created(package)
         library.add(package, event=False)
