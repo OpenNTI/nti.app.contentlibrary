@@ -24,6 +24,7 @@ from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentUnitAssociations
 
+from nti.contenttypes.courses.interfaces import ICourseCatalogEntry
 from nti.contenttypes.courses.interfaces import ICourseInstanceEnrollmentRecord
 
 from nti.contenttypes.courses.utils import get_courses_for_packages
@@ -33,7 +34,7 @@ from nti.traversal.traversal import find_interface
 
 def _on_operation_on_scope_membership(record, event):
     principal = record.Principal
-    if principal != None:
+    if principal is not None:
         pid = IPrincipal(principal).id
         _set_user_ticket(pid, _memcached_client())
 
@@ -56,7 +57,14 @@ class _CourseContentUnitAssociations(object):
         pass
 
     def associations(self, context):
+        result = []
         package = find_interface(context, IContentPackage, strict=False)
         if package is not None:
-            return get_courses_for_packages(packages=(package.ntiid,))
-        return ()
+            courses = get_courses_for_packages(packages=(package.ntiid,))
+            for course in courses or ():
+                entry = ICourseCatalogEntry(course, None)
+                if entry is not None:
+                    result.append(entry)
+                else:
+                    result.append(course)
+        return result or ()

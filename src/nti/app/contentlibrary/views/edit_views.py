@@ -13,6 +13,8 @@ import time
 import uuid
 import mimetypes
 
+from requests.structures import CaseInsensitiveDict
+
 from zope import component
 from zope import lifecycleevent
 
@@ -40,6 +42,8 @@ from nti.app.contentlibrary.views import LibraryPathAdapter
 
 from nti.appserver.ugd_edit_views import UGDPutView
 
+from nti.common.string import is_true
+
 from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -54,6 +58,10 @@ from nti.coremetadata.interfaces import IRecordable
 from nti.dataserver import authorization as nauth
 
 from nti.externalization.internalization import notify_modified
+from nti.externalization.externalization import to_external_object
+from nti.externalization.externalization import StandardExternalFields
+
+from nti.links.links import Link
 
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import get_provider
@@ -71,6 +79,9 @@ from nti.zodb.containers import time_to_64bit_int
 HTML = u'HTML'
 RST_MIMETYPE = b'text/x-rst'
 
+CLASS = StandardExternalFields.CLASS
+LINKS = StandardExternalFields.LINKS
+MIME_TYPE = StandardExternalFields.MIMETYPE
 
 class ContentPackageMixin(object):
 
@@ -269,15 +280,52 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
                permission=nauth.ACT_CONTENT_EDIT)
 class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
-    def _do_delete_object(self, theObject, event=False):
+    CONFIRM_CODE = 'EditableContentPackageDelete'
+    CONFIRM_MSG = _('This content has associations. Are you sure you want to delete?')
+    
+    def _do_delete_object(self, theObject, event=True):
         library = self._libray
         library.remove(theObject, event=event)
         return theObject
 
+    def _ntiids(self, associations):
+        for x in associations or ():
+            try:
+                yield x.ntiid
+            except AttributeError:
+                pass
+
+    def _raise_conflict_error(self, code, message, associations):
+        ntiids = [x.ntiid for x in self._ntiids(associations)]
+        logger.warn('Attempting to delete content package in (%s) (%s)',
+                    self.context.ntiid,
+                    ntiids)
+        params = dict(self.request.params)
+        params['force'] = True
+        links = (
+            Link(self.request.path, rel='confirm',
+                 params=params, method='DELETE'),
+        )
+        raise_json_error(self.request,
+                         hexc.HTTPConflict,
+                         {
+                            u'code': code,
+                            u'message': message,
+                            CLASS: 'DestructiveChallenge',
+                            LINKS: to_external_object(links),
+                            MIME_TYPE: 'application/vnd.nextthought.destructivechallenge'
+                         },
+                         None)
+
     def __call__(self):
-        if not self.context.is_published():
-            self._do_delete_object(self.context, event=False)
         associations = resolve_content_unit_associations(self.context)
-        if not associations:
-            self._do_delete_object(self.context, event=True)
+        params = CaseInsensitiveDict(self.request.params)
+        force = is_true(params.get('force'))
+        if not associations or force:
+            self._do_delete_object(self.context,
+                                   self.context.is_published())
+        else:
+            self._raise_conflict_error(self.CONFIRM_CODE,
+                                       self.CONFIRM_MSG,
+                                       associations)
         return self.context
