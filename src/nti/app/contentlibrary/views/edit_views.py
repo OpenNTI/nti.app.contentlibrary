@@ -47,7 +47,9 @@ from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
-from nti.coremetadata.interfaces import SYSTEM_USER_NAME
+from nti.coremetadata.interfaces import SYSTEM_USER_NAME 
+
+from nti.coremetadata.interfaces import IRecordable
 
 from nti.dataserver import authorization as nauth
 
@@ -59,6 +61,10 @@ from nti.ntiids.ntiids import get_specific
 from nti.ntiids.ntiids import make_specific_safe
 
 from nti.property.property import Lazy
+
+from nti.recorder.interfaces import TRX_TYPE_CREATE
+
+from nti.recorder.utils import record_transaction
 
 from nti.zodb.containers import time_to_64bit_int
 
@@ -174,9 +180,14 @@ class LibraryPostView(AbstractAuthenticatedView,
             package.contents = contents
         if contentType and contents:
             package.contentType = contentType
+        # set creator
+        package.creator = self.remoteUser().username
         # add to library
         lifecycleevent.created(package)
         library.add(package, event=False)
+        # record trax
+        if IRecordable.providedBy(package):
+            record_transaction(package, type_=TRX_TYPE_CREATE)
         self.request.response.status_int = 201
         return package
 
