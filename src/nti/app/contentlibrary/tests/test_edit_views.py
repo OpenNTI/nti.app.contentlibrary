@@ -62,6 +62,7 @@ class TestEditViews(ApplicationLayerTest):
         package = RenderableContentPackage(title='Bleach',
                                            description='Manga bleach')
         package.ntiid = ntiid
+        package.creator = self.default_username
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             library = component.getUtility(IContentPackageLibrary)
             library.add(package, event=False)
@@ -80,6 +81,7 @@ class TestEditViews(ApplicationLayerTest):
         package = RenderableContentPackage(title='Bleach',
                                            description='Manga bleach')
         package.ntiid = ntiid
+        package.creator = self.default_username
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             library = component.getUtility(IContentPackageLibrary)
             library.add(package, event=False)
@@ -112,6 +114,7 @@ class TestEditViews(ApplicationLayerTest):
         package = RenderableContentPackage(title='Bleach',
                                            description='Manga bleach')
         package.ntiid = ntiid
+        package.creator = self.default_username
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             library = component.getUtility(IContentPackageLibrary)
             library.add(package, event=False)
