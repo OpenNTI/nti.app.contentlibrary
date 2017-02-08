@@ -83,7 +83,8 @@ class ContentPackageMixin(object):
             if len(sources) == 1:
                 return iter(sources.values()).next()
             return sources.get('data') \
-                or sources.get('content')
+                or sources.get('content') \
+                or sources.get('contents')
         return None
 
     def _validate(self, content, contentType=RST_MIMETYPE):
@@ -245,7 +246,7 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
                              contentLength=len(contents),
                              contentDisposition="attachment")
         for k, v in headers:
-            response.setHeader(k, v)
+            response.headers[str(k)] = str(v)
         response.body = contents
         return response
 
