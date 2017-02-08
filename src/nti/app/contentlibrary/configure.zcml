@@ -10,7 +10,7 @@
 	<include package="zope.security" />
 
 	<include package="nti.contentlibrary" />
-	
+
 	<include package=".views" />
 	<include package=".policies" />
 	<include package=".appserver" />
@@ -29,19 +29,20 @@
 
 	<!-- ACL -->
 	<adapter factory=".acl._ContentPackageLibraryACLProvider" />
+	<adapter factory=".acl._RenderableContentPackageACLProvider" />
 	<adapter factory=".acl._ContentPackageBundleLibraryACLProvider" />
 	<adapter factory=".acl._DelimitedHierarchyContentUnitACLProvider" />
 	<adapter factory=".acl._DelimitedHierarchyContentPackageACLProvider" />
-	
+
 	<adapter factory=".acl._TestingLibraryTOCEntryACLProvider"
 			 zcml:condition="have testmode" />
 
-	
+
 	<configure zcml:condition="installed nti.contenttypes.courses">
 		<!-- Permissions cache -->
 		<subscriber handler="._courses._on_enroll_record" />
 		<subscriber handler="._courses._on_unenroll_record" />
-		
+
 		<!-- Catalog -->
 		<subscriber factory="._courses._CourseContentUnitAssociations"
 					provides="nti.contentlibrary.interfaces.IContentUnitAssociations"
@@ -102,7 +103,7 @@
 
 	<!-- Adapters & Subscribers -->
 	<adapter factory=".renderers._ContentUnitInfoCacheController" />
-		
+
 	<adapter factory=".adapters.presentation_asset_items_factory"
 			 for="nti.contentlibrary.interfaces.IContentUnit"
 			 provides="nti.contenttypes.presentation.interfaces.IPresentationAssetContainer" />
@@ -163,30 +164,30 @@
 	<subscriber	factory=".filters._LibraryContentObjectFilter"
 				provides="nti.appserver.interfaces.ICreatableObjectFilter"
 				for="nti.dataserver.interfaces.IUser" />
-		
+
 	<!-- Search pacakge resolvers -->
 	<utility factory=".search._DefaultRootPackageResolver" />
-					
+
 	<subscriber factory=".search._DefaultSearchPacakgeResolver"
 				provides="nti.contentsearch.interfaces.ISearchPackageResolver"
 				for="nti.dataserver.interfaces.IUser" />
-					
+
 	<subscriber factory=".search._ContentUnitSearchHitPredicate"
 				provides="nti.contentsearch.interfaces.ISearchHitPredicate"
 				for="nti.contentlibrary.interfaces.IContentUnit" />
-	
+
 	<subscriber factory=".search._SearchHitDecorator"
 				for="nti.contentsearch.interfaces.IContentUnitSearchHit"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
-				
+
 	<!-- Resolving metadata, used in the implementation of links -->
 	<adapter factory=".resolvers.ContentMetadataFromContentUnit" />
-	
+
 	<!-- Catalog -->
 	<adapter factory=".catalog._asset_to_ntiid" />
-	<adapter factory=".catalog._asset_to_target" />	
+	<adapter factory=".catalog._asset_to_target" />
 	<adapter factory=".catalog._asset_to_namespace" />
-	<adapter factory=".catalog._asset_to_containers" />	
+	<adapter factory=".catalog._asset_to_containers" />
 	<adapter factory=".catalog._asset_to_contained_type" />
 
 </configure>

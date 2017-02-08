@@ -18,6 +18,7 @@ from zope.interface.interfaces import ComponentLookupError
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentUnit
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackage
@@ -26,13 +27,16 @@ from nti.dataserver import authorization
 
 from nti.dataserver.authorization_acl import _ACL
 from nti.dataserver.authorization_acl import ace_allowing
+from nti.dataserver.authorization_acl import acl_from_aces
 from nti.dataserver.authorization_acl import ace_denying_all
 from nti.dataserver.authorization_acl import acl_from_ace_lines
 
+from nti.dataserver.interfaces import ACE_DENY_ALL
 from nti.dataserver.interfaces import ALL_PERMISSIONS
 from nti.dataserver.interfaces import AUTHENTICATED_GROUP_NAME
 
 from nti.dataserver.interfaces import IACLProvider
+from nti.dataserver.interfaces import ISupplementalACLProvider
 
 from nti.ntiids import ntiids
 
@@ -220,6 +224,39 @@ class _DelimitedHierarchyContentUnitACLProvider(_AbstractDelimitedHierarchyEntry
 		acl = super(_DelimitedHierarchyContentUnitACLProvider, self)._acl_from_string(context, acl_string, provenance=provenance)
 		return 	_supplement_acl_with_content_role(self, context, acl) \
 				if self._acl_sibling_fallback_name else acl
+
+@interface.implementer(IACLProvider)
+@component.adapter(IRenderableContentPackage)
+class _RenderableContentPackageACLProvider(object):
+	"""
+	Renderable content packages give admin users all-access. We also
+	supplement this acl with any :class:`ISupplementalACLProvider`
+	subscribers.
+
+	XXX: Should we do this for all content packages (if no acl file)?
+	"""
+
+	def __init__(self, context):
+		self.context = context
+
+	@Lazy
+	def __acl__(self):
+		aces = []
+		# By default, all admins and the creator have all-access to this content package.
+		for prin in (authorization.ROLE_CONTENT_ADMIN,
+					 authorization.ROLE_ADMIN,
+					 self.context.creator):
+			admin_ace = ace_allowing(prin, ALL_PERMISSIONS, self)
+			aces.append( admin_ace )
+		# Now add in any supplemental providers.
+		for supplemental in component.subscribers((self.context,), ISupplementalACLProvider):
+			for supplemental_ace in supplemental.__acl__ or ():
+				if supplemental_ace is not None:
+					aces.append( supplemental_ace )
+		# Deny the rest (maybe we mark a content package if it is publicly accessible...)
+		aces.append( ACE_DENY_ALL )
+		acl = acl_from_aces( aces )
+		return acl
 
 @interface.implementer(IACLProvider)
 @component.adapter(IContentPackageLibrary)
