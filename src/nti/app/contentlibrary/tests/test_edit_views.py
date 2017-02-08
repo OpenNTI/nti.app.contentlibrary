@@ -15,6 +15,8 @@ from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_property
 
+import fudge
+
 from zope import component
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -101,3 +103,24 @@ class TestEditViews(ApplicationLayerTest):
                         has_property('contentType', is_(b'text/x-rst')))
             history = ITransactionRecordHistory(package)
             assert_that(history.records(), has_length(1))
+    
+    @WithSharedApplicationMockDS(users=True, testapp=True)
+    @fudge.patch('nti.app.contentlibrary.views.edit_views.resolve_content_unit_associations')
+    def test_delete(self, mock_rca):
+        mock_rca.is_callable().with_args().returns(('foo',))
+        ntiid = u'tag:nextthought.com,2011-10:NTI-HTML-bleach_ichigo'
+        package = RenderableContentPackage(title='Bleach',
+                                           description='Manga bleach')
+        package.ntiid = ntiid
+        with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
+            library = component.getUtility(IContentPackageLibrary)
+            library.add(package, event=False)
+
+        href = '/dataserver2/Library/%s' % ntiid
+        self.testapp.delete(href, status=409)
+        
+        href = '/dataserver2/Library/%s?force=true' % ntiid
+        self.testapp.delete(href, status=200)
+        
+        href = '/dataserver2/Library/%s' % ntiid
+        self.testapp.get(href, status=404)
