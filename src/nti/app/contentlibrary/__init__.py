@@ -18,6 +18,9 @@ from nti.app.contentlibrary.utils import PAGE_INFO_MT_JSON
 #: Contents
 VIEW_CONTENTS = 'contents'
 
+#: Library path adapter
+LIBRARY_ADAPTER = 'Library'
+
 #: Library Path (GET) View
 LIBRARY_PATH_GET_VIEW = 'LibraryPath'
 
