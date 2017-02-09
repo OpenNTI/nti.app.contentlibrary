@@ -83,6 +83,7 @@ CLASS = StandardExternalFields.CLASS
 LINKS = StandardExternalFields.LINKS
 MIME_TYPE = StandardExternalFields.MIMETYPE
 
+
 class ContentPackageMixin(object):
 
     @Lazy
@@ -91,7 +92,9 @@ class ContentPackageMixin(object):
 
     @classmethod
     def _get_content(cls, ext_obj):
-        return ext_obj.get('data') or ext_obj.get('content')
+        return ext_obj.get('data') \
+            or ext_obj.get('content') \
+            or ext_obj.get('contents')
 
     def _get_source(self, request=None):
         request = self.request if not request else request
@@ -99,9 +102,7 @@ class ContentPackageMixin(object):
         if sources:
             if len(sources) == 1:
                 return iter(sources.values()).next()
-            return sources.get('data') \
-                or sources.get('content') \
-                or sources.get('contents')
+            return self._get_content(sources)
         return None
 
     def _validate(self, content, contentType=RST_MIMETYPE):
@@ -282,7 +283,8 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
 class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
     CONFIRM_CODE = 'EditableContentPackageDelete'
-    CONFIRM_MSG = _('This content has associations. Are you sure you want to delete?')
+    CONFIRM_MSG = _(
+        'This content has associations. Are you sure you want to delete?')
 
     def _do_delete_object(self, theObject, event=True):
         library = self._library
@@ -310,11 +312,11 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
         raise_json_error(self.request,
                          hexc.HTTPConflict,
                          {
-                            u'code': code,
-                            u'message': message,
-                            CLASS: 'DestructiveChallenge',
-                            LINKS: to_external_object(links),
-                            MIME_TYPE: 'application/vnd.nextthought.destructivechallenge'
+                             u'code': code,
+                             u'message': message,
+                             CLASS: 'DestructiveChallenge',
+                             LINKS: to_external_object(links),
+                             MIME_TYPE: 'application/vnd.nextthought.destructivechallenge'
                          },
                          None)
 
