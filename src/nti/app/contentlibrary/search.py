@@ -5,7 +5,6 @@
 """
 
 from __future__ import print_function, unicode_literals, absolute_import, division
-
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -28,6 +27,8 @@ from nti.contentsearch.interfaces import ISearchPackageResolver
 
 from nti.contentsearch.predicates import DefaultSearchHitPredicate
 
+from nti.coremetadata.interfaces import IPublishable
+
 from nti.dataserver.authorization import ACT_READ
 
 from nti.externalization.interfaces import StandardExternalFields
@@ -42,6 +43,10 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 from nti.property.property import Lazy
 
 CONTAINER_ID = StandardExternalFields.CONTAINER_ID
+
+
+def is_published(context):
+    return not IPublishable.providedBy(context) or context.is_published()
 
 
 @interface.implementer(ISearchPackageResolver)
@@ -95,7 +100,8 @@ class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
     def allow(self, item, score, query):
         if self.principal is None:
             return True
-        return has_permission(ACT_READ, item, self.request)
+        return  is_published(item) \
+            and has_permission(ACT_READ, item, self.request)
 
 
 @component.adapter(IContentUnitSearchHit)
