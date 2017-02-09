@@ -39,8 +39,9 @@ from nti.contentlibrary.interfaces import IDelimitedHierarchyContentUnit
 @component.adapter(LastModifiedBTreeContainer)
 class _ContentUnitPreferences(Persistent):
 
-    __parent__ = None
     __name__ = None
+    __parent__ = None
+
     sharedWith = None
 
     def __init__(self, createdTime=None, lastModified=None, sharedWith=None):
@@ -67,8 +68,9 @@ def _DelimitedHierarchyContentUnitPreferencesFactory(context):
     if sharedWith is None:
         return None
 
-    prefs = _ContentUnitPreferences(createdTime=time.mktime(context.created.timetuple()),
-                                    lastModified=time.mktime(context.modified.timetuple()),
-                                    sharedWith=context.sharedWith)
+    prefs = _ContentUnitPreferences(
+                    createdTime=time.mktime(context.created.timetuple()),
+                    lastModified=time.mktime(context.modified.timetuple()),
+                    sharedWith=context.sharedWith)
     prefs.__parent__ = context
     return prefs

@@ -14,6 +14,7 @@ from hamcrest import has_entry
 from hamcrest import assert_that
 from hamcrest import greater_than
 from hamcrest import has_property
+from nti.testing.matchers import verifiably_provides
 
 from nti.app.contentlibrary.interfaces import IContentUnitInfo
 
@@ -26,10 +27,9 @@ from nti.app.testing.layers import AppTestLayer
 
 from nti.contentlibrary.tests import ContentlibraryLayerTest
 
-from nti.testing.matchers import verifiably_provides
-
 
 class TestAppFilesystem(ContentlibraryLayerTest):
+    
     layer = AppTestLayer
 
     def test_adapter_prefs(self):
@@ -91,15 +91,15 @@ class _SecurityPolicyNewRequestSharedConfiguringTestLayer(NewRequestSharedConfig
     def tearDown(cls):
         config = getattr(NewRequestSharedConfiguringTestLayer, 'config')
         config.registry.unregisterUtility(cls.__new_policy,
-										  IAuthorizationPolicy)
-        config.registry.unregisterUtility(cls.__new_policy, 
-										  IAuthenticationPolicy)
+                                          IAuthorizationPolicy)
+        config.registry.unregisterUtility(cls.__new_policy,
+                                          IAuthenticationPolicy)
         if cls.__old_author:
             config.registry.registerUtility(cls.__old_author,
-										    IAuthorizationPolicy)
+                                            IAuthorizationPolicy)
         if cls.__old_authen:
-            config.registry.registerUtility(cls.__old_authen, 
-										    IAuthenticationPolicy)
+            config.registry.registerUtility(cls.__old_authen,
+                                            IAuthenticationPolicy)
 
     @classmethod
     def testSetUp(cls):
@@ -154,7 +154,8 @@ class TestContainerPrefs(NewRequestLayerTest):
 
     rem_username = layer.rem_username
 
-    def _do_check_root_inherited(self, ntiid=None, sharedWith=None, state='inherited', provenance=ntiids.ROOT):
+    def _do_check_root_inherited(
+            self, ntiid=None, sharedWith=None, state='inherited', provenance=ntiids.ROOT):
         unit = ContentUnit()
         unit.ntiid = ntiid
         # Notice that the root is missing from the lineage
@@ -201,17 +202,17 @@ class TestContainerPrefs(NewRequestLayerTest):
         cid_prefs.sharedWith = ['leaf']
 
         self._do_check_root_inherited(ntiid=cid,
-									  sharedWith=['leaf'], 
-									  state='set',
-									  provenance=cid)
+                                      sharedWith=['leaf'],
+                                      state='set',
+                                      provenance=cid)
 
         # Even setting something blank at the leaf trumps
         cid_prefs.sharedWith = []
 
-        self._do_check_root_inherited(ntiid=cid, 
-									  sharedWith=[],
-									  state='set', 
-									  provenance=cid)
+        self._do_check_root_inherited(ntiid=cid,
+                                      sharedWith=[],
+                                      state='set',
+                                      provenance=cid)
 
         # But if we delete it from the leaf, we're back to the root
         cid_prefs.sharedWith = None
@@ -243,13 +244,13 @@ class TestContainerPrefs(NewRequestLayerTest):
         content_unit.ntiid = cont_obj.containerId
 
         prefs = traverse(content_unit,
-                         "++fields++sharingPreference", 
+                         "++fields++sharingPreference",
                          request=self.request)
         assert_that(prefs, verifiably_provides(IContentUnitPreferences))
 
     def _do_update_prefs(self, content_unit, sharedWith=None):
         self.request.method = 'PUT'
-        prefs = traverse(content_unit, 
+        prefs = traverse(content_unit,
                          "++fields++sharingPreference",
                          request=self.request)
         assert_that(prefs, verifiably_provides(IContentUnitPreferences))
@@ -260,7 +261,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         class Accept(object):
 
-            def best_match(self, *args): 
+            def best_match(self, *args):
                 return 'application/json'
 
         self.request.accept = Accept()

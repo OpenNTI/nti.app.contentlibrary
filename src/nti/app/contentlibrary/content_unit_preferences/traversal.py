@@ -21,8 +21,9 @@ from pyramid.threadlocal import get_current_request
 
 from nti.app.contentlibrary.content_unit_preferences.interfaces import IContentUnitPreferences
 
-from nti.dataserver import users
 from nti.dataserver import authorization_acl as nacl
+
+from nti.dataserver import users
 
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import IDataserver
@@ -42,11 +43,11 @@ def _with_acl(prefs):
         return prefs
     # TODO: Replace this with a real ACL provider
     return ACLLocationProxy(
-            prefs,
-            prefs.__parent__,
-            prefs.__name__,
-            nacl.acl_from_aces(nacl.ace_allowing(user.username,
-                                                 ALL_PERMISSIONS)))
+        prefs,
+        prefs.__parent__,
+        prefs.__name__,
+        nacl.acl_from_aces(nacl.ace_allowing(user.username,
+                                             ALL_PERMISSIONS)))
 
 
 @interface.implementer(ITraversable)
@@ -92,8 +93,9 @@ class _ContentUnitFieldsTraversable(object):
             raise LocationError(name)
 
         request = self.request or get_current_request()
+        registry = request.registry
         remote_user = users.User.get_user(request.authenticated_userid,
-                                          dataserver=request.registry.getUtility(IDataserver))
+                                          dataserver=registry.getUtility(IDataserver))
         # Preferences for the root are actually stored
         # on the unnamed node
         ntiid = '' if self.context.ntiid == ntiids.ROOT else self.context.ntiid
