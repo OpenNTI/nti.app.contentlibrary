@@ -260,7 +260,7 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
         response = self.request.response
         contents = self.context.contents or b''
         contentType = bytes(self.context.contentType or RST_MIMETYPE)
-        ext = mimetypes.guess_extension(RST_MIMETYPE) or ".rst"
+        ext = mimetypes.guess_extension(contentType) or ".rst"
         downloadName = "contents%s" % ext
         headers = getHeaders(self.context,
                              contentType=contentType,
