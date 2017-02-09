@@ -13,11 +13,12 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 from nti.schema.field import Object
 
+
 class ILibraryCollection(ICollection):
     """
     An :class:`ICollection` wrapping a :class:`.IContentPackageLibrary`.
     """
 
     library = Object(IContentPackageLibrary,
-                      title="The library",
-                      readonly=True)
+                     title="The library",
+                     readonly=True)

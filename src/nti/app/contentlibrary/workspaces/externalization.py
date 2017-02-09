@@ -19,24 +19,27 @@ from nti.externalization.externalization import to_external_object
 from nti.externalization.interfaces import IExternalObject
 from nti.externalization.interfaces import LocatedExternalDict
 
+
 @component.adapter(ILibraryCollection)
 @interface.implementer(IExternalObject)
 class LibraryCollectionDetailExternalizer(object):
-	"""
-	Externalizes a Library wrapped as a collection.
-	"""
+    """
+    Externalizes a Library wrapped as a collection.
+    """
 
-	# TODO: This doesn't do a good job of externalizing it,
-	# though. We're skipping all the actual Collection parts
+    # TODO: This doesn't do a good job of externalizing it,
+    # though. We're skipping all the actual Collection parts
 
-	def __init__(self, collection):
-		self._collection = collection
+    def __init__(self, collection):
+        self._collection = collection
 
-	def toExternalObject(self, **kwargs):
-		library_items = self._collection.library_items
-		result = LocatedExternalDict({
-			'title': "Library",
-			'titles' : [to_external_object(x, **kwargs) for x in library_items] })
-		result.__name__ = self._collection.__name__
-		result.__parent__ = self._collection.__parent__
-		return result
+    def toExternalObject(self, **kwargs):
+        library_items = self._collection.library_items
+        result = LocatedExternalDict(
+            {
+                'title': "Library",
+                'titles': [to_external_object(x, **kwargs) for x in library_items]
+            })
+        result.__name__ = self._collection.__name__
+        result.__parent__ = self._collection.__parent__
+        return result

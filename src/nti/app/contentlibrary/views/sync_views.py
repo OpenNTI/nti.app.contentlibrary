@@ -296,7 +296,7 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
                 break
         if isinstance(ntiids, string_types):
             ntiids = set(ntiids.split())
-        ntiids = list(ntiids) if ntiids else ()
+        ntiids = tuple(ntiids) if ntiids else ()
         # execute
         result = self._do_sync(site=site,
                                ntiids=ntiids,
