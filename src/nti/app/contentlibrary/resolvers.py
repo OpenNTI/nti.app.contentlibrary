@@ -23,26 +23,29 @@ from nti.contentprocessing.interfaces import IContentMetadata
 from nti.contentprocessing.metadata_extractors import ImageMetadata
 from nti.contentprocessing.metadata_extractors import ContentMetadata
 
+
 @component.adapter(IContentUnit)
 @interface.implementer(IContentMetadata)
 def ContentMetadataFromContentUnit(content_unit):
-	# TODO: Is this the right level at which to externalize the hrefs?
-	result = ContentMetadata(title=content_unit.title,
-							 description=content_unit.description,
-							 contentLocation=IContentUnitHrefMapper(content_unit).href,
-							 mimeType='text/html')
-	result.__name__ = '@@metadata'
-	result.__parent__ = content_unit  # for ACL
+    # TODO: Is this the right level at which to externalize the hrefs?
+    mapper = IContentUnitHrefMapper(content_unit, None)
+    contentLocation = mapper.href if mapper is not None else None
+    result = ContentMetadata(title=content_unit.title,
+                             description=content_unit.description,
+                             contentLocation=contentLocation,
+                             mimeType='text/html')
+    result.__name__ = '@@metadata'
+    result.__parent__ = content_unit  # for ACL
 
-	def _attach_image(key):
-		image = ImageMetadata(url=IContentUnitHrefMapper(key).href)
-		image.__parent__ = result
-		if not result.images:
-			result.images = []
-		result.images.append(image)
+    def _attach_image(key):
+        image = ImageMetadata(url=IContentUnitHrefMapper(key).href)
+        image.__parent__ = result
+        if not result.images:
+            result.images = []
+        result.images.append(image)
 
-	for name in ('icon', 'thumbnail'):
-		key = getattr(content_unit, name)
-		if key:
-			_attach_image(key)
-	return result
+    for name in ('icon', 'thumbnail'):
+        key = getattr(content_unit, name, None)
+        if key is not None:
+            _attach_image(key)
+    return result
