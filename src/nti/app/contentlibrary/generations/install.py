@@ -32,9 +32,9 @@ class _SchemaManager(BaseSchemaManager):
 
     def __init__(self):
         super(_SchemaManager, self).__init__(
-            generation=generation,
-            minimum_generation=generation,
-            package_name='nti.app.contentlibrary.generations')
+                generation=generation,
+                minimum_generation=generation,
+                package_name='nti.app.contentlibrary.generations')
 
     def install(self, context):
         evolve(context)

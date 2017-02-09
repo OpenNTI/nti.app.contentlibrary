@@ -40,6 +40,39 @@ from nti.app.testing.application_webtest import ApplicationTestLayer
 
 from nti.dataserver.tests.mock_dataserver import WithMockDS
 from nti.dataserver.tests.mock_dataserver import mock_db_trans
+from nti.dataserver.tests.mock_dataserver import DSInjectorMixin
+
+from nti.testing.layers import find_test
+from nti.testing.layers import GCLayerMixin
+from nti.testing.layers import ZopeComponentLayer
+from nti.testing.layers import ConfiguringLayerMixin
+
+import zope.testing.cleanup
+
+
+class SharedConfiguringTestLayer(ZopeComponentLayer,
+                                 GCLayerMixin,
+                                 ConfiguringLayerMixin,
+                                 DSInjectorMixin):
+
+    set_up_packages = ('nti.dataserver', 'nti.app.contentlibrary')
+
+    @classmethod
+    def setUp(cls):
+        cls.setUpPackages()
+
+    @classmethod
+    def tearDown(cls):
+        cls.tearDownPackages()
+        zope.testing.cleanup.cleanUp()
+
+    @classmethod
+    def testSetUp(cls, test=None):
+        cls.setUpTestDS(test)
+
+    @classmethod
+    def testTearDown(cls):
+        pass
 
 
 class _SharedSetup(object):
@@ -74,7 +107,7 @@ class _SharedSetup(object):
 
             ds.getSiteManager().registerUtility(site,
                                                 provided=IEtcNamespace,
-                                                 name='bundles')
+                                                name='bundles')
 
     @staticmethod
     def setUp(layer):
@@ -141,8 +174,6 @@ class CourseTestContentApplicationTestLayer(ApplicationTestLayer):
     # TODO: May need to recreate the application with this library?
 
 import nti.contentlibrary.tests
-
-from nti.testing.layers import find_test
 
 
 class ContentLibraryApplicationTestLayer(ApplicationTestLayer):
