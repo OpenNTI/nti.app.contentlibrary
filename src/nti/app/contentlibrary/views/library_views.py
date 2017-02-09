@@ -516,8 +516,8 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
         # Try iterating
         def recur(unit):
             item_ntiid = getattr(unit, 'ntiid', None)
-            if         item_ntiid == target_ntiid \
-                    or target_ntiid in unit.embeddedContainerNTIIDs:
+            if     item_ntiid == target_ntiid \
+                or target_ntiid in unit.embeddedContainerNTIIDs:
                 return [unit]
             for child in unit.children:
                 result = recur(child)
