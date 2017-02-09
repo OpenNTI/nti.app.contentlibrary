@@ -217,7 +217,6 @@ class RemovePackageInaccessibleAssetsView(AbstractAuthenticatedView,
         return _read_input(self.request)
 
     def __call__(self):
-        result = LocatedExternalDict()
         endInteraction()
         try:
             result = remove_package_inaccessible_assets()
