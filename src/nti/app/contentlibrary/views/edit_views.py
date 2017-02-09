@@ -51,7 +51,7 @@ from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
-from nti.coremetadata.interfaces import SYSTEM_USER_NAME 
+from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.coremetadata.interfaces import IRecordable
 
@@ -123,7 +123,7 @@ class ContentPackageMixin(object):
         return content, contentType
 
     @Lazy
-    def _libray(self):
+    def _library(self):
         library = component.queryUtility(IContentPackageLibrary)
         if library is None:
             raise_json_error(self.request,
@@ -176,7 +176,7 @@ class LibraryPostView(AbstractAuthenticatedView,
             context.ntiid = ntiid
 
     def _do_call(self):
-        library = self._libray
+        library = self._library
         externalValue = self.readInput()
         package = self.readCreateUpdateContentObject(self.remoteUser,
                                                      search_owner=False,
@@ -200,6 +200,7 @@ class LibraryPostView(AbstractAuthenticatedView,
         if IRecordable.providedBy(package):
             record_transaction(package, type_=TRX_TYPE_CREATE)
         self.request.response.status_int = 201
+        logger.info('Created new content package (%s)', package.ntiid)
         return package
 
 
@@ -282,9 +283,9 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
     CONFIRM_CODE = 'EditableContentPackageDelete'
     CONFIRM_MSG = _('This content has associations. Are you sure you want to delete?')
-    
+
     def _do_delete_object(self, theObject, event=True):
-        library = self._libray
+        library = self._library
         library.remove(theObject, event=event)
         return theObject
 
