@@ -13,17 +13,18 @@ from zope import interface
 
 from nti.appserver.interfaces import ICreatableObjectFilter
 
+
 @interface.implementer(ICreatableObjectFilter)
 class _LibraryContentObjectFilter(object):
 
-	TO_FILTER = ("application/vnd.nextthought.contentlibrary.synchronizationparams",
-				 "application/vnd.nextthought.contentlibrary.librarysynchronizationresults")
+    TO_FILTER = ("application/vnd.nextthought.contentlibrary.synchronizationparams",
+                 "application/vnd.nextthought.contentlibrary.librarysynchronizationresults")
 
-	def __init__(self, context=None):
-		pass
+    def __init__(self, context=None):
+        pass
 
-	def filter_creatable_objects(self, terms):
-		for name in self.TO_FILTER:
-			if name in terms:
-				terms.pop(name, None)
-		return terms
+    def filter_creatable_objects(self, terms):
+        for name in self.TO_FILTER:
+            if name in terms:
+                terms.pop(name, None)
+        return terms
