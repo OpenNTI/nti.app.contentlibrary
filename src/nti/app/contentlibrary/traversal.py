@@ -18,16 +18,17 @@ from pyramid.interfaces import IRequest
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
+
 @interface.implementer(ITraversable)
 @component.adapter(IContentPackageLibrary, IRequest)
 class LibraryTraversable(object):
 
-	def __init__(self, context, request):
-		self.context = context
-		self.request = request
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
 
-	def traverse(self, key, remaining_path):
-		try:
-			return self.context[key]
-		except KeyError:
-			raise LocationError(key)
+    def traverse(self, key, remaining_path):
+        try:
+            return self.context[key]
+        except KeyError:
+            raise LocationError(key)
