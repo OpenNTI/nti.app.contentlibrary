@@ -6,7 +6,7 @@
 
 from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
- 
+
 logger = __import__('logging').getLogger(__name__)
 
 from zope import component
@@ -139,7 +139,7 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
         path = '/%s/Library/%s' % (get_ds2(self.request), context.ntiid)
         _links = result.setdefault(LINKS, [])
         for rel in rels:
-            link = Link(path, rel=rel, elements=(rel,),
+            link = Link(path, rel=rel, elements=('@@%s' % rel,),
                         ignore_properties_of_target=True)
             link.__name__ = ''
             link.__parent__ = context
