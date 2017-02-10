@@ -177,9 +177,11 @@ class LibraryPostView(AbstractAuthenticatedView,
     def _do_call(self):
         library = self._library
         externalValue = self.readInput()
-        package = self.readCreateUpdateContentObject(self.remoteUser,
-                                                     search_owner=False,
-                                                     externalValue=externalValue)
+        package, _, externalValue = \
+                self.performReadCreateUpdateContentObject(user=self.remoteUser,
+                                                          search_owner=False,
+                                                          externalValue=externalValue,
+                                                          deepCopy=True)
         # add to connection
         IConnection(library).add(package)
         # set ntiid according to package class
