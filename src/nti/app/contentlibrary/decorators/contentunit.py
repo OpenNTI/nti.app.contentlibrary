@@ -125,12 +125,11 @@ class _ContentBundlePagesLinkDecorator(object):
 @component.adapter(IEditableContentPackage, IRequest)
 class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
     """
-    Decorates with `contents` rel if we are an editor and we have contents.
+    Decorates with `contents` rel if we are an editor.
     """
 
     def _predicate(self, context, result):
         result =    self._is_authenticated \
-                and context.contents \
                 and has_permission(ACT_CONTENT_EDIT, context, self.request)
         return result
 
