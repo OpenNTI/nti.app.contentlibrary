@@ -16,6 +16,8 @@ from zope.location.interfaces import ILocation
 
 from pyramid.interfaces import IRequest
 
+from nti.app.contentlibrary import VIEW_CONTENTS
+
 from nti.app.contentlibrary.decorators import get_ds2
 
 from nti.app.contentlibrary.interfaces import IContentUnitInfo
@@ -29,6 +31,7 @@ from nti.appserver.pyramid_authorization import has_permission
 
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
@@ -113,6 +116,29 @@ class _ContentBundlePagesLinkDecorator(object):
         _links = result.setdefault(LINKS, [])
         link = Link(context, rel='Pages', elements=('Pages',))
         interface.alsoProvides(link, ILocation)
+        link.__name__ = ''
+        link.__parent__ = context
+        _links.append(link)
+
+
+@interface.implementer(IExternalMappingDecorator)
+@component.adapter(IEditableContentPackage, IRequest)
+class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
+    """
+    Decorates with `contents` rel if we are an editor and we have contents.
+    """
+
+    def _predicate(self, context, result):
+        result =    self._is_authenticated \
+                and context.contents \
+                and has_permission(ACT_CONTENT_EDIT, context, self.request)
+        return result
+
+    def _do_decorate_external(self, context, result):
+        path = '/%s/Library/%s' % (get_ds2(self.request), context.ntiid)
+        _links = result.setdefault(LINKS, [])
+        link = Link(path, rel=VIEW_CONTENTS, elements=('@@%s' % VIEW_CONTENTS,),
+                    ignore_properties_of_target=True)
         link.__name__ = ''
         link.__parent__ = context
         _links.append(link)

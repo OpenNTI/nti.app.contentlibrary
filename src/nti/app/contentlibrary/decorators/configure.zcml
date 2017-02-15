@@ -34,6 +34,11 @@
 	<subscriber factory=".contentunit._ContentBundlePagesLinkDecorator"
 				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
 
+    <subscriber factory=".contentunit.EditablePackageDecorator"
+                provides="nti.externalization.interfaces.IExternalObjectDecorator"
+                for="nti.contentlibrary.interfaces.IEditableContentPackage
+                     pyramid.interfaces.IRequest"/>
+
 	<subscriber factory=".contentunit.RenderablePackagePublishLinkDecorator"
 				provides="nti.externalization.interfaces.IExternalObjectDecorator"
 				for="nti.contentlibrary.interfaces.IRenderableContentPackage
