@@ -52,7 +52,7 @@ from nti.appserver.interfaces import ForbiddenContextException
 from nti.appserver.interfaces import IHierarchicalContextProvider
 from nti.appserver.interfaces import ILibraryPathLastModifiedProvider
 
-from nti.appserver.pyramid_authorization import is_readable
+from nti.appserver.pyramid_authorization import is_readable, has_permission
 
 from nti.appserver.workspaces.interfaces import IService
 
@@ -60,6 +60,7 @@ from nti.contentlibrary.indexed_data import get_catalog
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentUnitHrefMapper
 
@@ -224,13 +225,21 @@ class _LibraryTOCRedirectClassView(object):
         link.getNearestSite = lambda: component.getUtility(IDataserver).root
         return link
 
+    def _check_publication_view(self, context):
+        if self._is_published(context):
+            return True
+        elif    IContentRendered.providedBy(context) \
+            and has_permission(nauth.ACT_CONTENT_EDIT, context, self.request):
+            return True
+        return False
+            
     def __call__(self):
         jsonp_href = None
         request = self.request
         href = request.context.href
 
-        # check publication state
-        if not self._is_published(request.context):
+        # check publication views
+        if not self._check_publication_view(request.context):
             raise hexc.HTTPForbidden()
 
         # Right now, the ILibraryTOCEntries always have relative hrefs,
