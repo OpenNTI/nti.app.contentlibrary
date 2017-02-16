@@ -47,6 +47,7 @@ from nti.common.string import is_true
 from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
@@ -172,7 +173,8 @@ class LibraryPostView(AbstractAuthenticatedView,
 
     def _set_ntiid(self, context):
         ntiid = self.make_pacakge_ntiid(extra=self._extra)
-        context.ntiid = ntiid
+        if IRenderableContentUnit.providedBy(context):
+            context.ntiid = ntiid
 
     def _do_call(self):
         library = self._library
