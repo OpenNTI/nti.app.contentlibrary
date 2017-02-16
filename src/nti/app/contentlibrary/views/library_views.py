@@ -97,7 +97,10 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.traversal.traversal import find_interface
 
+CLASS = StandardExternalFields.CLASS
 ITEMS = StandardExternalFields.ITEMS
+MIMETYPE = StandardExternalFields.MIMETYPE
+LAST_MODIFIED = StandardExternalFields.LAST_MODIFIED
 
 
 def _create_page_info(request, href, ntiid, last_modified=0, jsonp_href=None):
@@ -212,11 +215,11 @@ class _LibraryTOCRedirectClassView(object):
         # fake it by rendering here
 
         def _t_ext_obj(**kwargs):
-            return {"Class": "Link",
-                    "MimeType": self.link_mt,
+            return {CLASS: "Link",
+                    MIMETYPE: self.link_mt,
                     "href": href,
                     "rel": "content",
-                    'Last Modified': lastModified or None}
+                    LAST_MODIFIED: lastModified or None}
 
         link.__name__ = href
         link.__parent__ = request.context
@@ -369,8 +372,8 @@ def _get_board_obj_path(obj):
 
     # Go up tree until we hit board/blog
     while item is not None:
-        if         IBoard.providedBy(item) \
-                or IPersonalBlog.providedBy(item):
+        if     IBoard.providedBy(item) \
+            or IPersonalBlog.providedBy(item):
 
             if top_level_context is not None:
                 result_list.append(top_level_context)
