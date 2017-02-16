@@ -17,6 +17,7 @@ from zope.location.interfaces import ILocation
 from pyramid.interfaces import IRequest
 
 from nti.app.contentlibrary import VIEW_CONTENTS
+from nti.app.contentlibrary import LIBRARY_ADAPTER
 
 from nti.app.contentlibrary.decorators import get_ds2
 
@@ -134,7 +135,7 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
         return result
 
     def _do_decorate_external(self, context, result):
-        path = '/%s/Library/%s' % (get_ds2(self.request), context.ntiid)
+        path = '/%s/%s/%s' % (get_ds2(self.request), LIBRARY_ADAPTER, context.ntiid)
         _links = result.setdefault(LINKS, [])
         link = Link(path, rel=VIEW_CONTENTS, elements=('@@%s' % VIEW_CONTENTS,),
                     ignore_properties_of_target=True)
@@ -161,7 +162,7 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
             rels = (VIEW_UNPUBLISH, VIEW_PUBLISH)
         else:
             rels = (VIEW_UNPUBLISH,)
-        path = '/%s/Library/%s' % (get_ds2(self.request), context.ntiid)
+        path = '/%s/%s/%s' % (get_ds2(self.request), LIBRARY_ADAPTER, context.ntiid)
         _links = result.setdefault(LINKS, [])
         for rel in rels:
             link = Link(path, rel=rel, elements=('@@%s' % rel,),
