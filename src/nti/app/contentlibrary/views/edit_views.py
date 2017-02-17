@@ -242,12 +242,13 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
 
     def __call__(self):
         content, contentType = self._check_content()
-        self.context.write_contents(content, contentType)
-        notify_modified(self.context,
-                        {
-                            'contents': content,
-                            'contentType': contentType
-                        })
+        if content and contentType:
+            self.context.write_contents(content, contentType)
+            notify_modified(self.context,
+                            {
+                                'contents': content,
+                                'contentType': contentType
+                            })
         return self.context
 
 
