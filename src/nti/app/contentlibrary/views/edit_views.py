@@ -35,6 +35,8 @@ from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.externalization.error import raise_json_error
 
+from nti.app.externalization.internalization import read_body_as_external_object
+
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
 from nti.app.contentlibrary.views import VIEW_CONTENTS
@@ -91,18 +93,20 @@ class ContentPackageMixin(object):
         return str(uuid.uuid4()).split('-')[0].upper()
 
     @classmethod
-    def _get_content(cls, ext_obj):
-        return ext_obj.get('data') \
-            or ext_obj.get('content') \
-            or ext_obj.get('contents')
+    def _get_contents(cls, ext_obj):
+        return ext_obj.get('contents')
 
+    @classmethod
+    def _get_content_type(cls, ext_obj):
+        return ext_obj.get('contentType')
+    
     def _get_source(self, request=None):
         request = self.request if not request else request
         sources = get_all_sources(request, RST_MIMETYPE)
         if sources:
             if len(sources) == 1:
                 return iter(sources.values()).next()
-            return self._get_content(sources)
+            return self._get_contents(sources)
         return None
 
     def _validate(self, content, contentType=RST_MIMETYPE):
@@ -112,14 +116,15 @@ class ContentPackageMixin(object):
             validator.validate(content)
 
     def _check_content(self, ext_obj=None):
-        contentType = None
-        content = self._get_content(ext_obj) if ext_obj else None
+        content = self._get_contents(ext_obj) if ext_obj else None
+        contentType = self._get_content_type(ext_obj) if ext_obj else None
         if not content:
             source = self._get_source(self.request)
             if source is not None:
                 content = source.read()
                 contentType = source.contentType or RST_MIMETYPE
         if content:
+            contentType = contentType or RST_MIMETYPE
             self._validate(content, contentType)
         return content, contentType
 
@@ -240,13 +245,18 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
 class ContentUnitContentsPutView(AbstractAuthenticatedView,
                                  ContentPackageMixin):
 
+    def readInput(self):
+        data = read_body_as_external_object(self.request)
+        return CaseInsensitiveDict(data or {})
+
     def __call__(self):
-        content, contentType = self._check_content()
-        if content and contentType:
-            self.context.write_contents(content, contentType)
+        data = self.readInput()
+        contents, contentType = self._check_content(data)
+        if contents and contentType:
+            self.context.write_contents(contents, contentType)
             notify_modified(self.context,
                             {
-                                'contents': content,
+                                'contents': contents,
                                 'contentType': contentType
                             })
         return self.context
@@ -286,8 +296,7 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
 class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
     CONFIRM_CODE = 'EditableContentPackageDelete'
-    CONFIRM_MSG = _(
-        'This content has associations. Are you sure you want to delete?')
+    CONFIRM_MSG = _('This content has associations. Are you sure you want to delete?')
 
     def _do_delete_object(self, theObject, event=True):
         library = self._library
