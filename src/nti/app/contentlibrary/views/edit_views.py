@@ -125,10 +125,9 @@ class ContentPackageMixin(object):
                 }
                 if IContentValidationError.providedBy(e):
                     error = to_external_object(e, decorate=False)
-                    error['message'] = error.get('Error')
                     data.update(error)
                 else:
-                    data['Error'] = data['message'] = str(e)
+                    data['message'] = str(e)
                 raise_json_error(self.request,
                                  hexc.HTTPUnprocessableEntity,
                                  data,
