@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import sys
+
 import time
 import uuid
 import mimetypes
@@ -50,6 +52,7 @@ from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IRenderableContentUnit
+from nti.contentlibrary.interfaces import IContentValidationError
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
@@ -99,7 +102,7 @@ class ContentPackageMixin(object):
     @classmethod
     def _get_content_type(cls, ext_obj):
         return ext_obj.get('contentType')
-    
+
     def _get_source(self, request=None):
         request = self.request if not request else request
         sources = get_all_sources(request, RST_MIMETYPE)
@@ -113,7 +116,23 @@ class ContentPackageMixin(object):
         validator = component.queryUtility(IContentValidator,
                                            name=contentType)
         if validator is not None:
-            validator.validate(content)
+            try:
+                validator.validate(content)
+            except Exception as e:
+                exc_info = sys.exc_info()
+                data = {
+                    u'code': 'ContentValidationError',
+                }
+                if IContentValidationError.providedBy(e):
+                    error = to_external_object(e, decorate=False)
+                    error['message'] = error.get('Error')
+                    data.update(error)
+                else:
+                    data['Error'] = data['message'] = str(e)
+                raise_json_error(self.request,
+                                 hexc.HTTPUnprocessableEntity,
+                                 data,
+                                 exc_info[2])
 
     def _check_content(self, ext_obj=None):
         content = self._get_contents(ext_obj) if ext_obj else None
@@ -185,10 +204,10 @@ class LibraryPostView(AbstractAuthenticatedView,
         library = self._library
         externalValue = self.readInput()
         package, _, externalValue = \
-                self.performReadCreateUpdateContentObject(user=self.remoteUser,
-                                                          search_owner=False,
-                                                          externalValue=externalValue,
-                                                          deepCopy=True)
+            self.performReadCreateUpdateContentObject(user=self.remoteUser,
+                                                      search_owner=False,
+                                                      externalValue=externalValue,
+                                                      deepCopy=True)
         # add to connection
         IConnection(library).add(package)
         # set ntiid according to package class
@@ -296,7 +315,8 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
 class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
     CONFIRM_CODE = 'EditableContentPackageDelete'
-    CONFIRM_MSG = _('This content has associations. Are you sure you want to delete?')
+    CONFIRM_MSG = _(
+        'This content has associations. Are you sure you want to delete?')
 
     def _do_delete_object(self, theObject, event=True):
         library = self._library
