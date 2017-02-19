@@ -106,6 +106,13 @@ class TestEditViews(ApplicationLayerTest):
             history = ITransactionRecordHistory(package)
             assert_that(history.records(), has_length(1))
     
+        href = '/dataserver2/Library/%s/@@contents' % ntiid
+        res = self.testapp.get(href, status=200)
+        assert_that(res.json_body, 
+                    has_entry('contentType', is_(str('text/x-rst'))))
+        assert_that(res.json_body, 
+                    has_entry('data', is_(str('ichigo'))))
+        
     @WithSharedApplicationMockDS(users=True, testapp=True)
     @fudge.patch('nti.app.contentlibrary.views.edit_views.resolve_content_unit_associations')
     def test_delete(self, mock_rca):

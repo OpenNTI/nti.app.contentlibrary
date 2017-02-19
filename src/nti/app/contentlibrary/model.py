@@ -13,6 +13,8 @@ from zope import interface
 
 from nti.app.contentlibrary.interfaces import IContentUnitContents
 
+from nti.property.property import alias
+
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.schema.schema import SchemaConfigured
@@ -23,3 +25,5 @@ class ContentUnitContents(SchemaConfigured):
     createDirectFieldProperties(IContentUnitContents)
 
     mime_type = mimeType = u'application/vnd.nextthought.contentunit.contents'
+
+    contents = alias('data')
