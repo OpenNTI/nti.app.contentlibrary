@@ -86,7 +86,7 @@ class TestEditViews(ApplicationLayerTest):
             library = component.getUtility(IContentPackageLibrary)
             library.add(package, event=False)
 
-        href = '/dataserver2/Library/%s/@@contents' % ntiid
+        href = '/dataserver2/Library/%s/@@contents?attachment=True' % ntiid
         res = self.testapp.get(href, status=200)
         assert_that(res.body, has_length(0))
 
