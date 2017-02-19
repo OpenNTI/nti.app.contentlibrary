@@ -146,7 +146,8 @@ class ContentPackageMixin(object):
                 content = source.read()
                 contentType = source.contentType or RST_MIMETYPE
         if content:
-            contentType = contentType or RST_MIMETYPE
+            content = bytes_(content)
+            contentType = bytes_(contentType or RST_MIMETYPE)
             self._validate(content, contentType)
         return content, contentType
 
