@@ -41,10 +41,14 @@ from nti.app.externalization.internalization import read_body_as_external_object
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
+from nti.app.contentlibrary.model import ContentUnitContents
+
 from nti.app.contentlibrary.views import VIEW_CONTENTS
 from nti.app.contentlibrary.views import LibraryPathAdapter
 
 from nti.appserver.ugd_edit_views import UGDPutView
+
+from nti.base._compat import bytes_
 
 from nti.common.string import is_true
 
@@ -289,10 +293,10 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
 class ContentPackageContentsGetView(AbstractAuthenticatedView,
                                     ContentPackageMixin):
 
-    def __call__(self):
+    def as_attachment(self):
         response = self.request.response
         contents = self.context.contents or b''
-        contentType = bytes(self.context.contentType or RST_MIMETYPE)
+        contentType = bytes_(self.context.contentType or RST_MIMETYPE)
         ext = mimetypes.guess_extension(contentType) or ".rst"
         downloadName = "contents%s" % ext
         headers = getHeaders(self.context,
@@ -304,6 +308,20 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
             response.headers[str(k)] = str(v)
         response.body = contents
         return response
+
+    def as_model(self):
+        result = ContentUnitContents()
+        result.ntiid = self.context.ntiid
+        result.contents = self.context.contents or b''
+        result.contentType = bytes_(self.context.contentType or RST_MIMETYPE)
+        return result
+
+    def __call__(self):
+        params = CaseInsensitiveDict(self.request.params)
+        attachment = is_true(params.get('attachment') or 'False')
+        if attachment:
+            return self.as_attachment()
+        return self.as_model()
 
 
 @view_config(context=IEditableContentPackage)

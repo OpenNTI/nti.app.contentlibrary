@@ -190,4 +190,9 @@
 	<adapter factory=".catalog._asset_to_containers" />
 	<adapter factory=".catalog._asset_to_contained_type" />
 
+	<!-- Externalization -->
+	<ext:registerAutoPackageIO
+		root_interfaces=".interfaces.IContentUnitContents"
+		modules=".model" />
+
 </configure>

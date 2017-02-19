@@ -10,8 +10,13 @@ __docformat__ = "restructuredtext en"
 # disable: too many ancestors
 # pylint: disable=I0011,R0901
 
+from zope import interface
+
 from zope.container.constraints import contains
 from zope.container.constraints import containers
+
+from zope.schema import Bytes as ValidBytes
+from zope.schema import BytesLine as ValidBytesLine 
 
 from zope.securitypolicy.interfaces import IRolePermissionManager
 
@@ -35,6 +40,7 @@ from nti.dataserver.interfaces import IShouldHaveTraversablePath
 
 from nti.schema.field import List
 from nti.schema.field import Object
+from nti.schema.field import TextLine as ValidTextLine
 
 
 class IContentBoard(IDefaultForumBoard,
@@ -124,3 +130,26 @@ class IContentUnitInfo(INTIIDEntry):
                          description=""" Typically this will only be provided for one-off requests.
                                     Bulk collections/requests will not have it.
                                     """)
+
+
+# Mixins
+
+class IContentUnitContents(interface.Interface):
+
+    ntiid = ValidTextLine(title='Content unit NTIID')
+
+    contentType = ValidBytesLine(
+        title=u'Content Type',
+        description=u'The content type identifies the type of data.',
+        default=b'',
+        required=False,
+        missing_value=b''
+    )
+
+    data = ValidBytes(
+        title=u'Data',
+        description=u'The actual content of the object.',
+        default=b'',
+        missing_value=b'',
+        required=False,
+    )
