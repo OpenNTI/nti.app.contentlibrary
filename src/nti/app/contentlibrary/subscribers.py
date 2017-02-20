@@ -9,7 +9,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import time
 import simplejson
 
 from zope import component
@@ -36,7 +35,6 @@ from nti.contentlibrary.indexed_data import get_library_catalog
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
-from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageAddedEvent
 from nti.contentlibrary.interfaces import IContentPackageSyncResults
 from nti.contentlibrary.interfaces import IContentPackageReplacedEvent
@@ -70,7 +68,6 @@ from nti.dataserver.authorization import ACT_CONTENT_EDIT
 from nti.dataserver.authorization import ROLE_CONTENT_ADMIN
 
 from nti.externalization.interfaces import StandardExternalFields
-from nti.externalization.interfaces import IObjectModifiedFromExternalEvent
 
 from nti.intid.common import addIntId
 from nti.intid.common import removeIntId
@@ -653,9 +650,3 @@ def _on_content_pacakge_library_synced(library, event):
 			board = IContentBoard(bundle, None)
 			if board is not None:
 				board.createDefaultForum()
-
-@component.adapter(IEditableContentPackage, IObjectModifiedFromExternalEvent)
-def _contents_modified(package, event):
-	if     event.external_value \
-		or 'contents' in event.external_value:
-		package.contents_last_modified = time.time()
