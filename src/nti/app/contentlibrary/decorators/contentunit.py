@@ -46,7 +46,8 @@ from nti.externalization.singleton import SingletonDecorator
 
 from nti.links.links import Link
 
-from nti.ntiids.ntiids import is_valid_ntiid_string, find_object_with_ntiid
+from nti.ntiids.ntiids import is_valid_ntiid_string
+from nti.ntiids.ntiids import find_object_with_ntiid
 
 LINKS = StandardExternalFields.LINKS
 
@@ -88,7 +89,8 @@ class _ContentUnitInfoDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
 @component.adapter(IContentUnitInfo, IRequest)
 @interface.implementer(IExternalMappingDecorator)
-class _ContentUnitInfoTitleDecorator(AbstractAuthenticatedRequestAwareDecorator):
+class _ContentUnitInfoTitleDecorator(
+        AbstractAuthenticatedRequestAwareDecorator):
     """
     Decorates context with ContentPackage title.
     """
@@ -132,8 +134,8 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
     """
 
     def _predicate(self, context, result):
-        result =    self._is_authenticated \
-                and has_permission(ACT_CONTENT_EDIT, context, self.request)
+        result = self._is_authenticated \
+             and has_permission(ACT_CONTENT_EDIT, context, self.request)
         return result
 
     def _need_publish_contents_link(self, context):
@@ -148,7 +150,9 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
             and context.contents_last_modified > context.publishLastModified
 
     def _do_decorate_external(self, context, result):
-        path = '/%s/%s/%s' % (get_ds2(self.request), LIBRARY_ADAPTER, context.ntiid)
+        path = '/%s/%s/%s' % (get_ds2(self.request),
+                              LIBRARY_ADAPTER,
+                              context.ntiid)
         _links = result.setdefault(LINKS, [])
         rels = (VIEW_CONTENTS,)
         if self._need_publish_contents_link(context):
@@ -165,11 +169,12 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
 @interface.implementer(IExternalMappingDecorator)
 @component.adapter(IRenderableContentPackage, IRequest)
-class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDecorator):
+class RenderablePackagePublishLinkDecorator(
+        AbstractAuthenticatedRequestAwareDecorator):
 
     def _predicate(self, context, result):
         result =    self._is_authenticated \
-                and has_permission(ACT_CONTENT_EDIT, context, self.request)
+            and has_permission(ACT_CONTENT_EDIT, context, self.request)
         return result
 
     def _do_decorate_external(self, context, result):
@@ -181,7 +186,9 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
             rels = (VIEW_UNPUBLISH, VIEW_PUBLISH)
         else:
             rels = (VIEW_UNPUBLISH,)
-        path = '/%s/%s/%s' % (get_ds2(self.request), LIBRARY_ADAPTER, context.ntiid)
+        path = '/%s/%s/%s' % (get_ds2(self.request),
+                              LIBRARY_ADAPTER,
+                              context.ntiid)
         _links = result.setdefault(LINKS, [])
         for rel in rels:
             link = Link(path, rel=rel, elements=('@@%s' % rel,),
@@ -191,16 +198,17 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
             _links.append(link)
 
 
-@interface.implementer(IExternalMappingDecorator)
 @component.adapter(IContentUnitContents)
+@interface.implementer(IExternalMappingDecorator)
 class ContentUnitContentsDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _predicate(self, context, result):
-        unit = find_object_with_ntiid( context.ntiid )
+        unit = find_object_with_ntiid(context.ntiid)
         result =    self._is_authenticated \
-                and has_permission(ACT_CONTENT_EDIT, unit, self.request)
+            and has_permission(ACT_CONTENT_EDIT, unit, self.request)
         return result
 
     def _do_decorate_external(self, context, result):
-        unit = find_object_with_ntiid( context.ntiid )
+        unit = find_object_with_ntiid(context.ntiid)
         result['version'] = unit.version
+        result['length'] = len(context['data'] or b'')
