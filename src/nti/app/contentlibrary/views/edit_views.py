@@ -124,7 +124,27 @@ class ContentPackageMixin(object):
             return self._get_contents(sources)
         return None
 
+    def _validate_version(self):
+        """
+        If given a content version, validate that it matches what
+        we have. Otherwise, it indicates the PUT might be trampling
+        over another user's edits.
+        """
+        params = CaseInsensitiveDict( self.request.params )
+        version = params.get( 'version' )
+        # XXX: We dont want a 'force' link right?
+        if version and version != self.context.version:
+            raise_json_error(
+                self.request,
+                hexc.HTTPConflict,
+                {
+                    u'message': _('The content version does not match. Please refresh.'),
+                    u'code': 'ContentVersionConflictError'
+                },
+                None)
+
     def _validate(self, content, contentType=RST_MIMETYPE):
+        self._validate_version()
         validator = component.queryUtility(IContentValidator,
                                            name=contentType)
         if validator is not None:
