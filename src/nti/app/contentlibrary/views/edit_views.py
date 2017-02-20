@@ -15,6 +15,8 @@ import time
 import uuid
 import mimetypes
 
+from datetime import datetime
+
 from requests.structures import CaseInsensitiveDict
 
 from zope import component
@@ -44,6 +46,8 @@ from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtils
 from nti.app.contentlibrary.model import ContentUnitContents
 
 from nti.app.contentlibrary.views import VIEW_CONTENTS
+from nti.app.contentlibrary.views import VIEW_PUBLISH_CONTENTS
+
 from nti.app.contentlibrary.views import LibraryPathAdapter
 
 from nti.appserver.ugd_edit_views import UGDPutView
@@ -80,7 +84,11 @@ from nti.ntiids.ntiids import make_specific_safe
 from nti.property.property import Lazy
 
 from nti.recorder.interfaces import TRX_TYPE_CREATE
+from nti.recorder.interfaces import TRX_TYPE_UPDATE
 
+from nti.recorder.interfaces import ITransactionRecordHistory
+
+from nti.recorder.utils import decompress
 from nti.recorder.utils import record_transaction
 
 from nti.zodb.containers import time_to_64bit_int
@@ -294,9 +302,12 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
 class ContentPackageContentsGetView(AbstractAuthenticatedView,
                                     ContentPackageMixin):
 
+    def _get_contents(self):
+        return self.context.contents or b''
+
     def as_attachment(self):
         response = self.request.response
-        contents = self.context.contents or b''
+        contents = self._get_contents()
         contentType = bytes_(self.context.contentType or RST_MIMETYPE)
         ext = mimetypes.guess_extension(contentType) or ".rst"
         downloadName = "contents%s" % ext
@@ -313,7 +324,7 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
     def as_model(self):
         result = ContentUnitContents()
         result.ntiid = self.context.ntiid
-        result.contents = self.context.contents or b''
+        result.contents = self._get_contents()
         result.contentType = bytes_(self.context.contentType or RST_MIMETYPE)
         return result
 
@@ -323,6 +334,55 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
         if attachment:
             return self.as_attachment()
         return self.as_model()
+
+
+@view_config(context=IEditableContentPackage)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='GET',
+               name=VIEW_PUBLISH_CONTENTS,
+               permission=nauth.ACT_CONTENT_EDIT)
+class PackagePublishedContentsGetView(ContentPackageContentsGetView):
+
+    def _include_record(self, record, publish_time):
+        return  record.created <= publish_time \
+            and record.attributes \
+            and 'contents' in record.attributes
+
+    def _get_publish_record(self, records, publish_time):
+        records = [x for x in records if self._include_record(x, publish_time)]
+        result = None
+        if records:
+            sorted_txs = sorted(records, lambda x: x.created)
+            result = sorted_txs[-1]
+        return result
+
+    def _get_contents(self):
+        history = ITransactionRecordHistory(self.context)
+        # Get all update records before our publish time
+        records = history.query(record_type=TRX_TYPE_UPDATE)
+        publish_time = self.context.publishLastModified
+        result = None
+        if publish_time and records:
+            # Sort and fetch the closest update to publish time
+            publish_time = datetime.utcfromtimestamp(publish_time)
+            result = self._get_publish_record( records, publish_time )
+
+        if result is None:
+            logger.warn('No publish contents found (%s) (update_record_count=%s)',
+                        self.context.ntiid,
+                        len( records ))
+            raise hexc.HTTPNotFound(_('No publish contents found'))
+
+        result = decompress( result.external_value )
+        try:
+            result = result['contents']
+        except KeyError:
+            logger.warn('No publish contents found (%s) (external_value=%s)',
+                        self.context.ntiid,
+                        result)
+            raise hexc.HTTPNotFound(_('No publish contents found'))
+        return result
 
 
 @view_config(context=IEditableContentPackage)

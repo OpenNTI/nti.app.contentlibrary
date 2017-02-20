@@ -18,6 +18,7 @@ from pyramid.interfaces import IRequest
 
 from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import LIBRARY_ADAPTER
+from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
 
 from nti.app.contentlibrary.decorators import get_ds2
 
@@ -134,14 +135,31 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
                 and has_permission(ACT_CONTENT_EDIT, context, self.request)
         return result
 
+    def _need_publish_contents_link(self, context):
+        """
+        A rel for fetching the published contents of a
+        IRenderableContentPackage. This is only necessary
+        if we have our `contents` modified after our
+        publishLastModified time.
+        """
+        return  context.contents_last_modified \
+            and context.publishLastModified \
+            and context.contents_last_modified > context.publishLastModified
+
     def _do_decorate_external(self, context, result):
         path = '/%s/%s/%s' % (get_ds2(self.request), LIBRARY_ADAPTER, context.ntiid)
         _links = result.setdefault(LINKS, [])
-        link = Link(path, rel=VIEW_CONTENTS, elements=('@@%s' % VIEW_CONTENTS,),
-                    ignore_properties_of_target=True)
-        link.__name__ = ''
-        link.__parent__ = context
-        _links.append(link)
+        rels = (VIEW_CONTENTS,)
+        if self._need_publish_contents_link(context):
+            rels = (VIEW_CONTENTS, VIEW_PUBLISH_CONTENTS)
+        for rel in rels:
+            link = Link(path,
+                        rel=rel,
+                        elements=('@@%s' % rel,),
+                        ignore_properties_of_target=True)
+            link.__name__ = ''
+            link.__parent__ = context
+            _links.append(link)
 
 
 @interface.implementer(IExternalMappingDecorator)

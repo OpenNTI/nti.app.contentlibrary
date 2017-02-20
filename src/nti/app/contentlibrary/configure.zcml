@@ -148,6 +148,10 @@
 
 	<subscriber handler=".subscribers._initialize_package_roles" />
 
+	<subscriber handler=".subscribers._contents_modified"
+                for="nti.contentlibrary.interfaces.IEditableContentPackage
+                     nti.externalization.interfaces.IObjectModifiedFromExternalEvent"/>
+
 	<!-- mutation -->
 	<subscriber handler=".subscribers._update_indices_when_content_changes"
 				for="nti.contentlibrary.interfaces.IContentPackage
