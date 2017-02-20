@@ -89,8 +89,7 @@ class _ContentUnitInfoDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
 @component.adapter(IContentUnitInfo, IRequest)
 @interface.implementer(IExternalMappingDecorator)
-class _ContentUnitInfoTitleDecorator(
-        AbstractAuthenticatedRequestAwareDecorator):
+class _ContentUnitInfoTitleDecorator(AbstractAuthenticatedRequestAwareDecorator):
     """
     Decorates context with ContentPackage title.
     """
@@ -169,12 +168,11 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
 @interface.implementer(IExternalMappingDecorator)
 @component.adapter(IRenderableContentPackage, IRequest)
-class RenderablePackagePublishLinkDecorator(
-        AbstractAuthenticatedRequestAwareDecorator):
+class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _predicate(self, context, result):
-        result =    self._is_authenticated \
-            and has_permission(ACT_CONTENT_EDIT, context, self.request)
+        result = self._is_authenticated \
+             and has_permission(ACT_CONTENT_EDIT, context, self.request)
         return result
 
     def _do_decorate_external(self, context, result):
@@ -204,8 +202,8 @@ class ContentUnitContentsDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _predicate(self, context, result):
         unit = find_object_with_ntiid(context.ntiid)
-        result =    self._is_authenticated \
-            and has_permission(ACT_CONTENT_EDIT, unit, self.request)
+        result = self._is_authenticated \
+             and has_permission(ACT_CONTENT_EDIT, unit, self.request)
         return result
 
     def _do_decorate_external(self, context, result):
