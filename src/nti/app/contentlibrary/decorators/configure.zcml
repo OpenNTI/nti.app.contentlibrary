@@ -40,8 +40,13 @@
                      pyramid.interfaces.IRequest"/>
 
 	<subscriber factory=".contentunit.RenderablePackagePublishLinkDecorator"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator"
 				for="nti.contentlibrary.interfaces.IRenderableContentPackage
 					 pyramid.interfaces.IRequest"/>
+
+	<subscriber factory=".contentunit.ContentUnitContentsDecorator"
+                provides="nti.externalization.interfaces.IExternalMappingDecorator"
+                for="nti.app.contentlibrary.interfaces.IContentUnitContents
+                     pyramid.interfaces.IRequest"/>
 
 </configure>

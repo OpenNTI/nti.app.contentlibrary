@@ -23,6 +23,7 @@ from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
 from nti.app.contentlibrary.decorators import get_ds2
 
 from nti.app.contentlibrary.interfaces import IContentUnitInfo
+from nti.app.contentlibrary.interfaces import IContentUnitContents
 
 from nti.app.publishing import VIEW_PUBLISH
 from nti.app.publishing import VIEW_UNPUBLISH
@@ -45,7 +46,7 @@ from nti.externalization.singleton import SingletonDecorator
 
 from nti.links.links import Link
 
-from nti.ntiids.ntiids import is_valid_ntiid_string
+from nti.ntiids.ntiids import is_valid_ntiid_string, find_object_with_ntiid
 
 LINKS = StandardExternalFields.LINKS
 
@@ -188,3 +189,18 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
             link.__name__ = ''
             link.__parent__ = context
             _links.append(link)
+
+
+@interface.implementer(IExternalMappingDecorator)
+@component.adapter(IContentUnitContents)
+class ContentUnitContentsDecorator(AbstractAuthenticatedRequestAwareDecorator):
+
+    def _predicate(self, context, result):
+        unit = find_object_with_ntiid( context.ntiid )
+        result =    self._is_authenticated \
+                and has_permission(ACT_CONTENT_EDIT, unit, self.request)
+        return result
+
+    def _do_decorate_external(self, context, result):
+        unit = find_object_with_ntiid( context.ntiid )
+        result['version'] = unit.version
