@@ -209,4 +209,4 @@ class ContentUnitContentsDecorator(AbstractAuthenticatedRequestAwareDecorator):
     def _do_decorate_external(self, context, result):
         unit = find_object_with_ntiid(context.ntiid)
         result['version'] = unit.version
-        result['length'] = len(result['data'] or b'')
+        result['length'] = len(context.data or b'')
