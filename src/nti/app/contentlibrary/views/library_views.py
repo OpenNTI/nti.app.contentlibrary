@@ -235,7 +235,15 @@ class _LibraryTOCRedirectClassView(object):
             and has_permission(nauth.ACT_CONTENT_EDIT, context, self.request):
             return True
         return False
-            
+
+    def _get_unit_href(self, unit, default_href):
+        mapper = IContentUnitHrefMapper(unit, None)
+        if mapper is None:
+            # Try key
+            mapper = IContentUnitHrefMapper(unit.key, None)
+        result = mapper and mapper.href
+        return result or default_href
+
     def __call__(self):
         jsonp_href = None
         request = self.request
@@ -250,11 +258,10 @@ class _LibraryTOCRedirectClassView(object):
         # Is it a relative path?
         assert not href.startswith('/') or '://' not in href
 
-        # FIXME: We're assuming these map into the URL space
-        # based in their root name. Is that valid? Do we need another mapping
-        # layer?
+        # FIXME: We're assuming these map into the URL space based on their
+        # root name. Is that valid? Do we need another mapping layer?
+        href = self._get_unit_href(request.context, href)
         jsonp = request.context.href + '.jsonp'
-        href = IContentUnitHrefMapper(request.context).href or href
         jsonp_key = request.context.does_sibling_entry_exist(jsonp)
         if jsonp_key is not None and jsonp_key:
             jsonp_href = IContentUnitHrefMapper(jsonp_key).href
