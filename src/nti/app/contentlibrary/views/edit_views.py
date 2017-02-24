@@ -429,8 +429,8 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
                 pass
 
     def _raise_conflict_error(self, code, message, associations):
-        ntiids = [x.ntiid for x in self._ntiids(associations)]
-        logger.warn('Attempting to delete content package in (%s) (%s)',
+        ntiids = [x for x in self._ntiids(associations)]
+        logger.warn('Attempting to delete content package (%s) (%s)',
                     self.context.ntiid,
                     ntiids)
         params = dict(self.request.params)
@@ -461,4 +461,6 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
             self._raise_conflict_error(self.CONFIRM_CODE,
                                        self.CONFIRM_MSG,
                                        associations)
-        return self.context
+        result = hexc.HTTPNoContent()
+        result.last_modified = time.time()
+        return result

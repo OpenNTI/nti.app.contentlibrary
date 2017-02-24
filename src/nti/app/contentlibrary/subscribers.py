@@ -569,7 +569,7 @@ def _update_indices_when_content_changes(content_package, event):
 
 def _clear_when_removed(content_package, force=True, process_global=False):
 	"""
-	Because we don't know where the data is stored, when an
+	Because we don't know where the data is stored, when a
 	content package is removed we need to clear its data.
 	"""
 	result = []
