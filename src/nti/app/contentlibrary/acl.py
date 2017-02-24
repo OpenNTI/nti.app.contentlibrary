@@ -246,6 +246,8 @@ class _RenderableContentPackageACLProvider(object):
 		for prin in (authorization.ROLE_CONTENT_ADMIN,
 					 authorization.ROLE_ADMIN,
 					 self.context.creator):
+			if prin is None:
+				continue
 			admin_ace = ace_allowing(prin, ALL_PERMISSIONS, self)
 			aces.append( admin_ace )
 		# Now add in any supplemental providers.
