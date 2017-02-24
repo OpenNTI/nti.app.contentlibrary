@@ -99,20 +99,20 @@ class TestEditViews(ApplicationLayerTest):
 
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             package = find_object_with_ntiid(ntiid)
-            assert_that(package, 
+            assert_that(package,
                         has_property('contents', is_(b'ichigo')))
             assert_that(package,
                         has_property('contentType', is_(b'text/x-rst')))
             history = ITransactionRecordHistory(package)
             assert_that(history.records(), has_length(1))
-    
+
         href = '/dataserver2/Library/%s/@@contents' % ntiid
         res = self.testapp.get(href, status=200)
-        assert_that(res.json_body, 
+        assert_that(res.json_body,
                     has_entry('contentType', is_(str('text/x-rst'))))
-        assert_that(res.json_body, 
+        assert_that(res.json_body,
                     has_entry('data', is_(str('ichigo'))))
-        
+
     @WithSharedApplicationMockDS(users=True, testapp=True)
     @fudge.patch('nti.app.contentlibrary.views.edit_views.resolve_content_unit_associations')
     def test_delete(self, mock_rca):
@@ -128,9 +128,9 @@ class TestEditViews(ApplicationLayerTest):
 
         href = '/dataserver2/Library/%s' % ntiid
         self.testapp.delete(href, status=409)
-        
+
         href = '/dataserver2/Library/%s?force=true' % ntiid
-        self.testapp.delete(href, status=200)
-        
+        self.testapp.delete(href, status=204)
+
         href = '/dataserver2/Library/%s' % ntiid
         self.testapp.get(href, status=404)
