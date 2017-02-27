@@ -160,6 +160,10 @@
 				for="nti.contentlibrary.interfaces.IContentPackage
 					 zope.lifecycleevent.IObjectRemovedEvent" />
 
+	<subscriber handler=".subscribers._clear_index_when_content_unpublished"
+				for="nti.contentlibrary.interfaces.IContentPackage
+					 nti.coremetadata.interfaces.IObjectUnpublishedEvent" />
+
 	<!-- Filters -->
 	<subscriber	factory=".filters._LibraryContentObjectFilter"
 				provides="nti.appserver.interfaces.ICreatableObjectFilter"
