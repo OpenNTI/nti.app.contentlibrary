@@ -24,8 +24,6 @@ from zope import lifecycleevent
 
 from zope.file.download import getHeaders
 
-from ZODB.interfaces import IConnection
-
 from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
@@ -64,6 +62,8 @@ from nti.contentlibrary.interfaces import IContentValidationError
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
+from nti.contentlibrary.library import register_content_units
+
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.coremetadata.interfaces import IRecordable
@@ -71,8 +71,11 @@ from nti.coremetadata.interfaces import IRecordable
 from nti.dataserver import authorization as nauth
 
 from nti.externalization.internalization import notify_modified
+
 from nti.externalization.externalization import to_external_object
 from nti.externalization.externalization import StandardExternalFields
+
+from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.links.links import Link
 
@@ -193,7 +196,7 @@ class ContentPackageMixin(object):
         return library
 
     @classmethod
-    def make_pacakge_ntiid(cls, provider=None, base=None, extra=None):
+    def make_package_ntiid(cls, provider=None, base=None, extra=None):
         creator = SYSTEM_USER_NAME
         current_time = time_to_64bit_int(time.time())
         provider = provider \
@@ -228,9 +231,15 @@ class LibraryPostView(AbstractAuthenticatedView,
     content_predicate = IEditableContentPackage
 
     def _set_ntiid(self, context):
-        ntiid = self.make_pacakge_ntiid(extra=self._extra)
-        if IRenderableContentUnit.providedBy(context):
+        if not IRenderableContentUnit.providedBy(context):
+            ntiid = self.make_package_ntiid(extra=self._extra)
             context.ntiid = ntiid
+        else:
+            # Renderable content will get a new ntiid post-render, so
+            # make sure we have a solid OID now so that we can replace
+            # later.
+            ntiid = to_external_ntiid_oid(context)
+        context.ntiid = ntiid
 
     def _do_call(self):
         library = self._library
@@ -240,9 +249,9 @@ class LibraryPostView(AbstractAuthenticatedView,
                                                       search_owner=False,
                                                       externalValue=externalValue,
                                                       deepCopy=True)
-        # add to connection
-        IConnection(library).add(package)
-        # set ntiid according to package class
+        # Register early and set the ntiid before adding to the library
+        # (this adds to the connection).
+        register_content_units(library, package)
         self._set_ntiid(package)
         # read content
         contents, contentType = self._check_content(externalValue)
