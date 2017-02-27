@@ -213,8 +213,8 @@ def _is_obj_locked(node):
 
 
 def _can_be_removed(registered, force=False):
-    result = registered is not None and (
-        force or not _is_obj_locked(registered))
+    result =     registered is not None \
+            and (force or not _is_obj_locked(registered))
     return result
 can_be_removed = _can_be_removed
 
@@ -624,8 +624,7 @@ def _clear_when_removed(content_package, force=True, process_global=False):
     # Remove indexes for our contained items; ignoring the global library.
     # Not sure if this will work when we have shared items
     # across multiple content packages.
-    if not process_global and IGlobalContentPackage.providedBy(
-            content_package):
+    if not process_global and IGlobalContentPackage.providedBy(content_package):
         return result
     _clear_last_modified(content_package, catalog)
 
