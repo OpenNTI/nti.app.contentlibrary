@@ -34,9 +34,11 @@ from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageAddedEvent
+from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageSyncResults
 from nti.contentlibrary.interfaces import IContentPackageReplacedEvent
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
+from nti.contentlibrary.interfaces import IContentPackageRenderedEvent
 from nti.contentlibrary.interfaces import IContentPackageLibraryDidSyncEvent
 
 from nti.contentlibrary.synchronize import ContentPackageSyncResults
@@ -608,6 +610,13 @@ def _update_indices_when_content_changes(content_package, event):
     if IContentPackageReplacedEvent.providedBy(event):
         new_children_dict = _get_children_dict(content_package)
         _update_container(event.original, content_package, new_children_dict)
+
+
+@component.adapter(IRenderableContentPackage, IContentPackageRenderedEvent)
+def _on_content_package_rendered(content_package, event):
+    if content_package.is_published():
+        update_indices_when_content_changes(content_package)
+
 
 # clear events
 

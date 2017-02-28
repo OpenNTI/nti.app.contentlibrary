@@ -149,9 +149,9 @@
 	<subscriber handler=".subscribers._initialize_package_roles" />
 
 	<!-- publishing -->
-	<subscriber handler=".subscribers._update_indices_when_content_changes"
-				for="nti.contentlibrary.interfaces.IContentPackage
-					 nti.coremetadata.interfaces.IObjectPublishedEvent" />
+	<subscriber handler=".subscribers._on_content_package_rendered"
+				for="nti.contentlibrary.interfaces.IRenderableContentPackage
+					 nti.contentlibrary.interfaces.IContentPackageRenderedEvent" />
 
 	<!-- mutation -->
 	<subscriber handler=".subscribers._update_indices_when_content_changes"
