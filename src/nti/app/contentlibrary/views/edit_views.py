@@ -464,8 +464,7 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
         params = CaseInsensitiveDict(self.request.params)
         force = is_true(params.get('force'))
         if not associations or force:
-            self._do_delete_object(self.context,
-                                   self.context.is_published())
+            self._do_delete_object(self.context)
         else:
             self._raise_conflict_error(self.CONFIRM_CODE,
                                        self.CONFIRM_MSG,
