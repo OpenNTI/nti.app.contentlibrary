@@ -148,6 +148,11 @@
 
 	<subscriber handler=".subscribers._initialize_package_roles" />
 
+	<!-- publishing -->
+	<subscriber handler=".subscribers._update_indices_when_content_changes"
+				for="nti.contentlibrary.interfaces.IContentPackage
+					 nti.coremetadata.interfaces.IObjectPublishedEvent" />
+
 	<!-- mutation -->
 	<subscriber handler=".subscribers._update_indices_when_content_changes"
 				for="nti.contentlibrary.interfaces.IContentPackage
