@@ -32,6 +32,8 @@ from nti.app.base.abstract_views import AbstractAuthenticatedView
 
 from nti.app.contentlibrary import LIBRARY_PATH_GET_VIEW
 
+from nti.app.contentlibrary import MessageFactory as _
+
 from nti.app.contentlibrary.utils import PAGE_INFO_MT
 from nti.app.contentlibrary.utils import PAGE_INFO_MT_JSON
 from nti.app.contentlibrary.utils import find_page_info_view_helper
@@ -61,6 +63,7 @@ from nti.contentlibrary.indexed_data import get_catalog
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentRendered
+from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentUnitHrefMapper
 
@@ -229,12 +232,13 @@ class _LibraryTOCRedirectClassView(object):
         return link
 
     def _check_publication_view(self, context):
-        if self._is_published(context):
-            return True
-        elif    IContentRendered.providedBy(context) \
-            and has_permission(nauth.ACT_CONTENT_EDIT, context, self.request):
-            return True
-        return False
+        # Allow access if rendered and the content is published or we have admin.
+        if      not self._is_published(context) \
+            and not has_permission(nauth.ACT_CONTENT_EDIT, context, self.request):
+            raise hexc.HTTPForbidden(_('Do not have access to unpublished object.'))
+        if      IRenderableContentUnit.providedBy(context) \
+            and not IContentRendered.providedBy(context):
+            raise hexc.HTTPNotFound(_('Object not yet rendered.'))
 
     def _get_unit_href(self, unit, default_href):
         mapper = IContentUnitHrefMapper(unit, None)
@@ -249,9 +253,7 @@ class _LibraryTOCRedirectClassView(object):
         request = self.request
         href = request.context.href
 
-        # check publication views
-        if not self._check_publication_view(request.context):
-            raise hexc.HTTPForbidden()
+        self._check_publication_view(request.context)
 
         # Right now, the ILibraryTOCEntries always have relative hrefs,
         # which may or may not include a leading /.
