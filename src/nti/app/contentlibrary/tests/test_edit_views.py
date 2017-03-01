@@ -75,6 +75,11 @@ class TestEditViews(ApplicationLayerTest):
         assert_that(res.json_body,
                     has_entry('description', is_('Ichigo and Rukia')))
 
+        ext_obj = {'icon': 'http://bleach.org/ichigo.png'}
+        res = self.testapp.put_json(href, ext_obj, status=200)
+        assert_that(res.json_body,
+                    has_entry('icon', is_('http://bleach.org/ichigo.png')))
+
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_contents(self):
         ntiid = u'tag:nextthought.com,2011-10:NTI-HTML-bleach_ichigo'
