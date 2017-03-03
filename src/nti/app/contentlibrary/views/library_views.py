@@ -58,6 +58,11 @@ from nti.appserver.pyramid_authorization import is_readable, has_permission
 
 from nti.appserver.workspaces.interfaces import IService
 
+from nti.contentlibrary import CONTENT_UNIT_MIME_TYPE
+from nti.contentlibrary import CONTENT_PACKAGE_MIME_TYPE
+from nti.contentlibrary import RENDERABLE_CONTENT_UNIT_MIME_TYPE
+from nti.contentlibrary import RENDERABLE_CONTENT_PACKAGE_MIME_TYPE
+
 from nti.contentlibrary.indexed_data import get_catalog
 
 from nti.contentlibrary.interfaces import IContentUnit
@@ -143,6 +148,47 @@ def _create_page_info(request, href, ntiid, last_modified=0, jsonp_href=None):
         info.lastModified = last_modified
     return info
 
+_content_view_defaults = dict(route_name='objects.generic.traversal',
+                              renderer='rest',
+                              context=IContentUnit,
+                              permission=nauth.ACT_READ,
+                              request_method='GET')
+
+class BaseContentGetView(AbstractAuthenticatedView):
+    """
+    A GET view for fetching the actual content unit object.
+    """
+
+    def _is_published(self, unit):
+        return not IPublishable.providedBy(unit) or unit.is_published()
+
+    def __call__(self):
+        context = self.context
+        if      not self._is_published(context) \
+            and not has_permission(nauth.ACT_CONTENT_EDIT, context, self.request):
+            raise hexc.HTTPForbidden(_('Do not have access to unpublished object.'))
+        return context
+
+@view_config(accept=CONTENT_UNIT_MIME_TYPE,
+             **_content_view_defaults)
+class _ContentUnitGetView(BaseContentGetView):
+    pass
+
+@view_config(accept=CONTENT_PACKAGE_MIME_TYPE,
+             **_content_view_defaults)
+class _ContentPackageGetView(BaseContentGetView):
+    pass
+
+@view_config(accept=RENDERABLE_CONTENT_UNIT_MIME_TYPE,
+             **_content_view_defaults)
+class _RenderableContentUnitGetView(BaseContentGetView):
+    pass
+
+@view_config(accept=RENDERABLE_CONTENT_PACKAGE_MIME_TYPE,
+             **_content_view_defaults)
+class _RenderableContentPackageGetView(BaseContentGetView):
+    pass
+
 
 @view_config(name='')
 @view_config(name='link+json')
@@ -154,8 +200,8 @@ def _create_page_info(request, href, ntiid, last_modified=0, jsonp_href=None):
                request_method='GET')
 class _LibraryTOCRedirectClassView(object):
     """
-    Given an :class:`lib_interfaces.IContentUnit`, redirect the
-    request to the static content. This allows unifying handling of
+    Given an :class:`lib_interfaces.IContentUnit`, redirect the request
+    to the (perhaps) static content. This allows unifying handling of
     NTIIDs.
 
     If the client uses the ``Accept`` header to ask for a Link to the
