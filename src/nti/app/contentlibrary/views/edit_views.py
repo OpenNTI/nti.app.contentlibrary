@@ -50,6 +50,8 @@ from nti.app.contentlibrary.views import LibraryPathAdapter
 
 from nti.appserver.ugd_edit_views import UGDPutView
 
+from nti.base._compat import bytes_
+
 from nti.common.string import is_true
 
 from nti.contentlibrary.interfaces import IContentValidator
@@ -175,8 +177,8 @@ class ContentPackageMixin(object):
                 content = source.read()
                 contentType = source.contentType or RST_MIMETYPE
         if content:
-            content = str(content)
-            contentType = str(contentType or RST_MIMETYPE)
+            content = bytes_(content)
+            contentType = bytes_(contentType or RST_MIMETYPE)
             self._validate(content, contentType)
         return content, contentType
 
@@ -335,7 +337,7 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
     def as_attachment(self):
         response = self.request.response
         contents = self._get_contents()
-        contentType = str(self.context.contentType or RST_MIMETYPE)
+        contentType = bytes_(self.context.contentType or RST_MIMETYPE)
         ext = mimetypes.guess_extension(contentType) or ".rst"
         downloadName = "contents%s" % ext
         headers = getHeaders(self.context,
@@ -352,7 +354,7 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
         result = ContentUnitContents()
         result.ntiid = self.context.ntiid
         result.contents = self._get_contents()
-        result.contentType = str(self.context.contentType or RST_MIMETYPE)
+        result.contentType = bytes_(self.context.contentType or RST_MIMETYPE)
         return result
 
     def __call__(self):
