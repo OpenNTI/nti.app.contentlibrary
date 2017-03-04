@@ -148,26 +148,31 @@ def _create_page_info(request, href, ntiid, last_modified=0, jsonp_href=None):
         info.lastModified = last_modified
     return info
 
+
 _content_view_defaults = dict(route_name='objects.generic.traversal',
                               renderer='rest',
                               context=IContentUnit,
                               permission=nauth.ACT_READ,
                               request_method='GET')
 
+
 @view_config(accept=CONTENT_UNIT_MIME_TYPE,
              **_content_view_defaults)
 class _ContentUnitGetView(GenericGetView):
     pass
+
 
 @view_config(accept=CONTENT_PACKAGE_MIME_TYPE,
              **_content_view_defaults)
 class _ContentPackageGetView(GenericGetView):
     pass
 
+
 @view_config(accept=RENDERABLE_CONTENT_UNIT_MIME_TYPE,
              **_content_view_defaults)
 class _RenderableContentUnitGetView(GenericGetView):
     pass
+
 
 @view_config(accept=RENDERABLE_CONTENT_PACKAGE_MIME_TYPE,
              **_content_view_defaults)
@@ -263,10 +268,12 @@ class _LibraryTOCRedirectClassView(object):
         return link
 
     def _check_publication_view(self, context):
-        # Allow access if rendered and the content is published or we have admin.
+        # Allow access if rendered and the content is published or we have
+        # admin.
         if      not self._is_published(context) \
             and not has_permission(nauth.ACT_CONTENT_EDIT, context, self.request):
-            raise hexc.HTTPForbidden(_('Do not have access to unpublished object.'))
+            raise hexc.HTTPForbidden(
+                _('Do not have access to unpublished object.'))
         if      IRenderableContentUnit.providedBy(context) \
             and not IContentRendered.providedBy(context):
             raise hexc.HTTPNotFound(_('Object not yet rendered.'))
@@ -650,8 +657,8 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
                     if hierarchy_context:
                         hierarchy_context = hierarchy_context[0]
                     if      hierarchy_context \
-                        and isinstance(hierarchy_context, (list, tuple)) \
-                        and len(hierarchy_context) > 1:
+                            and isinstance(hierarchy_context, (list, tuple)) \
+                            and len(hierarchy_context) > 1:
                         # Drop returned top level context
                         result_list.extend(hierarchy_context[1:])
                     path_list = self._externalize_children(legacy_path)
@@ -781,3 +788,6 @@ class _PostLibraryPathView(AbstractCachingLibraryPathView):
 
     def __call__(self):
         return self.do_call(_get_board_obj_path, self.context)
+
+
+del _content_view_defaults
