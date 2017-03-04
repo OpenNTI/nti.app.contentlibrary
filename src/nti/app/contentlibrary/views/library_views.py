@@ -154,39 +154,24 @@ _content_view_defaults = dict(route_name='objects.generic.traversal',
                               permission=nauth.ACT_READ,
                               request_method='GET')
 
-class BaseContentGetView(AbstractAuthenticatedView):
-    """
-    A GET view for fetching the actual content unit object.
-    """
-
-    def _is_published(self, unit):
-        return not IPublishable.providedBy(unit) or unit.is_published()
-
-    def __call__(self):
-        context = self.context
-        if      not self._is_published(context) \
-            and not has_permission(nauth.ACT_CONTENT_EDIT, context, self.request):
-            raise hexc.HTTPForbidden(_('Do not have access to unpublished object.'))
-        return context
-
 @view_config(accept=CONTENT_UNIT_MIME_TYPE,
              **_content_view_defaults)
-class _ContentUnitGetView(BaseContentGetView):
+class _ContentUnitGetView(GenericGetView):
     pass
 
 @view_config(accept=CONTENT_PACKAGE_MIME_TYPE,
              **_content_view_defaults)
-class _ContentPackageGetView(BaseContentGetView):
+class _ContentPackageGetView(GenericGetView):
     pass
 
 @view_config(accept=RENDERABLE_CONTENT_UNIT_MIME_TYPE,
              **_content_view_defaults)
-class _RenderableContentUnitGetView(BaseContentGetView):
+class _RenderableContentUnitGetView(GenericGetView):
     pass
 
 @view_config(accept=RENDERABLE_CONTENT_PACKAGE_MIME_TYPE,
              **_content_view_defaults)
-class _RenderableContentPackageGetView(BaseContentGetView):
+class _RenderableContentPackageGetView(GenericGetView):
     pass
 
 
