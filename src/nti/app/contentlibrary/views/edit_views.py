@@ -9,8 +9,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import sys
-
 import time
 import uuid
 import mimetypes
@@ -54,11 +52,9 @@ from nti.base._compat import bytes_
 
 from nti.common.string import is_true
 
-from nti.contentlibrary.interfaces import IContentValidator
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IRenderableContentUnit
-from nti.contentlibrary.interfaces import IContentValidationError
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
@@ -146,27 +142,8 @@ class ContentPackageMixin(object):
                 },
                 None)
 
-    def _validate(self, content, contentType=RST_MIMETYPE):
+    def _validate(self):
         self._validate_version()
-        validator = component.queryUtility(IContentValidator,
-                                           name=contentType)
-        if validator is not None:
-            try:
-                validator.validate(content)
-            except Exception as e:
-                exc_info = sys.exc_info()
-                data = {
-                    u'code': 'ContentValidationError',
-                }
-                if IContentValidationError.providedBy(e):
-                    error = to_external_object(e, decorate=False)
-                    data.update(error)
-                else:
-                    data['message'] = str(e)
-                raise_json_error(self.request,
-                                 hexc.HTTPUnprocessableEntity,
-                                 data,
-                                 exc_info[2])
 
     def _check_content(self, ext_obj=None):
         content = self._get_contents(ext_obj) if ext_obj else None
@@ -179,7 +156,7 @@ class ContentPackageMixin(object):
         if content:
             content = bytes_(content)
             contentType = bytes_(contentType or RST_MIMETYPE)
-            self._validate(content, contentType)
+            self._validate()
         return content, contentType
 
     @Lazy
