@@ -210,12 +210,11 @@ class LibraryPostView(AbstractAuthenticatedView,
     def _set_ntiid(self, context):
         if not IRenderableContentUnit.providedBy(context):
             ntiid = self.make_package_ntiid(extra=self._extra)
-            context.ntiid = ntiid
         else:
             # Renderable content will get a new ntiid post-render, so
-            # make sure we have a solid OID now so that we can replace
-            # later.
-            ntiid = to_external_ntiid_oid(context)
+            # make sure we have a consistent OID now so that we can replace
+            # the ntiid later.
+            ntiid = to_external_ntiid_oid(context, use_cache=False)
         context.ntiid = ntiid
 
     def _do_call(self):
