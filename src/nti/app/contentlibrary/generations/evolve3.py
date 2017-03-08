@@ -47,7 +47,7 @@ def index_site(current_site, catalog, intids,  seen):
     with site(current_site):
         library = component.queryUtility(IContentPackageLibrary)
         if library is None:
-            continue
+            return
 
         def _recur(unit):
             doc_id = intids.queryId(unit)

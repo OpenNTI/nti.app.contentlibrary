@@ -68,7 +68,6 @@ def do_evolve(context):
         library = component.queryUtility(IContentPackageLibrary)
         if library is not None:
             library.syncContentPackages()
-                
         catalog = install_library_catalog(ds_folder, intids)
         catalog[IX_CREATEDTIME].clear()
         catalog[IX_LASTMODIFIED].clear()
