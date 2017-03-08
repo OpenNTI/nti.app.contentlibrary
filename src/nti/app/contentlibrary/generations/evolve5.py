@@ -9,7 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-generation = 3
+generation = 5
 
 from zope import component
 from zope import interface
@@ -19,14 +19,10 @@ from zope.component.hooks import setHooks
 
 from zope.intid.interfaces import IIntIds
 
-from nti.contentlibrary.index import install_library_catalog
-
-from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.indexed_data.catalog import install_assets_library_catalog
 
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IOIDResolver
-
-from nti.site.hostpolicy import get_all_host_sites
 
 
 @interface.implementer(IDataserver)
@@ -43,26 +39,7 @@ class MockDataserver(object):
         return None
 
 
-def index_site(current_site, catalog, intids,  seen):
-    with site(current_site):
-        library = component.queryUtility(IContentPackageLibrary)
-        if library is None:
-            continue
-
-        def _recur(unit):
-            doc_id = intids.queryId(unit)
-            if doc_id is not None:
-                catalog.index_doc(doc_id, unit)
-            for child in unit.children or ():
-                _recur(child)
-
-        for package in library.contentPackages or ():
-            if not package.ntiid in seen:
-                _recur(package)
-                seen.add(package.ntiid)
-
-
-def do_evolve(context):
+def do_evolve(context, generation=generation):
     setHooks()
     conn = context.connection
     root = conn.root()
@@ -76,24 +53,18 @@ def do_evolve(context):
         assert  component.getSiteManager() == ds_folder.getSiteManager(), \
                 "Hooks not installed?"
 
-        seen = set()
         lsm = ds_folder.getSiteManager()
         intids = lsm.getUtility(IIntIds)
 
-        library = component.queryUtility(IContentPackageLibrary)
-        if library is not None:
-            library.syncContentPackages()
-
-        catalog = install_library_catalog(ds_folder, intids)
-        for current_site in get_all_host_sites():
-            index_site(current_site, catalog, intids, seen)
+        install_assets_library_catalog(ds_folder, intids)
+        logger.info('Dataserver evolution %s done.', generation)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
-    logger.info('Dataserver evolution %s done. %s objects indexed', generation)
+    logger.info('Dataserver evolution %s done.', generation)
 
 
 def evolve(context):
     """
-    Evolve to gen 3 by installing the library catalog.
+    Evolve to gen 5 by installing the new library asset catalog.
     """
-    do_evolve(context)
+    # do_evolve(context) DON"T Install YET
