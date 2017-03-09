@@ -358,7 +358,7 @@ class PackagePublishedContentsGetView(ContentPackageContentsGetView):
         records = [x for x in records if self._include_record(x, publish_time)]
         result = None
         if records:
-            sorted_txs = sorted(records, lambda x: x.created)
+            sorted_txs = sorted(records, key=lambda x: x.created)
             result = sorted_txs[-1]
         return result
 
