@@ -13,8 +13,6 @@ import time
 import uuid
 import mimetypes
 
-from datetime import datetime
-
 from requests.structures import CaseInsensitiveDict
 
 from zope import component
@@ -60,6 +58,8 @@ from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.contentlibrary.library import register_content_units
 
+from nti.contentlibrary.utils import get_snapshot_contents
+
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.coremetadata.interfaces import IRecordable
@@ -83,11 +83,7 @@ from nti.ntiids.ntiids import make_specific_safe
 from nti.property.property import Lazy
 
 from nti.recorder.interfaces import TRX_TYPE_CREATE
-from nti.recorder.interfaces import TRX_TYPE_UPDATE
 
-from nti.recorder.interfaces import ITransactionRecordHistory
-
-from nti.recorder.utils import decompress
 from nti.recorder.utils import record_transaction
 
 from nti.zodb.containers import time_to_64bit_int
@@ -348,44 +344,20 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
                name=VIEW_PUBLISH_CONTENTS,
                permission=nauth.ACT_CONTENT_EDIT)
 class PackagePublishedContentsGetView(ContentPackageContentsGetView):
-
-    def _include_record(self, record, publish_time):
-        return  record.created <= publish_time \
-            and record.attributes \
-            and 'contents' in record.attributes
-
-    def _get_publish_record(self, records, publish_time):
-        records = [x for x in records if self._include_record(x, publish_time)]
-        result = None
-        if records:
-            sorted_txs = sorted(records, key=lambda x: x.created)
-            result = sorted_txs[-1]
-        return result
+    """
+    A view to fetch the contents of an `IEditableContentPackage` as-of
+    the most recent publish.
+    """
 
     def _get_contents(self):
-        history = ITransactionRecordHistory(self.context)
-        # Get all update records before our publish time
-        records = history.query(record_type=TRX_TYPE_UPDATE)
         publish_time = self.context.publishLastModified
         result = None
-        if publish_time and records:
+        if publish_time:
             # Sort and fetch the closest update to publish time
-            publish_time = datetime.utcfromtimestamp(publish_time)
-            result = self._get_publish_record( records, publish_time )
+            result = get_snapshot_contents(self.context, publish_time)
 
         if result is None:
-            logger.warn('No publish contents found (%s) (update_record_count=%s)',
-                        self.context.ntiid,
-                        len( records ))
-            raise hexc.HTTPNotFound(_('No publish contents found'))
-
-        result = decompress( result.external_value )
-        try:
-            result = result['contents']
-        except KeyError:
-            logger.warn('No publish contents found (%s) (external_value=%s)',
-                        self.context.ntiid,
-                        result)
+            logger.warn('No publish contents found (%s)', self.context)
             raise hexc.HTTPNotFound(_('No publish contents found'))
         return result
 
