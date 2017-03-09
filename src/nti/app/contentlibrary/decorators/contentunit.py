@@ -176,14 +176,11 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
         return result
 
     def _do_decorate_external(self, context, result):
+        # We always want to return the PUBLISH rel since the client
+        # may not update state for every edit/PUT.
+        rels = (VIEW_UNPUBLISH, VIEW_PUBLISH)
         if not context.is_published():
             rels = (VIEW_PUBLISH,)
-        elif (context.lastModified or 0) > (context.publishLastModified or 0):
-            # Published with recent modifications, give user the option to publish
-            # and render again.
-            rels = (VIEW_UNPUBLISH, VIEW_PUBLISH)
-        else:
-            rels = (VIEW_UNPUBLISH,)
         path = '/%s/%s/%s' % (get_ds2(self.request),
                               LIBRARY_ADAPTER,
                               context.ntiid)
