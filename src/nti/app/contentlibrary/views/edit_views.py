@@ -148,12 +148,12 @@ class ContentPackageMixin(object):
     def _check_content(self, ext_obj=None):
         content = self._get_contents(ext_obj) if ext_obj else None
         contentType = self._get_content_type(ext_obj) if ext_obj else None
-        if not content:
+        if content is None:
             source = self._get_source(self.request)
             if source is not None:
                 content = source.read()
                 contentType = source.contentType or RST_MIMETYPE
-        if content:
+        if content is not None:
             content = bytes_(content)
             contentType = bytes_(contentType or RST_MIMETYPE)
             self._validate()
@@ -231,10 +231,10 @@ class LibraryPostView(AbstractAuthenticatedView,
         self._set_ntiid(package)
         # read content
         contents, contentType = self._check_content(externalValue)
-        if contents:
+        if contents is not None:
             package.contents = contents
-        if contentType and contents:
-            package.contentType = contentType
+            if contentType is not None:
+                package.contentType = contentType
         # set creator
         package.creator = self.remoteUser.username
         # add to library
