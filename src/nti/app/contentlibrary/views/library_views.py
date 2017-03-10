@@ -72,6 +72,8 @@ from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentUnitHrefMapper
 
+from nti.contenttypes.presentation.interfaces import IPresentationAsset
+
 from nti.dataserver import authorization as nauth
 
 from nti.dataserver.contenttypes.forums.interfaces import IPost
@@ -622,9 +624,8 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
         return result
 
     def _get_legacy_path_to_id(self, container_id):
-        # In the worst case, we may have to go through the
-        # library twice, looking for children and then
-        # embedded. With caching, this may not be too horrible.
+        # In the worst case, we may have to go through the library twice,
+        # looking for children and then embedded.
         # TODO: This will not find items contained by other items
         # (e.g. videos, slides, etc).
         library = component.queryUtility(IContentPackageLibrary)
@@ -677,10 +678,16 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
         return not records
 
     def _get_content_packages(self, obj, context):
-        # If we're not a content asset, we will not be found in our
-        # course units.
-        if not self._is_content_asset(obj):
+        # If we're an asset, but not a content asset, we will not be
+        # found in our course units.
+        if      IPresentationAsset.providedBy(obj) \
+            and not self._is_content_asset(obj):
             return ()
+
+        if IContentUnit.providedBy(obj):
+            # Short circuit and just use the package we have
+            package = find_interface(obj, IContentPackage, strict=True)
+            return (package,)
 
         try:
             packages = context.ContentPackageBundle.ContentPackages
@@ -708,11 +715,11 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
             packages = self._get_content_packages(obj, top_level_context)
 
             for package in packages:
-                path_list = self._get_path_for_package(
-                    package, obj, target_ntiid)
+                path_list = self._get_path_for_package(package, obj, target_ntiid)
                 if path_list and is_readable(package):
                     path_list = self._externalize_children(path_list)
                     result_list.extend(path_list)
+                    break
             result.append(result_list)
 
         # If we have nothing yet, it could mean our object
