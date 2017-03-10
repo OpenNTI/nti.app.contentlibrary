@@ -58,7 +58,7 @@ from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.contentlibrary.library import register_content_units
 
-from nti.contentlibrary.utils import get_snapshot_contents
+from nti.contentlibrary.utils import get_published_contents
 
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
@@ -350,11 +350,7 @@ class PackagePublishedContentsGetView(ContentPackageContentsGetView):
     """
 
     def _get_contents(self):
-        publish_time = self.context.publishLastModified
-        result = None
-        if publish_time:
-            # Sort and fetch the closest update to publish time
-            result = get_snapshot_contents(self.context, publish_time)
+        result = get_published_contents(self.context)
 
         if result is None:
             logger.warn('No publish contents found (%s)', self.context)
