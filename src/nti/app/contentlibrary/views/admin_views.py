@@ -11,6 +11,8 @@ logger = __import__('logging').getLogger(__name__)
 
 import time
 
+from zope import component
+
 from requests.structures import CaseInsensitiveDict
 
 from pyramid import httpexceptions as hexc
@@ -27,6 +29,7 @@ from nti.app.externalization.error import raise_json_error
 from nti.common.string import is_true
 
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.dataserver import authorization as nauth
@@ -35,6 +38,8 @@ from nti.externalization.externalization import to_external_object
 from nti.externalization.externalization import StandardExternalFields
 
 from nti.links.links import Link
+
+from nti.property.property import Lazy
 
 CLASS = StandardExternalFields.CLASS
 LINKS = StandardExternalFields.LINKS
@@ -51,6 +56,11 @@ class ContentPackageDeleteView(AbstractAuthenticatedView):
     CONFIRM_CODE = 'ContentPackageDelete'
     CONFIRM_MSG = _(
         'This content has associations. Are you sure you want to delete?')
+
+    @Lazy
+    def _library(self):
+        library = component.queryUtility(IContentPackageLibrary)
+        return library
 
     def _do_delete_object(self, theObject, event=True):
         library = self._library
