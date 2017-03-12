@@ -150,6 +150,6 @@ class RemoveInvalidPackagesView(AbstractAuthenticatedView):
             stored = library.get(package.ntiid)
             if stored is None:
                 self._do_delete_object(package)
-                items[package.ntiid] = package.ntiid
+                items[package.ntiid] = package
         result[TOTAL] = result[ITEM_COUNT] = len(items)
         return result
