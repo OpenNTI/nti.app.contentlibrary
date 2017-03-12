@@ -1,0 +1,102 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+.. $Id$
+"""
+
+from __future__ import print_function, unicode_literals, absolute_import, division
+__docformat__ = "restructuredtext en"
+
+logger = __import__('logging').getLogger(__name__)
+
+import time
+
+from requests.structures import CaseInsensitiveDict
+
+from pyramid import httpexceptions as hexc
+
+from pyramid.view import view_config
+from pyramid.view import view_defaults
+
+from nti.app.base.abstract_views import AbstractAuthenticatedView
+
+from nti.app.contentlibrary import MessageFactory as _
+
+from nti.app.externalization.error import raise_json_error
+
+from nti.common.string import is_true
+
+from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import resolve_content_unit_associations
+
+from nti.dataserver import authorization as nauth
+
+from nti.externalization.externalization import to_external_object
+from nti.externalization.externalization import StandardExternalFields
+
+from nti.links.links import Link
+
+CLASS = StandardExternalFields.CLASS
+LINKS = StandardExternalFields.LINKS
+MIMETYPE = StandardExternalFields.MIMETYPE
+
+
+@view_config(context=IContentPackage)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='DELETE',
+               permission=nauth.ACT_NTI_ADMIN)
+class ContentPackageDeleteView(AbstractAuthenticatedView):
+
+    CONFIRM_CODE = 'ContentPackageDelete'
+    CONFIRM_MSG = _(
+        'This content has associations. Are you sure you want to delete?')
+
+    def _do_delete_object(self, theObject, event=True):
+        library = self._library
+        library.remove(theObject, event=event)
+        return theObject
+
+    def _ntiids(self, associations):
+        for x in associations or ():
+            try:
+                yield x.ntiid
+            except AttributeError:
+                pass
+
+    def _raise_conflict_error(self, code, message, associations):
+        ntiids = [x for x in self._ntiids(associations)]
+        logger.warn('Attempting to delete content package (%s) (%s)',
+                    self.context.ntiid,
+                    ntiids)
+        params = dict(self.request.params)
+        params['force'] = True
+        links = (
+            Link(self.request.path, rel='confirm',
+                 params=params, method='DELETE'),
+        )
+        raise_json_error(
+            self.request,
+            hexc.HTTPConflict,
+            {
+                u'code': code,
+                u'message': message,
+                CLASS: 'DestructiveChallenge',
+                LINKS: to_external_object(links),
+                MIMETYPE: 'application/vnd.nextthought.destructivechallenge'
+            },
+            None)
+
+    def __call__(self):
+        associations = resolve_content_unit_associations(self.context)
+        params = CaseInsensitiveDict(self.request.params)
+        force = is_true(params.get('force'))
+        if not associations or force:
+            self._do_delete_object(self.context)
+        else:
+            self._raise_conflict_error(self.CONFIRM_CODE,
+                                       self.CONFIRM_MSG,
+                                       associations)
+        result = hexc.HTTPNoContent()
+        result.last_modified = time.time()
+        return result
