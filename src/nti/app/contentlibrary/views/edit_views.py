@@ -108,6 +108,13 @@ class ContentPackageMixin(object):
     def _get_contents(cls, ext_obj):
         return ext_obj.get('contents')
 
+    def _get_contents_object(self, contents):
+        result = ContentUnitContents()
+        result.ntiid = self.context.ntiid
+        result.contents = contents
+        result.contentType = bytes_(self.context.contentType or RST_MIMETYPE)
+        return result
+
     @classmethod
     def _get_content_type(cls, ext_obj):
         return ext_obj.get('contentType')
@@ -268,6 +275,8 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
             contentObject.contents = contents
         if contentType:
             contentObject.contentType = contentType
+        result = to_external_object(result)
+        result['contents'] = self._get_contents_object(contents)
         return result
 
 
@@ -294,7 +303,9 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
                                 'contents': contents,
                                 'contentType': contentType
                             })
-        return self.context
+        result = to_external_object(self.context)
+        result['contents'] = self._get_contents_object(contents)
+        return result
 
 
 @view_config(context=IEditableContentPackage)
@@ -325,19 +336,13 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
         response.body = contents
         return response
 
-    def as_model(self):
-        result = ContentUnitContents()
-        result.ntiid = self.context.ntiid
-        result.contents = self._get_contents()
-        result.contentType = bytes_(self.context.contentType or RST_MIMETYPE)
-        return result
-
     def __call__(self):
         params = CaseInsensitiveDict(self.request.params)
         attachment = is_true(params.get('attachment') or 'False')
         if attachment:
             return self.as_attachment()
-        return self.as_model()
+        contents = self._get_contents()
+        return self._get_contents_object(contents)
 
 
 @view_config(context=IEditableContentPackage)
