@@ -60,6 +60,8 @@ from nti.contentlibrary.library import register_content_units
 
 from nti.contentlibrary.utils import get_published_contents
 
+from nti.contenttypes.presentation.interfaces import IPresentationAsset
+
 from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.coremetadata.interfaces import IRecordable
@@ -366,9 +368,12 @@ class PackagePublishedContentsGetView(ContentPackageContentsGetView):
                permission=nauth.ACT_CONTENT_EDIT)
 class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
+    LESSON_CONFIRM_CODE = 'EditableContentPackageInLessonDelete'
+    LESSON_CONFIRM_MSG = _(
+        'This content is available in lessons. Are you sure you want to delete?')
+
     CONFIRM_CODE = 'EditableContentPackageDelete'
-    CONFIRM_MSG = _(
-        'This content has associations. Are you sure you want to delete?')
+    CONFIRM_MSG = _('Are you sure you want to delete?')
 
     def _do_delete_object(self, theObject, event=True):
         library = self._library
@@ -404,12 +409,22 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
                          },
                          None)
 
+    def _get_lesson_associations(self):
+        associations = resolve_content_unit_associations(self.context)
+        return [x for x in associations or () if IPresentationAsset.providedBy(x)]
+
     def __call__(self):
         associations = resolve_content_unit_associations(self.context)
+        lesson_associations = [x for x in associations or ()
+                               if IPresentationAsset.providedBy(x)]
         params = CaseInsensitiveDict(self.request.params)
         force = is_true(params.get('force'))
-        if not associations or force:
+        if force:
             self._do_delete_object(self.context)
+        elif lesson_associations:
+            self._raise_conflict_error(self.LESSON_CONFIRM_CODE,
+                                       self.LESSON_CONFIRM_MSG,
+                                       associations)
         else:
             self._raise_conflict_error(self.CONFIRM_CODE,
                                        self.CONFIRM_MSG,
