@@ -236,6 +236,7 @@ class LibraryPostView(AbstractAuthenticatedView,
         # add to library
         lifecycleevent.created(package)
         library.add(package, event=False)
+        lifecycleevent.added(package, library)
         # record trax
         if IRecordable.providedBy(package):
             record_transaction(package, type_=TRX_TYPE_CREATE)
