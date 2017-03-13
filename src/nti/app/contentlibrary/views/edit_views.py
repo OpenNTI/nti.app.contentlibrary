@@ -275,8 +275,10 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
             contentObject.contents = contents
         if contentType:
             contentObject.contentType = contentType
-        result = to_external_object(result)
-        result['contents'] = self._get_contents_object(contents)
+        result = self.context
+        if contents:
+            result = to_external_object(result)
+            result['contents'] = self._get_contents_object(contents)
         return result
 
 
@@ -303,8 +305,10 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
                                 'contents': contents,
                                 'contentType': contentType
                             })
-        result = to_external_object(self.context)
-        result['contents'] = self._get_contents_object(contents)
+        result = self.context
+        if contents:
+            result = to_external_object(self.context)
+            result['contents'] = self._get_contents_object(contents)
         return result
 
 
