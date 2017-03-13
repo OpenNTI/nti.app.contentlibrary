@@ -686,7 +686,8 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
 
         if IContentUnit.providedBy(obj):
             # Short circuit and just use the package we have
-            package = find_interface(obj, IContentPackage, strict=True)
+            # XXX: Global libray doesnt have lineage...
+            package = find_interface(obj, IContentPackage, strict=False)
             return (package,)
 
         try:
