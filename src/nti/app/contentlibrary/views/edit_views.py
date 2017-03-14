@@ -110,8 +110,8 @@ class ContentPackageMixin(object):
 
     def _get_contents_object(self, contents):
         result = ContentUnitContents()
-        result.ntiid = self.context.ntiid
         result.contents = contents
+        result.ntiid = self.context.ntiid
         result.contentType = bytes_(self.context.contentType or RST_MIMETYPE)
         return result
 
@@ -182,7 +182,7 @@ class ContentPackageMixin(object):
         creator = SYSTEM_USER_NAME
         current_time = time_to_64bit_int(time.time())
         provider = provider \
-            or (get_provider(base) or 'NTI' if base else 'NTI')
+                or (get_provider(base) or 'NTI' if base else 'NTI')
 
         specific_base = get_specific(base) if base else None
         if specific_base:
@@ -263,13 +263,13 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
 
     def updateContentObject(self, contentObject, externalValue, set_id=False,
                             notify=True, pre_hook=None, object_hook=None):
-        result = UGDPutView.updateContentObject(self,
-                                                contentObject,
-                                                externalValue,
-                                                set_id=set_id,
-                                                notify=notify,
-                                                pre_hook=pre_hook,
-                                                object_hook=object_hook)
+        UGDPutView.updateContentObject(self,
+                                       contentObject,
+                                       externalValue,
+                                       set_id=set_id,
+                                       notify=notify,
+                                       pre_hook=pre_hook,
+                                       object_hook=object_hook)
         contents, contentType = self._check_content(externalValue)
         if contents:
             contentObject.contents = contents
