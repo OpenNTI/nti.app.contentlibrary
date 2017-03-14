@@ -303,7 +303,8 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
             notify_modified(self.context,
                             {
                                 'contents': contents,
-                                'contentType': contentType
+                                'contentType': contentType,
+                                'version': self.context.version
                             })
         result = self.context
         if contents:
