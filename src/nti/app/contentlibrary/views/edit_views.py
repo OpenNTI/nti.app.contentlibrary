@@ -20,6 +20,8 @@ from zope import lifecycleevent
 
 from zope.file.download import getHeaders
 
+from zope.intid.interfaces import IIntIds
+
 from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
@@ -72,8 +74,6 @@ from nti.externalization.internalization import notify_modified
 
 from nti.externalization.externalization import to_external_object
 from nti.externalization.externalization import StandardExternalFields
-
-from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.links.links import Link
 
@@ -216,10 +216,12 @@ class LibraryPostView(AbstractAuthenticatedView,
         if not IRenderableContentUnit.providedBy(context):
             ntiid = self.make_package_ntiid(extra=self._extra)
         else:
-            # Renderable content will get a new ntiid post-render, so
-            # make sure we have a consistent OID now so that we can replace
-            # the ntiid later.
-            ntiid = to_external_ntiid_oid(context, use_cache=False)
+            # Use predictable ntiids for renderable content packages
+            intids = component.getUtility(IIntIds)
+            specific= '%s.0' % intids.getId(context)
+            ntiid = make_ntiid(nttype=HTML,
+                               provider='NTI',
+                               specific=specific)
         context.ntiid = ntiid
 
     def _do_call(self):
