@@ -157,7 +157,7 @@ class ContentPackageMixin(object):
             source = self._get_source(self.request)
             if source is not None:
                 content = source.read()
-                contentType = source.contentType or RST_MIMETYPE
+                contentType = contentType or source.contentType or RST_MIMETYPE
         if content is not None:
             content = bytes_(content)
             contentType = bytes_(contentType or RST_MIMETYPE)
