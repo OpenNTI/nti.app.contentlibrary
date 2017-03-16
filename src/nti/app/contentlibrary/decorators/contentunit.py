@@ -149,18 +149,14 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
             and context.contents_last_modified > context.publishLastModified
 
     def _do_decorate_external(self, context, result):
-        path = '/%s/%s/%s' % (get_ds2(self.request),
-                              LIBRARY_ADAPTER,
-                              context.ntiid)
         _links = result.setdefault(LINKS, [])
         rels = (VIEW_CONTENTS,)
         if self._need_publish_contents_link(context):
             rels = (VIEW_CONTENTS, VIEW_PUBLISH_CONTENTS)
         for rel in rels:
-            link = Link(path,
+            link = Link(context,
                         rel=rel,
-                        elements=('@@%s' % rel,),
-                        ignore_properties_of_target=True)
+                        elements=('@@%s' % rel,))
             link.__name__ = ''
             link.__parent__ = context
             _links.append(link)
