@@ -22,6 +22,8 @@ from pyramid.view import view_defaults
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
+from nti.app.externalization.view_mixins import BatchingUtilsMixin
+
 from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.contentlibrary.views import LibraryPathAdapter
@@ -153,4 +155,27 @@ class RemoveInvalidPackagesView(AbstractAuthenticatedView):
                 self._do_delete_object(package)
                 items[package.ntiid] = package
         result[TOTAL] = result[ITEM_COUNT] = len(items)
+        return result
+
+
+@view_config(context=LibraryPathAdapter)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='GET',
+               name="AllContentPackages",
+               permission=nauth.ACT_NTI_ADMIN)
+class AllContentPackagesView(AbstractAuthenticatedView,
+                             BatchingUtilsMixin):
+
+    _DEFAULT_BATCH_SIZE = 30
+    _DEFAULT_BATCH_START = 0
+
+    def __call__(self):
+        result = LocatedExternalDict()
+        result.__name__ = self.request.view_name
+        result.__parent__ = self.request.context
+        packages = get_content_packages(mime_types=ALL_CONTENT_MIMETYPES)
+        result['TotalItemCount'] = len(packages)
+        self._batch_items_iterable(result, packages)
+        result[ITEM_COUNT] = len(result[ITEMS])
         return result
