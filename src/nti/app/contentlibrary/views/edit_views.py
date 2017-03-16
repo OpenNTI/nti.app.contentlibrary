@@ -134,8 +134,8 @@ class ContentPackageMixin(object):
         we have. Otherwise, it indicates the PUT might be trampling
         over another user's edits.
         """
-        params = CaseInsensitiveDict( self.request.params )
-        version = params.get( 'version' )
+        params = CaseInsensitiveDict(self.request.params)
+        version = params.get('version')
         # XXX: We dont want a 'force' link right?
         if version and version != self.context.version:
             raise_json_error(
@@ -218,7 +218,7 @@ class LibraryPostView(AbstractAuthenticatedView,
         else:
             # Use predictable ntiids for renderable content packages
             intids = component.getUtility(IIntIds)
-            specific= '%s.0' % intids.getId(context)
+            specific = '%s' % intids.getId(context)
             ntiid = make_ntiid(nttype=HTML,
                                provider='NTI',
                                specific=specific)
