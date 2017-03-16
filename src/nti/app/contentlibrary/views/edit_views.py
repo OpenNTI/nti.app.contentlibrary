@@ -366,7 +366,6 @@ class PackagePublishedContentsGetView(ContentPackageContentsGetView):
 
     def _get_contents(self):
         result = get_published_contents(self.context)
-
         if result is None:
             logger.warn('No publish contents found (%s)', self.context)
             raise hexc.HTTPNotFound(_('No publish contents found'))
