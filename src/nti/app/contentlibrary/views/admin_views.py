@@ -174,7 +174,8 @@ class AllContentPackagesView(AbstractAuthenticatedView,
         result = LocatedExternalDict()
         result.__name__ = self.request.view_name
         result.__parent__ = self.request.context
-        packages = get_content_packages(mime_types=ALL_CONTENT_MIMETYPES)
+        packages = sorted(get_content_packages(mime_types=ALL_CONTENT_MIMETYPES), 
+                          key=lambda p: p.ntiid)
         result['TotalItemCount'] = len(packages)
         self._batch_items_iterable(result, packages)
         result[ITEM_COUNT] = len(result[ITEMS])
