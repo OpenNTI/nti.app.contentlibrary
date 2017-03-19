@@ -154,6 +154,12 @@ class RemoveInvalidPackagesView(AbstractAuthenticatedView):
                 logger.info('Removing package (%s)', package.ntiid)
                 self._do_delete_object(package)
                 items[package.ntiid] = package
+        # remove invalid registrations
+        try:
+            for ntiid in library.removeInvalidContentUnits().keys():
+                items[ntiid] = None
+        except AttributeError:
+            pass
         result[TOTAL] = result[ITEM_COUNT] = len(items)
         return result
 
