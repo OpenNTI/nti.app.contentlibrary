@@ -44,8 +44,10 @@ class _UGDLibraryPathLinkDecorator(object):
     def decorateExternalMapping(self, context, result):
         container_id = context.containerId
         container = find_object_with_ntiid(container_id)
-        external_ntiid = to_external_ntiid_oid(
-            container) if container else None
+        if container is not None:
+            external_ntiid = to_external_ntiid_oid(container)
+        else:
+            external_ntiid = None
         if external_ntiid is None:
             # Non-persistent content unit perhaps.
             # Just add library path to our note.
