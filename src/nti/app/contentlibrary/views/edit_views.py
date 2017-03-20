@@ -128,14 +128,17 @@ class ContentPackageMixin(object):
             return self._get_contents(sources)
         return None
 
+    def _get_version(self):
+        params = CaseInsensitiveDict(self.request.params)
+        return params.get('version')
+        
     def _validate_version(self):
         """
         If given a content version, validate that it matches what
         we have. Otherwise, it indicates the PUT might be trampling
         over another user's edits.
         """
-        params = CaseInsensitiveDict(self.request.params)
-        version = params.get('version')
+        version = self._get_version()
         # XXX: We dont want a 'force' link right?
         if version and version != self.context.version:
             raise_json_error(
@@ -301,12 +304,13 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
         data = self.readInput()
         contents, contentType = self._check_content(data)
         if contents and contentType:
+            version = self._get_version() or self.context.version
             self.context.write_contents(contents, contentType)
             notify_modified(self.context,
                             {
                                 'contents': contents,
                                 'contentType': contentType,
-                                'version': self.context.version
+                                'version': version
                             })
         result = self.context
         if contents:
