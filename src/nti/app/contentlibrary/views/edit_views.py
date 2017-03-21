@@ -132,21 +132,39 @@ class ContentPackageMixin(object):
         params = CaseInsensitiveDict(self.request.params)
         return params.get('version') or ext_obj.get('version')
 
+    def _get_overwrite_flag(self, ext_obj):
+        params = CaseInsensitiveDict(self.request.params)
+        return params.get('force') or ext_obj.get('force')
+
     def _validate_version(self, ext_obj):
         """
         If given a content version, validate that it matches what
         we have. Otherwise, it indicates the PUT might be trampling
         over another user's edits.
         """
+        overwrite_flag = self._get_overwrite_flag(ext_obj)
+        if is_true(overwrite_flag):
+            logger.info("Overwriting content package edits (%s)",
+                        self.context.ntiid)
+            return
         version = self._get_version(ext_obj)
-        # XXX: We dont want a 'force' link right?
         if version is not None and version != self.context.version:
+            # Provide links to overwrite (force flag) or refresh on conflict.
+            links = []
+            link = Link(self.request.path, rel='overwrite',
+                        params={'force':True}, method='PUT')
+            links.append( link )
+            link = Link(self.request.path, rel='refresh', method='GET')
+            links.append( link )
             raise_json_error(
                 self.request,
                 hexc.HTTPConflict,
                 {
-                    u'message': _('The content version does not match. Please refresh.'),
-                    u'code': 'ContentVersionConflictError'
+                    CLASS: 'DestructiveChallenge',
+                    u'message': _('The contents have been changed while you were editing.'),
+                    u'code': 'ContentVersionConflictError',
+                    LINKS: to_external_object(links),
+                    MIME_TYPE: 'application/vnd.nextthought.destructivechallenge'
                 },
                 None)
 
