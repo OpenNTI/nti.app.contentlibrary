@@ -128,19 +128,19 @@ class ContentPackageMixin(object):
             return self._get_contents(sources)
         return None
 
-    def _get_version(self):
+    def _get_version(self, ext_obj):
         params = CaseInsensitiveDict(self.request.params)
-        return params.get('version')
-        
-    def _validate_version(self):
+        return params.get('version') or ext_obj.get('version')
+
+    def _validate_version(self, ext_obj):
         """
         If given a content version, validate that it matches what
         we have. Otherwise, it indicates the PUT might be trampling
         over another user's edits.
         """
-        version = self._get_version()
+        version = self._get_version(ext_obj)
         # XXX: We dont want a 'force' link right?
-        if version and version != self.context.version:
+        if version is not None and version != self.context.version:
             raise_json_error(
                 self.request,
                 hexc.HTTPConflict,
@@ -150,8 +150,8 @@ class ContentPackageMixin(object):
                 },
                 None)
 
-    def _validate(self):
-        self._validate_version()
+    def _validate(self, ext_obj):
+        self._validate_version(ext_obj)
 
     def _check_content(self, ext_obj=None):
         content = self._get_contents(ext_obj) if ext_obj else None
@@ -164,7 +164,7 @@ class ContentPackageMixin(object):
         if content is not None:
             content = bytes_(content)
             contentType = bytes_(contentType or RST_MIMETYPE)
-            self._validate()
+            self._validate(ext_obj)
         return content, contentType
 
     @Lazy
@@ -304,7 +304,7 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
         data = self.readInput()
         contents, contentType = self._check_content(data)
         if contents and contentType:
-            version = self._get_version() or self.context.version
+            version = self._get_version(data) or self.context.version
             self.context.write_contents(contents, contentType)
             notify_modified(self.context,
                             {
