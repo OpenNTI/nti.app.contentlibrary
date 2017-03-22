@@ -20,8 +20,6 @@ from zope import lifecycleevent
 
 from zope.file.download import getHeaders
 
-from zope.intid.interfaces import IIntIds
-
 from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
@@ -55,17 +53,16 @@ from nti.common.string import is_true
 
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
-from nti.contentlibrary.interfaces import IRenderableContentUnit
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.contentlibrary.library import register_content_units
 
+from nti.contentlibrary.utils import make_package_ntiid
 from nti.contentlibrary.utils import get_published_contents
+from nti.contentlibrary.utils import make_content_package_ntiid
 
 from nti.contenttypes.presentation.interfaces import IPresentationAsset
-
-from nti.coremetadata.interfaces import SYSTEM_USER_NAME
 
 from nti.coremetadata.interfaces import IRecordable
 
@@ -78,20 +75,12 @@ from nti.externalization.externalization import StandardExternalFields
 
 from nti.links.links import Link
 
-from nti.ntiids.ntiids import make_ntiid
-from nti.ntiids.ntiids import get_provider
-from nti.ntiids.ntiids import get_specific
-from nti.ntiids.ntiids import make_specific_safe
-
 from nti.property.property import Lazy
 
 from nti.recorder.interfaces import TRX_TYPE_CREATE
 
 from nti.recorder.utils import record_transaction
 
-from nti.zodb.containers import time_to_64bit_int
-
-HTML = u'HTML'
 RST_MIMETYPE = b'text/x-rst'
 
 CLASS = StandardExternalFields.CLASS
@@ -153,12 +142,12 @@ class ContentPackageMixin(object):
             # Provide links to overwrite (force flag) or refresh on conflict.
             links = []
             link = Link(self.request.path, rel='overwrite',
-                        params={'force':True}, method='PUT')
-            links.append( link )
+                        params={'force': True}, method='PUT')
+            links.append(link)
             link = Link(self.context, rel='refresh',
                         method='GET',
                         elements=('@@%s' % VIEW_PACKAGE_WITH_CONTENTS,))
-            links.append( link )
+            links.append(link)
             raise_json_error(
                 self.request,
                 hexc.HTTPConflict,
@@ -203,26 +192,7 @@ class ContentPackageMixin(object):
 
     @classmethod
     def make_package_ntiid(cls, provider=None, base=None, extra=None):
-        creator = SYSTEM_USER_NAME
-        current_time = time_to_64bit_int(time.time())
-        provider = provider \
-                or (get_provider(base) or 'NTI' if base else 'NTI')
-
-        specific_base = get_specific(base) if base else None
-        if specific_base:
-            specific_base += '.%s.%s' % (creator, current_time)
-        else:
-            specific_base = '%s.%s' % (creator, current_time)
-
-        if extra:
-            specific_base = specific_base + ".%s" % extra
-        specific = make_specific_safe(specific_base)
-
-        ntiid = make_ntiid(nttype=HTML,
-                           base=base,
-                           provider=provider,
-                           specific=specific)
-        return ntiid
+        return make_package_ntiid(provider, base, extra)
 
 
 @view_config(context=LibraryPathAdapter)
@@ -237,16 +207,7 @@ class LibraryPostView(AbstractAuthenticatedView,
     content_predicate = IEditableContentPackage
 
     def _set_ntiid(self, context):
-        if not IRenderableContentUnit.providedBy(context):
-            ntiid = self.make_package_ntiid(extra=self._extra)
-        else:
-            # Use predictable ntiids for renderable content packages
-            intids = component.getUtility(IIntIds)
-            specific = '%s' % intids.getId(context)
-            ntiid = make_ntiid(nttype=HTML,
-                               provider='NTI',
-                               specific=specific)
-        context.ntiid = ntiid
+        context.ntiid = make_content_package_ntiid(context)
 
     def _do_call(self):
         library = self._library
