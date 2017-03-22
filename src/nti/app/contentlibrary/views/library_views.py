@@ -743,6 +743,14 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
         """
         result_lists.sort(key=lambda x: len(x), reverse=True)
 
+    def _is_visible(self, item):
+        """
+        Object is published or we're an editor.
+        """
+        return     not IPublishable.providedBy(item) \
+                or item.is_published() \
+                or has_permission(nauth.ACT_CONTENT_EDIT, item, self.request)
+
     def _get_params(self):
         params = CaseInsensitiveDict(self.request.params)
         obj_ntiid = params.get('objectId')
@@ -756,7 +764,11 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
             obj_ntiid = obj.containerId
             obj = find_object_with_ntiid(obj_ntiid)
         if obj is None:
-            raise hexc.HTTPNotFound('%s not found' % obj_ntiid)
+            raise hexc.HTTPNotFound(_('%s not found' % obj_ntiid))
+        # See if the reading is no longer visible to our user.
+        if      IContentUnit.providedBy(obj) \
+            and not self._is_visible( obj ):
+            raise hexc.HTTPForbidden(_('Path not accessible.'))
 
         # Get the ntiid off the object because we may have an OID
         obj_ntiid = getattr(obj, 'ntiid', None) or obj_ntiid
