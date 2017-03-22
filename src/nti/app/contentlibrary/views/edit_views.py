@@ -89,7 +89,6 @@ from nti.site.interfaces import IHostPolicyFolder
 
 from nti.traversal.traversal import find_interface
 
-HTML = u'HTML'
 RST_MIMETYPE = b'text/x-rst'
 
 CLASS = StandardExternalFields.CLASS
