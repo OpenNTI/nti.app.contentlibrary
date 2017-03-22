@@ -22,6 +22,7 @@ from pyramid import httpexceptions as hexc
 from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import LIBRARY_ADAPTER
 from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
+from nti.app.contentlibrary import VIEW_PACKAGE_WITH_CONTENTS
 
 from nti.app.contentlibrary import MessageFactory
 

@@ -21,6 +21,9 @@ VIEW_CONTENTS = 'contents'
 #: A view to fetch the published contentx
 VIEW_PUBLISH_CONTENTS = 'PublishContents'
 
+#: A view to fetch the published contentx
+VIEW_PACKAGE_WITH_CONTENTS = 'PackageWithContents'
+
 #: Library path adapter
 LIBRARY_ADAPTER = 'Library'
 

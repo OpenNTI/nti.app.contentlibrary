@@ -43,6 +43,7 @@ from nti.app.contentlibrary.model import ContentUnitContents
 
 from nti.app.contentlibrary.views import VIEW_CONTENTS
 from nti.app.contentlibrary.views import VIEW_PUBLISH_CONTENTS
+from nti.app.contentlibrary.views import VIEW_PACKAGE_WITH_CONTENTS
 
 from nti.app.contentlibrary.views import LibraryPathAdapter
 
@@ -154,7 +155,9 @@ class ContentPackageMixin(object):
             link = Link(self.request.path, rel='overwrite',
                         params={'force':True}, method='PUT')
             links.append( link )
-            link = Link(self.request.path, rel='refresh', method='GET')
+            link = Link(self.context, rel='refresh',
+                        method='GET',
+                        elements=('@@%s' % VIEW_PACKAGE_WITH_CONTENTS,))
             links.append( link )
             raise_json_error(
                 self.request,
@@ -372,6 +375,24 @@ class ContentPackageContentsGetView(AbstractAuthenticatedView,
             return self.as_attachment()
         contents = self._get_contents()
         return self._get_contents_object(contents)
+
+
+@view_config(context=IEditableContentPackage)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='GET',
+               name=VIEW_PACKAGE_WITH_CONTENTS,
+               permission=nauth.ACT_CONTENT_EDIT)
+class ContentPackageWithContentsGetView(ContentPackageContentsGetView):
+    """
+    Convenience class to return the package with inlined contents.
+    """
+
+    def __call__(self):
+        contents = super(ContentPackageWithContentsGetView, self).__call__()
+        result = to_external_object(self.context)
+        result['contents'] = contents
+        return result
 
 
 @view_config(context=IEditableContentPackage)
