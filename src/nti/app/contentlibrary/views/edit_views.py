@@ -18,6 +18,8 @@ from requests.structures import CaseInsensitiveDict
 from zope import component
 from zope import lifecycleevent
 
+from zope.component.hooks import site as current_site
+
 from zope.file.download import getHeaders
 
 from pyramid import httpexceptions as hexc
@@ -81,6 +83,13 @@ from nti.recorder.interfaces import TRX_TYPE_CREATE
 
 from nti.recorder.utils import record_transaction
 
+from nti.site.hostpolicy import get_host_site
+
+from nti.site.interfaces import IHostPolicyFolder
+
+from nti.traversal.traversal import find_interface
+
+HTML = u'HTML'
 RST_MIMETYPE = b'text/x-rst'
 
 CLASS = StandardExternalFields.CLASS
@@ -177,9 +186,15 @@ class ContentPackageMixin(object):
             self._validate(ext_obj)
         return content, contentType
 
-    @Lazy
-    def _library(self):
-        library = component.queryUtility(IContentPackageLibrary)
+    def get_library(self, context=None):
+        if context is None:
+            library = component.queryUtility(IContentPackageLibrary)
+        else:
+            # If context is given, attempt to use the site the given context
+            # is stored in. This is necessary to avoid data loss during sync.
+            folder = find_interface(context, IHostPolicyFolder, strict=False)
+            with current_site(get_host_site(folder.__name__)):
+                library = component.queryUtility(IContentPackageLibrary)
         if library is None:
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
@@ -210,7 +225,7 @@ class LibraryPostView(AbstractAuthenticatedView,
         context.ntiid = make_content_package_ntiid(context)
 
     def _do_call(self):
-        library = self._library
+        library = self.get_library()
         externalValue = self.readInput()
         package, _, externalValue = \
             self.performReadCreateUpdateContentObject(user=self.remoteUser,
@@ -391,7 +406,7 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
     CONFIRM_MSG = _('Are you sure you want to delete?')
 
     def _do_delete_object(self, theObject, event=True):
-        library = self._library
+        library = self.get_library(context=self.context)
         library.remove(theObject, event=event)
         return theObject
 
