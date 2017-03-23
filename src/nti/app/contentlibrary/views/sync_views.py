@@ -27,6 +27,10 @@ except ImportError:
 
 from zope import component
 
+from zope.component.hooks import getSite
+
+from zope.event import notify
+
 from zope.security.management import endInteraction
 from zope.security.management import restoreInteraction
 
@@ -38,6 +42,8 @@ from pyramid.view import view_config
 from pyramid.view import view_defaults
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
+
+from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.contentlibrary import LOCK_TIMEOUT
 from nti.app.contentlibrary import SYNC_LOCK_NAME
@@ -51,6 +57,12 @@ from nti.app.externalization.internalization import read_body_as_external_object
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
 from nti.common.string import TRUE_VALUES
+
+from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IRenderableContentPackage
+from nti.contentlibrary.interfaces import ContentPackageReplacedEvent
+
+from nti.contentlibrary.synchronize import ContentPackageSyncResults
 
 from nti.dataserver.interfaces import IRedisClient
 from nti.dataserver.interfaces import IDataserverFolder
@@ -131,8 +143,9 @@ class _SetSyncLockView(AbstractAuthenticatedView):
             return lock
         raise_json_error(self.request,
                          hexc.HTTPLocked,
-                         {'message': 'Sync already in progress',
-                          'code': 'Exception'},
+                         {
+                             'message': _('Sync already in progress'),
+                             'code': 'Exception'},
                          None)
 
     def __call__(self):
@@ -204,10 +217,10 @@ class _SyncContentPackagesMixin(_AbstractSyncAllLibrariesView):
     # disabling it.
     _SLEEP = True
 
-    def _executable(self, sleep, site, *args, **kwargs):
+    def _executable(self, sleep, site=None, *args, **kwargs):
         raise NotImplementedError
 
-    def _do_sync(self, site, *args, **kwargs):
+    def _do_sync(self, site=None, *args, **kwargs):
         now = time.time()
         result = LocatedExternalDict()
         result['Transaction'] = self._txn_id()
@@ -302,3 +315,30 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
                                ntiids=ntiids,
                                allowRemoval=allowRemoval)
         return result
+
+
+@view_config(name='Sync')
+@view_config(name='Synchronize')
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               context=IContentPackage,
+               permission=ACT_SYNC_LIBRARY)
+class _SyncContentPacakgeView(_SyncContentPackagesMixin):
+    """
+    A view that synchronizes a content package
+    """
+
+    def _executable(self, sleep=None, site=None, *args, **kwargs):
+        package = self.context
+        if      IRenderableContentPackage.providedBy(package) \
+            and not package.is_published():
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                 'message': _('Content has not been published'),
+                                 'code': 'Exception'},
+                             None)
+        results = ContentPackageSyncResults(Site=getattr(getSite(), '__name__', None),
+                                            ContentPackageNTIID=package.ntiid)
+        notify(ContentPackageReplacedEvent(package, package, results=results))
+        return None, results
