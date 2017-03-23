@@ -27,9 +27,9 @@ except ImportError:
 
 from zope import component
 
-from zope.component.hooks import getSite
+from zope.component.hooks import site as current_site
 
-from zope.event import notify
+from zope.event import notify as event_notify
 
 from zope.security.management import endInteraction
 from zope.security.management import restoreInteraction
@@ -62,7 +62,10 @@ from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import ContentPackageReplacedEvent
 
+from nti.contentlibrary.synchronize import SynchronizationResults
 from nti.contentlibrary.synchronize import ContentPackageSyncResults
+
+from nti.contentlibrary.utils import get_content_package_site
 
 from nti.dataserver.interfaces import IRedisClient
 from nti.dataserver.interfaces import IDataserverFolder
@@ -72,6 +75,8 @@ from nti.dataserver.authorization import ACT_SYNC_LIBRARY
 from nti.externalization.interfaces import LocatedExternalDict
 
 from nti.property.property import Lazy
+
+from nti.site.hostpolicy import get_host_site
 
 
 @view_config(permission=ACT_SYNC_LIBRARY)
@@ -338,7 +343,16 @@ class _SyncContentPacakgeView(_SyncContentPackagesMixin):
                                  'message': _('Content has not been published'),
                                  'code': 'Exception'},
                              None)
-        results = ContentPackageSyncResults(Site=getattr(getSite(), '__name__', None),
-                                            ContentPackageNTIID=package.ntiid)
-        notify(ContentPackageReplacedEvent(package, package, results=results))
-        return None, results
+        # prepare results
+        site = get_content_package_site(package)
+        sync_results = SynchronizationResults() 
+        results = ContentPackageSyncResults(Site=site,
+                                           ContentPackageNTIID=package.ntiid)
+        sync_results.add(results)
+        # do sync
+        with current_site(get_host_site(site)):  # use pkg site
+            event = ContentPackageReplacedEvent(package, 
+                                                package, 
+                                                results=sync_results)
+            event_notify(event)
+            return None, results
