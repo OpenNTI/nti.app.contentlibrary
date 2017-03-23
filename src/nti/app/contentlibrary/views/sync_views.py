@@ -56,7 +56,7 @@ from nti.app.externalization.internalization import read_body_as_external_object
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
-from nti.common.string import TRUE_VALUES
+from nti.common.string import is_true
 
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
@@ -306,7 +306,7 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
         # parse params
         site = values.get('site')
         allowRemoval = values.get('allowRemoval') or u''
-        allowRemoval = allowRemoval.lower() in TRUE_VALUES
+        allowRemoval = is_true(allowRemoval)
         # things to sync
         for name in ('ntiids', 'ntiid', 'packages', 'package'):
             ntiids = values.get(name)
