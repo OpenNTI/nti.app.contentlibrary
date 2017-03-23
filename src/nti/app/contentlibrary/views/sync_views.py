@@ -347,7 +347,7 @@ class _SyncContentPacakgeView(_SyncContentPackagesMixin):
         site = get_content_package_site(package)
         sync_results = SynchronizationResults() 
         results = ContentPackageSyncResults(Site=site,
-                                           ContentPackageNTIID=package.ntiid)
+                                            ContentPackageNTIID=package.ntiid)
         sync_results.add(results)
         # do sync
         with current_site(get_host_site(site)):  # use pkg site
