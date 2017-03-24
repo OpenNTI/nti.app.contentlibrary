@@ -272,12 +272,12 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
                                        pre_hook=pre_hook,
                                        object_hook=object_hook)
         contents, contentType = self._check_content(externalValue)
-        if contents:
+        if contents is not None:
             contentObject.contents = contents
         if contentType:
             contentObject.contentType = contentType
         result = self.context
-        if contents:
+        if contents is not None:
             result = to_external_object(result)
             result['contents'] = self._get_contents_object(contents)
         return result
