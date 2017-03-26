@@ -29,8 +29,6 @@ from zope import component
 
 from zope.component.hooks import site as current_site
 
-from zope.event import notify as event_notify
-
 from zope.security.management import endInteraction
 from zope.security.management import restoreInteraction
 
@@ -59,8 +57,8 @@ from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtils
 from nti.common.string import is_true
 
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IRenderableContentPackage
-from nti.contentlibrary.interfaces import ContentPackageReplacedEvent
 
 from nti.contentlibrary.synchronize import SynchronizationResults
 from nti.contentlibrary.synchronize import ContentPackageSyncResults
@@ -333,6 +331,25 @@ class _SyncContentPacakgeView(_SyncContentPackagesMixin):
     A view that synchronizes a content package
     """
 
+    def _replace(self, package):
+        ntiid = package.ntiid
+        site = get_content_package_site(package)
+        # prepare results
+        sync_results = SynchronizationResults() 
+        results = ContentPackageSyncResults(Site=site,
+                                            ContentPackageNTIID=package.ntiid)
+        sync_results.add(results)
+        # do sync
+        with current_site(get_host_site(site)):  # use pkg site
+            library = component.getUtility(IContentPackageLibrary)
+            # enumerate all content packages
+            enumeration = library.enumeration
+            content_packages = enumeration.enumerateContentPackages()
+            content_packages = {x.ntiid:x for x in content_packages}
+            # replace w/ new one
+            library.replace(content_packages[ntiid], results=sync_results)
+        return results
+
     def _executable(self, sleep=None, site=None, *args, **kwargs):
         package = self.context
         if      IRenderableContentPackage.providedBy(package) \
@@ -344,15 +361,4 @@ class _SyncContentPacakgeView(_SyncContentPackagesMixin):
                                  'code': 'Exception'},
                              None)
         # prepare results
-        site = get_content_package_site(package)
-        sync_results = SynchronizationResults() 
-        results = ContentPackageSyncResults(Site=site,
-                                            ContentPackageNTIID=package.ntiid)
-        sync_results.add(results)
-        # do sync
-        with current_site(get_host_site(site)):  # use pkg site
-            event = ContentPackageReplacedEvent(package, 
-                                                package, 
-                                                results=sync_results)
-            event_notify(event)
-            return None, results
+        return None, self._replace(package)
