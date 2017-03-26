@@ -360,5 +360,4 @@ class _SyncContentPacakgeView(_SyncContentPackagesMixin):
                                  'message': _('Content has not been published'),
                                  'code': 'Exception'},
                              None)
-        # prepare results
         return None, self._replace(package)
