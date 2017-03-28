@@ -171,7 +171,7 @@
 
 	<!-- Filters -->
 	<subscriber	factory=".filters._LibraryContentObjectFilter"
-				provides="nti.appserver.interfaces.ICreatableObjectFilter"
+				provides="nti.dataserver.interfaces.ICreatableObjectFilter"
 				for="nti.dataserver.interfaces.IUser" />
 
 	<!-- Search pacakge resolvers -->
