@@ -7,6 +7,7 @@ Sync views.
 """
 
 from __future__ import print_function, unicode_literals, absolute_import, division
+from nti.coremetadata.interfaces import IPublishable
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -45,6 +46,8 @@ from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.contentlibrary import LOCK_TIMEOUT
 from nti.app.contentlibrary import SYNC_LOCK_NAME
+
+from nti.app.contentlibrary.subscribers import update_indices_when_content_changes
 
 from nti.app.contentlibrary.synchronize import syncContentPackages
 
@@ -326,7 +329,7 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
                renderer='rest',
                context=IContentPackage,
                permission=ACT_SYNC_LIBRARY)
-class _SyncContentPacakgeView(_SyncContentPackagesMixin):
+class _SyncContentPacakgeView(_AbstractSyncAllLibrariesView):
     """
     A view that synchronizes a content package
     """
@@ -335,7 +338,7 @@ class _SyncContentPacakgeView(_SyncContentPackagesMixin):
         ntiid = package.ntiid
         site = get_content_package_site(package)
         # prepare results
-        sync_results = SynchronizationResults() 
+        sync_results = SynchronizationResults()
         results = ContentPackageSyncResults(Site=site,
                                             ContentPackageNTIID=package.ntiid)
         sync_results.add(results)
@@ -345,12 +348,12 @@ class _SyncContentPacakgeView(_SyncContentPackagesMixin):
             # enumerate all content packages
             enumeration = library.enumeration
             content_packages = enumeration.enumerateContentPackages()
-            content_packages = {x.ntiid:x for x in content_packages}
+            content_packages = {x.ntiid: x for x in content_packages}
             # replace w/ new one
             library.replace(content_packages[ntiid], results=sync_results)
         return results
 
-    def _executable(self, sleep=None, site=None, *args, **kwargs):
+    def _do_call(self):
         package = self.context
         if      IRenderableContentPackage.providedBy(package) \
             and not package.is_published():
@@ -360,4 +363,28 @@ class _SyncContentPacakgeView(_SyncContentPackagesMixin):
                                  'message': _('Content has not been published'),
                                  'code': 'Exception'},
                              None)
-        return None, self._replace(package)
+        return self._replace(package)
+
+
+@view_config(context=IContentPackage)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               permission=ACT_SYNC_LIBRARY,
+               name='SyncPresentationAssets')
+class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
+
+    def _process_package(self, package):
+        site = get_content_package_site(package)
+        with current_site(get_host_site(site)):  # use pkg site
+            update_indices_when_content_changes(package)
+
+    def _do_call(self):
+        package = self.context
+        if IPublishable.providedBy(package) and not package.is_published():
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                 'message': _('Content has not been published'),
+                                 'code': 'Exception'},
+                             None)
+        return self._process_package(package)
