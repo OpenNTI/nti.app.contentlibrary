@@ -376,7 +376,7 @@ class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
     def _process_package(self, package):
         site = get_content_package_site(package)
         with current_site(get_host_site(site)):  # use pkg site
-            update_indices_when_content_changes(package)
+            return update_indices_when_content_changes(package)
 
     def _do_call(self):
         package = self.context
