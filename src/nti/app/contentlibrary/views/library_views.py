@@ -536,10 +536,10 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
 
     Typical return:
             [ [ <TopLevelContext>,
-                    <Heirarchical Node>,
-                    <Presentation Asset>,
-                    <PageInfo>* ],
-                    ...
+                <Heirarchical Node>,
+                <Presentation Asset>,
+                <PageInfo>* ],
+                ...
             ]
 
     For authored content, that will not exist in a content package,
