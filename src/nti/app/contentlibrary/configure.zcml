@@ -204,4 +204,13 @@
 		root_interfaces=".interfaces.IContentUnitContents"
 		modules=".model" />
 
+	<!-- Metadata -->
+	<configure zcml:condition="installed nti.metadata">
+		<subscriber	factory=".predicates._SystemContentPackages"
+					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
+
+		<subscriber	factory=".predicates._UserContentPackages"
+					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
+	</configure>
+
 </configure>
