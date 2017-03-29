@@ -28,7 +28,7 @@ from nti.property.property import Lazy
 from nti.site.hostpolicy import run_job_in_all_host_sites
 
 
-class _PackageObjectMixin(BasePrincipalObjects):
+class _PackageObjectsMixin(BasePrincipalObjects):
 
     @Lazy
     def intids(self):
@@ -57,7 +57,7 @@ class _PackageObjectMixin(BasePrincipalObjects):
 
 
 @component.adapter(ISystemUserPrincipal)
-class _SystemContentPackages(BasePrincipalObjects):
+class _SystemContentPackages(_PackageObjectsMixin):
 
     def iter_items(self, result, seen):
         library = self.library
@@ -66,7 +66,7 @@ class _SystemContentPackages(BasePrincipalObjects):
         for item in library.contentPackages:
             doc_id = self.intids.queryId(item)
             if      doc_id is not None \
-                and doc_id not in seen  \
+                and doc_id not in seen \
                 and not IEditableContentPackage.providedBy(item):
                 seen.add(doc_id)
                 result.append(item)
@@ -75,7 +75,7 @@ class _SystemContentPackages(BasePrincipalObjects):
 
 
 @component.adapter(IUser)
-class _UserContentPackages(BasePrincipalObjects):
+class _UserContentPackages(_PackageObjectsMixin):
 
     def iter_items(self, result, seen):
         user = self.user
@@ -85,11 +85,9 @@ class _UserContentPackages(BasePrincipalObjects):
         for item in library.contentPackages:
             doc_id = self.intids.queryId(item)
             if      doc_id is not None \
-                and doc_id not in seen  \
+                and doc_id not in seen \
                 and IEditableContentPackage.providedBy(item):
-                # get creator
-                creator = item.creator
-                creator = getattr(creator, 'username', creator)
+                creator = getattr(item.creator, 'username', None)
                 creator = getattr(creator, 'id', creator) or u''
                 seen.add(doc_id)
                 if creator.lower() == user.username.lower():
