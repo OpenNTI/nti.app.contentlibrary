@@ -62,7 +62,6 @@ from nti.contenttypes.presentation.utils import create_ntivideo_from_external
 from nti.contenttypes.presentation.utils import create_timelime_from_external
 from nti.contenttypes.presentation.utils import create_relatedwork_from_external
 
-from nti.coremetadata.interfaces import IRecordable
 from nti.coremetadata.interfaces import IObjectUnpublishedEvent
 
 from nti.dataserver.authorization import ACT_READ
@@ -76,6 +75,8 @@ from nti.intid.common import addIntId
 from nti.intid.common import removeIntId
 
 from nti.ntiids.ntiids import is_valid_ntiid_string
+
+from nti.recorder.interfaces import IRecordable
 
 from nti.recorder.record import copy_transaction_history
 from nti.recorder.record import remove_transaction_history

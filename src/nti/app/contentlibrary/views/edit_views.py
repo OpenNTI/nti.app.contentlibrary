@@ -66,8 +66,6 @@ from nti.contentlibrary.utils import make_content_package_ntiid
 
 from nti.contenttypes.presentation.interfaces import IPresentationAsset
 
-from nti.coremetadata.interfaces import IRecordable
-
 from nti.dataserver import authorization as nauth
 
 from nti.externalization.internalization import notify_modified
@@ -80,6 +78,8 @@ from nti.links.links import Link
 from nti.property.property import Lazy
 
 from nti.recorder.interfaces import TRX_TYPE_CREATE
+
+from nti.recorder.interfaces import IRecordable
 
 from nti.recorder.utils import record_transaction
 
