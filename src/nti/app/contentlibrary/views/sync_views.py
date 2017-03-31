@@ -218,7 +218,7 @@ class _AbstractSyncAllLibrariesView(_SetSyncLockView,
                                                                    exc_traceback,
                                                                    with_filenames=True))
             raise_json_error(self.request,
-                             hexc.HTTPUnprocessableEntity,
+                             hexc.HTTPServerError,
                              result,
                              exc_traceback)
         finally:
