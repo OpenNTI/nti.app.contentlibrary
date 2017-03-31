@@ -13,7 +13,6 @@ logger = __import__('logging').getLogger(__name__)
 
 import sys
 import time
-import traceback
 from six import string_types
 
 from requests.structures import CaseInsensitiveDict
@@ -26,6 +25,7 @@ except ImportError:
         return id(transaction.get())
 
 from zope import component
+from zope import exceptions
 
 from zope.component.hooks import site as current_site
 
@@ -208,6 +208,19 @@ class _AbstractSyncAllLibrariesView(_SetSyncLockView,
         try:
             logger.info('Starting sync %s', self._txn_id())
             return self._do_call()
+        except Exception as e: 
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            result = LocatedExternalDict()
+            result['message'] = str(e)
+            result['code'] = e.__class__.__name__
+            result['traceback'] = repr(exceptions.format_exception(exc_type,
+                                                                   exc_value,
+                                                                   exc_traceback,
+                                                                   with_filenames=True))
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             result,
+                             exc_traceback)
         finally:
             self.release(lock)
             restoreInteraction()
@@ -250,9 +263,10 @@ class _SyncContentPackagesMixin(_AbstractSyncAllLibrariesView):
             # XXX: No, we should not expose the traceback over the web. Ever,
             # unless the exception catching middleware is installed, which is only
             # in devmode.
-            result['traceback'] = repr(traceback.format_exception(exc_type,
-                                                                  exc_value,
-                                                                  exc_traceback))
+            result['traceback'] = repr(exceptions.format_exception(exc_type,
+                                                                   exc_value,
+                                                                   exc_traceback,
+                                                                   with_filenames=True))
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
                              result,
