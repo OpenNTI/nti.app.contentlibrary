@@ -138,6 +138,8 @@ class _IsSyncInProgressView(AbstractAuthenticatedView):
                name='SetSyncLock')
 class _SetSyncLockView(AbstractAuthenticatedView):
 
+    blocking = False
+
     @Lazy
     def redis(self):
         return component.getUtility(IRedisClient)
@@ -145,7 +147,7 @@ class _SetSyncLockView(AbstractAuthenticatedView):
     def acquire(self):
         # Fail fast if we cannot acquire the lock.
         lock = self.redis.lock(SYNC_LOCK_NAME, LOCK_TIMEOUT)
-        acquired = lock.acquire(blocking=False)
+        acquired = lock.acquire(blocking=self.blocking)
         if acquired:
             return lock
         raise_json_error(self.request,
@@ -344,10 +346,12 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
                renderer='rest',
                context=IContentPackage,
                permission=ACT_SYNC_LIBRARY)
-class _SyncContentPacakgeView(_AbstractSyncAllLibrariesView):
+class _SyncContentPackageView(_AbstractSyncAllLibrariesView):
     """
     A view that synchronizes a content package
     """
+
+    blocking = True
 
     def _replace(self, package):
         ntiid = package.ntiid
@@ -387,6 +391,8 @@ class _SyncContentPacakgeView(_AbstractSyncAllLibrariesView):
                permission=ACT_SYNC_LIBRARY,
                name='SyncPresentationAssets')
 class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
+
+    blocking = True
 
     def _process_package(self, package):
         site = get_content_package_site(package)
