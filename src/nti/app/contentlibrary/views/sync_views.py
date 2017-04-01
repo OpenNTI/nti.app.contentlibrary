@@ -210,7 +210,7 @@ class _AbstractSyncAllLibrariesView(_SetSyncLockView,
         try:
             logger.info('Starting sync %s', self._txn_id())
             return self._do_call()
-        except Exception as e: 
+        except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             result = LocatedExternalDict()
             result['message'] = str(e)
@@ -366,22 +366,20 @@ class _SyncContentPackageView(_AbstractSyncAllLibrariesView):
             library = component.getUtility(IContentPackageLibrary)
             # enumerate all content packages
             enumeration = library.enumeration
-            content_packages = enumeration.enumerateContentPackages()
-            content_packages = {x.ntiid: x for x in content_packages}
+            content_packages = [
+                x for x in enumeration.enumerateContentPackages() if x.ntiid == ntiid
+            ]
+            assert content_packages, _("Could not find contents in library")
             # replace w/ new one
-            library.replace(content_packages[ntiid], results=sync_results)
+            library.replace(content_packages[0], results=sync_results)
         return results
 
     def _do_call(self):
         package = self.context
         if      IRenderableContentPackage.providedBy(package) \
             and not package.is_published():
-            raise_json_error(self.request,
-                             hexc.HTTPUnprocessableEntity,
-                             {
-                                 'message': _('Content has not been published'),
-                                 'code': 'Exception'},
-                             None)
+            raise ValueError(_('Content has not been published'))
+
         return self._replace(package)
 
 
