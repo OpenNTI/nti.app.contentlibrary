@@ -153,7 +153,7 @@ class _SetSyncLockView(AbstractAuthenticatedView):
         raise_json_error(self.request,
                          hexc.HTTPLocked,
                          {
-                             'message': _('Sync already in progress'),
+                             'message': _('Sync in progress'),
                              'code': 'Exception'},
                          None)
 
