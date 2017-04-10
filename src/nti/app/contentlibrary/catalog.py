@@ -17,23 +17,23 @@ from pyramid.location import lineage
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 
-from nti.contentlibrary.indexed_data.interfaces import INTIIDAdapter
-from nti.contentlibrary.indexed_data.interfaces import ITargetAdapter
-from nti.contentlibrary.indexed_data.interfaces import INamespaceAdapter
-from nti.contentlibrary.indexed_data.interfaces import ISlideDeckAdapter
-from nti.contentlibrary.indexed_data.interfaces import IContainersAdapter
-from nti.contentlibrary.indexed_data.interfaces import IContainedTypeAdapter
-
 from nti.contenttypes.presentation import iface_of_asset
 
 from nti.contenttypes.presentation.interfaces import IPointer
 from nti.contenttypes.presentation.interfaces import IAssetRef
 from nti.contenttypes.presentation.interfaces import INTISlide
+from nti.contenttypes.presentation.interfaces import INTIIDAdapter
 from nti.contenttypes.presentation.interfaces import INTISlideDeck
 from nti.contenttypes.presentation.interfaces import INTISlideVideo
+from nti.contenttypes.presentation.interfaces import ITargetAdapter
+from nti.contenttypes.presentation.interfaces import INamespaceAdapter
+from nti.contenttypes.presentation.interfaces import ISlideDeckAdapter
+from nti.contenttypes.presentation.interfaces import IContainersAdapter
 from nti.contenttypes.presentation.interfaces import IPresentationAsset
+from nti.contenttypes.presentation.interfaces import IContainedTypeAdapter
 
 from nti.traversal.traversal import find_interface
+
 
 # Type
 
@@ -201,6 +201,7 @@ def _asset_to_containers(context):
     containers.discard(None)
     containers.discard(context.ntiid)
     return _Containers(tuple(containers))
+
 
 # Slide deck
 
