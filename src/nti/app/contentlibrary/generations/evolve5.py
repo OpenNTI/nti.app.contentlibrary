@@ -19,7 +19,7 @@ from zope.component.hooks import setHooks
 
 from zope.intid.interfaces import IIntIds
 
-from nti.contentlibrary.indexed_data.catalog import install_assets_library_catalog
+from nti.contenttypes.presentation.index import install_assets_library_catalog
 
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IOIDResolver
