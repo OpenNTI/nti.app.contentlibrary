@@ -17,7 +17,7 @@ from nti.assessment import ASSESSMENT_INTERFACES
 
 from nti.contenttypes.presentation import ALL_PRESENTATION_ASSETS_INTERFACES
 
-from nti.contentlibrary.indexed_data.interfaces import IContainedTypeAdapter
+from nti.contenttypes.presentation.interfaces import IContainedTypeAdapter
 
 from nti.app.contentlibrary.tests import ContentLibraryApplicationTestLayer
 
