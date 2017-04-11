@@ -193,6 +193,7 @@
 	<adapter factory=".resolvers.ContentMetadataFromContentUnit" />
 
 	<!-- Catalog -->
+	<adapter factory=".catalog._asset_to_site" />
 	<adapter factory=".catalog._asset_to_ntiid" />
 	<adapter factory=".catalog._asset_to_target" />
 	<adapter factory=".catalog._asset_to_namespace" />

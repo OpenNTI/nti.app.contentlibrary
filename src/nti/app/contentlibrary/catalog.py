@@ -22,6 +22,7 @@ from nti.contenttypes.presentation import iface_of_asset
 from nti.contenttypes.presentation.interfaces import IPointer
 from nti.contenttypes.presentation.interfaces import IAssetRef
 from nti.contenttypes.presentation.interfaces import INTISlide
+from nti.contenttypes.presentation.interfaces import ISiteAdapter
 from nti.contenttypes.presentation.interfaces import INTIIDAdapter
 from nti.contenttypes.presentation.interfaces import INTISlideDeck
 from nti.contenttypes.presentation.interfaces import INTISlideVideo
@@ -32,7 +33,27 @@ from nti.contenttypes.presentation.interfaces import IContainersAdapter
 from nti.contenttypes.presentation.interfaces import IPresentationAsset
 from nti.contenttypes.presentation.interfaces import IContainedTypeAdapter
 
+from nti.site.interfaces import IHostPolicyFolder
+
 from nti.traversal.traversal import find_interface
+
+# Site
+
+
+class _Site(object):
+
+    __slots__ = (b'site',)
+
+    def __init__(self, site):
+        self.site = site
+
+
+@component.adapter(IPresentationAsset)
+@interface.implementer(ISiteAdapter)
+def _asset_to_site(context):
+    folder = find_interface(context, IHostPolicyFolder, strict=False)
+    if folder is not None:
+        return _Site(folder.__name__)
 
 
 # Type
