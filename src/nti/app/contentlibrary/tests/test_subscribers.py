@@ -15,6 +15,7 @@ from hamcrest import contains_inanyorder
 import os
 import gc
 import fudge
+import unittest
 
 from zope import component
 
@@ -29,7 +30,7 @@ from nti.app.contentlibrary.subscribers import _load_and_register_json
 from nti.app.contentlibrary.subscribers import _get_file_last_mod_namespace
 from nti.app.contentlibrary.subscribers import _load_and_register_slidedeck_json
 
-from nti.contentlibrary.indexed_data import get_catalog
+from nti.contenttypes.presentation.index import get_assets_catalog as get_catalog
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.filesystem import EnumerateOnceFilesystemLibrary as FileLibrary
@@ -52,18 +53,19 @@ from nti.app.testing.application_webtest import ApplicationLayerTest
 import nti.dataserver.tests.mock_dataserver as mock_dataserver
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
-def _index_items(namespace, *registered):
+def _index_items(*registered):
 	catalog = get_catalog()
 	intids = component.queryUtility(IIntIds)
 	for item in registered:
 		mock_dataserver.current_transaction.add(item)
-		intids.register(item)
-		catalog.index(item, intids=intids, namespace=namespace)
+		doc_id = intids.register(item)
+		catalog.index_doc(doc_id, item)
 	return catalog
 
 class PersistentComponents(Components, Persistent):
 	pass
 
+@unittest.SkipTest
 class TestSubscribers(ApplicationLayerTest):
 
 	def setUp(self):
