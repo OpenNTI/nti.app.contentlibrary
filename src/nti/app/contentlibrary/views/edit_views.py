@@ -299,7 +299,7 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
     def __call__(self):
         data = self.readInput()
         contents, contentType = self._check_content(data)
-        if contents and contentType:
+        if contents is not None and contentType:
             version = self._get_version(data) or self.context.version
             self.context.write_contents(contents, contentType)
             notify_modified(self.context,
@@ -309,7 +309,7 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
                                 'version': version
                             })
         result = self.context
-        if contents:
+        if contents is not None:
             result = to_external_object(self.context)
             result['contents'] = self._get_contents_object(contents)
         return result
