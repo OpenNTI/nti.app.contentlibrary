@@ -111,8 +111,7 @@ class _ContainedObjectsQuerier(object):
         # TODO: Is this what we want for all implementations?
         units = []
         results = []
-        children = library.childrenOfNTIID(
-            ntiid) if library is not None else ()
+        children = library.childrenOfNTIID(ntiid) if library else ()
         for unit in children or ():
             unit = ntiids.find_object_with_ntiid(unit)
             if unit is not None:
