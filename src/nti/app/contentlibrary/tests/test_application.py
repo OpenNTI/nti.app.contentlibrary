@@ -153,7 +153,9 @@ class TestApplicationLibraryBase(ApplicationLayerTest):
 			self._create_user()
 		testapp = TestApp( self.app, extra_environ=self._make_extra_environ() )
 
-		for accept_type in ('application/json','application/vnd.nextthought.pageinfo','application/vnd.nextthought.pageinfo+json'):
+		for accept_type in ('application/json',
+						    'application/vnd.nextthought.pageinfo',
+						    'application/vnd.nextthought.pageinfo+json'):
 
 			res = testapp.get( '/dataserver2/NTIIDs/' + self.child_ntiid,
 							   headers={"Accept": accept_type} )
@@ -162,12 +164,20 @@ class TestApplicationLibraryBase(ApplicationLayerTest):
 			assert_that( res.content_type, is_( 'application/vnd.nextthought.pageinfo+json' ) )
 			assert_that( res.json_body, has_entry( 'MimeType', 'application/vnd.nextthought.pageinfo' ) )
 			if self._check_content_link:
-				assert_that( res.json_body, has_entry( 'Links', has_item( all_of( has_entry( 'rel', 'content' ),
-																				  has_entry( 'href', '/prealgebra/sect_0002.html' ) ) ) ) )
+				assert_that( res.json_body,
+								has_entry( 'Links',
+										has_item(
+											all_of(
+												has_entry( 'rel', 'content' ),
+												has_entry( 'href', '/prealgebra/sect_0002.html' ) ) ) ) )
 
-			assert_that( res.json_body, has_entry( 'Links', has_item( all_of( has_entry( 'rel', self._stream_type ),
-																			  has_entry( 'href',
-																						 '/dataserver2/users/sjohnson@nextthought.com/Pages(' + self.child_ntiid + ')/' + self._stream_type ) ) ) ) )
+			assert_that( res.json_body,
+							has_entry( 'Links',
+									has_item(
+										all_of(
+											has_entry( 'rel', self._stream_type ),
+											has_entry( 'href',
+													   '/dataserver2/users/sjohnson@nextthought.com/Pages(' + self.child_ntiid + ')/' + self._stream_type ) ) ) ) )
 
 
 class TestApplicationLibrary(TestApplicationLibraryBase):
@@ -180,9 +190,12 @@ class TestApplicationLibrary(TestApplicationLibraryBase):
 		# Unauth gets nothing
 		testapp.get( '/dataserver2/NTIIDs/' + self.child_ntiid, status=401 )
 
-		res = testapp.get( '/dataserver2/NTIIDs/' + self.child_ntiid, extra_environ=self._make_extra_environ() )
+		res = testapp.get( '/dataserver2/NTIIDs/' + self.child_ntiid,
+						   headers={'accept':str('text/html')},
+						   extra_environ=self._make_extra_environ() )
 		assert_that( res.status_int, is_( 303 ) )
-		assert_that( res.headers, has_entry( 'Location', 'http://localhost/prealgebra/sect_0002.html' ) )
+		assert_that( res.headers, has_entry( 'Location',
+											 'http://localhost/prealgebra/sect_0002.html' ) )
 
 	@WithSharedApplicationMockDS
 	def test_library_redirect_with_fragment(self):
@@ -191,12 +204,14 @@ class TestApplicationLibrary(TestApplicationLibraryBase):
 
 		testapp = TestApp( self.app )
 
-
 		fragment = "#fragment"
 		ntiid = self.child_ntiid + fragment
-		res = testapp.get( '/dataserver2/NTIIDs/' + ntiid, extra_environ=self._make_extra_environ() )
+		res = testapp.get( '/dataserver2/NTIIDs/' + ntiid,
+						   headers={'accept':str('text/html')},
+						   extra_environ=self._make_extra_environ() )
 		assert_that( res.status_int, is_( 303 ) )
-		assert_that( res.headers, has_entry( 'Location', 'http://localhost/prealgebra/sect_0002.html' ) )
+		assert_that( res.headers, has_entry( 'Location',
+											'http://localhost/prealgebra/sect_0002.html' ) )
 
 	@WithSharedApplicationMockDS
 	def test_library_accept_link(self):
