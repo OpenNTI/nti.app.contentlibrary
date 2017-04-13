@@ -181,7 +181,6 @@ class _RenderableContentUnitGetView(GenericGetView):
 class _RenderableContentPackageGetView(GenericGetView):
     pass
 
-
 @view_config(name='')
 @view_config(name='link+json')
 @view_config(name='pageinfo+json')
