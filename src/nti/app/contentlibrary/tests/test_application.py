@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
+from __future__ import print_function, unicode_literals, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -165,9 +165,9 @@ class TestApplicationLibraryBase(ApplicationLayerTest):
             self._create_user()
         testapp = TestApp(self.app, extra_environ=self._make_extra_environ())
 
-        for accept_type in ('application/json',
-                            'application/vnd.nextthought.pageinfo',
-                            'application/vnd.nextthought.pageinfo+json'):
+        for accept_type in (b'application/json',
+                            b'application/vnd.nextthought.pageinfo',
+                            b'application/vnd.nextthought.pageinfo+json'):
 
             res = testapp.get('/dataserver2/NTIIDs/' + self.child_ntiid,
                               headers={b"Accept": accept_type})
@@ -205,7 +205,7 @@ class TestApplicationLibrary(TestApplicationLibraryBase):
         testapp.get('/dataserver2/NTIIDs/' + self.child_ntiid, status=401)
 
         res = testapp.get('/dataserver2/NTIIDs/' + self.child_ntiid,
-                          headers={b'accept': str('text/html')},
+                          headers={b'accept': b'text/html'},
                           extra_environ=self._make_extra_environ())
         assert_that(res.status_int, is_(303))
         assert_that(res.headers, has_entry('Location',
@@ -221,7 +221,7 @@ class TestApplicationLibrary(TestApplicationLibraryBase):
         fragment = "#fragment"
         ntiid = self.child_ntiid + fragment
         res = testapp.get('/dataserver2/NTIIDs/' + ntiid,
-                          headers={'accept': str('text/html')},
+                          headers={b'accept': b'text/html'},
                           extra_environ=self._make_extra_environ())
         assert_that(res.status_int, is_(303))
         assert_that(res.headers, 
@@ -236,14 +236,14 @@ class TestApplicationLibrary(TestApplicationLibraryBase):
 
         res = testapp.get('/dataserver2/NTIIDs/' + self.child_ntiid,
                           headers={
-                              b"Accept": "application/vnd.nextthought.link+json"},
+                              b"Accept": b"application/vnd.nextthought.link+json"},
                           extra_environ=self._make_extra_environ())
         assert_that(res.status_int, is_(200))
 
-        assert_that(res.content_type, is_(
-            'application/vnd.nextthought.link+json'))
-        assert_that(res.json_body, has_entry(
-            'href', '/prealgebra/sect_0002.html'))
+        assert_that(res.content_type, 
+					is_('application/vnd.nextthought.link+json'))
+        assert_that(res.json_body, 
+					has_entry('href', '/prealgebra/sect_0002.html'))
 
     @WithSharedApplicationMockDS
     def test_directly_set_page_shared_settings_using_field(self):
@@ -256,16 +256,15 @@ class TestApplicationLibrary(TestApplicationLibraryBase):
 
         # Ensure we have modification dates on our _NTIIDEntries
         # so that our trump behaviour works as expected
-        self.config.registry.registerUtility(
-            self._setup_library(lastModified=1000))
-        accept_type = 'application/json'
+        self.config.registry.registerUtility(self._setup_library(lastModified=1000))
+        accept_type = b'application/json'
         testapp = TestApp(self.app)
         # To start with, there is no modification info
         res = testapp.get(str('/dataserver2/Objects/' + self.child_ntiid),
                           headers={b"Accept": accept_type},
                           extra_environ=self._make_extra_environ())
-        assert_that(res.last_modified, is_(
-            datetime.datetime.fromtimestamp(1000, webob.datetime_utils.UTC)))
+        assert_that(res.last_modified, 
+					is_(datetime.datetime.fromtimestamp(1000, webob.datetime_utils.UTC)))
         orig_etag = res.etag
 
         data = json.dumps({"sharedWith": ["a@b"]})
@@ -278,16 +277,16 @@ class TestApplicationLibrary(TestApplicationLibraryBase):
                           extra_environ=self._make_extra_environ())
         assert_that(res.status_int, is_(200))
 
-        assert_that(res.content_type, is_(
-            'application/vnd.nextthought.pageinfo+json'))
-        assert_that(res.content_location, is_(
-            UQ('/dataserver2/Objects/' + self.child_ntiid)))
-        assert_that(res.json_body, has_entry(
-            'MimeType', 'application/vnd.nextthought.pageinfo'))
-        assert_that(res.json_body, has_entry(
-            'sharingPreference', has_entry('sharedWith', ['a@b'])))
-        assert_that(res.json_body, has_entry(
-            'href', '/dataserver2/Objects/' + self.child_ntiid))
+        assert_that(res.content_type, 
+					is_('application/vnd.nextthought.pageinfo+json'))
+        assert_that(res.content_location, 
+					is_(UQ('/dataserver2/Objects/' + self.child_ntiid)))
+        assert_that(res.json_body, 
+					has_entry('MimeType', 'application/vnd.nextthought.pageinfo'))
+        assert_that(res.json_body, 
+					has_entry('sharingPreference', has_entry('sharedWith', ['a@b'])))
+        assert_that(res.json_body, 
+					has_entry('href', '/dataserver2/Objects/' + self.child_ntiid))
         # Now there is modification
         assert_that(res.last_modified, is_(greater_than_or_equal_to(now)))
         last_mod = res.last_modified
@@ -313,6 +312,7 @@ class TestApplicationLibraryNoSlash(TestApplicationLibrary):
 
 
 class TestRootPageEntryLibrary(TestApplicationLibraryBase):
+
     child_ntiid = ntiids.ROOT
     _check_content_link = False
     _stream_type = 'RecursiveStream'
@@ -328,7 +328,7 @@ class TestRootPageEntryLibrary(TestApplicationLibraryBase):
         now = datetime.datetime.now(webob.datetime_utils.UTC)
         now = now.replace(microsecond=0)
 
-        accept_type = 'application/json'
+        accept_type = b'application/json'
         data = json.dumps({"sharedWith": ["a@b"]})
         res = testapp.put(str('/dataserver2/NTIIDs/' + ntiids.ROOT + '/++fields++sharingPreference'),
                           data,
@@ -351,7 +351,7 @@ class TestRootPageEntryLibrary(TestApplicationLibraryBase):
 
         testapp = TestApp(self.app)
         res = testapp.get('/dataserver2/NTIIDs/' + self.child_ntiid,
-                          headers={"Accept": accept_type},
+                          headers={b"Accept": accept_type},
                           extra_environ=self._make_extra_environ())
         assert_that(res.status_int, is_(200))
         assert_that(res.json_body, 
