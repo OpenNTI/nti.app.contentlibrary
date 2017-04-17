@@ -13,6 +13,8 @@ import time
 
 from zope import component
 
+from zope.intid.interfaces import IIntIds
+
 from requests.structures import CaseInsensitiveDict
 
 from pyramid import httpexceptions as hexc
@@ -32,11 +34,13 @@ from nti.app.externalization.error import raise_json_error
 
 from nti.common.string import is_true
 
+from nti.contentlibrary import ALL_CONTENT_MIMETYPES
+
+from nti.contentlibrary.index import get_contentlibrary_catalog
+
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
-
-from nti.contentlibrary import ALL_CONTENT_MIMETYPES
 
 from nti.contentlibrary.utils import get_content_packages
 
@@ -186,3 +190,37 @@ class AllContentPackagesView(AbstractAuthenticatedView,
         self._batch_items_iterable(result, packages)
         result[ITEM_COUNT] = len(result[ITEMS])
         return result
+
+
+@view_config(context=LibraryPathAdapter)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='POST',
+               name="ReindexAllContentPackages",
+               permission=nauth.ACT_NTI_ADMIN)
+class ReindexAllContentPackagesView(AbstractAuthenticatedView):
+
+    @Lazy
+    def _library(self):
+        library = component.queryUtility(IContentPackageLibrary)
+        return library
+
+    def _process_meta(self, package):
+        try:
+            from nti.metadata import queue_add
+            queue_add(package)
+        except ImportError:
+            pass
+
+    def __call__(self):
+        library  = self._library
+        if library is not None:
+            intids = component.getUtility(IIntIds)
+            catalog = get_contentlibrary_catalog()
+            for package in library.contentPackages or ():
+                doc_id = intids.queryId(package)
+                if doc_id is None:
+                    continue
+                catalog.index_doc(doc_id, package)
+                self._process_meta(package)
+        return hexc.HTTPNoContent()
