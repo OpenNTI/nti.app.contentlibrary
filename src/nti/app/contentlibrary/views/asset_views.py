@@ -28,7 +28,6 @@ from nti.app.base.abstract_views import AbstractAuthenticatedView
 from nti.app.contentlibrary.subscribers import can_be_removed
 from nti.app.contentlibrary.subscribers import removed_registered
 from nti.app.contentlibrary.subscribers import clear_content_package_assets
-from nti.app.contentlibrary.subscribers import update_indices_when_content_changes
 
 from nti.app.contentlibrary.utils.common import remove_package_inaccessible_assets
 
@@ -83,10 +82,12 @@ def _read_input(request):
     return result
 
 
-@view_config(context=IContentPackage)
+@view_config(name='assets')
+@view_config(name='GetPresentationAssets')
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
                request_method='GET',
+               context=IContentPackage,
                permission=nauth.ACT_SYNC_LIBRARY,
                name='GetPresentationAssets')
 class GetPackagePresentationAssetsView(AbstractAuthenticatedView):
@@ -157,20 +158,6 @@ class ResetPackagePresentationAssetsView(_AbstractSyncAllLibrariesView):
                         remove_transaction_history(item)
         result[TOTAL] = result[ITEM_COUNT] = len(items)
         return result
-
-
-@view_config(context=IContentPackage)
-@view_defaults(route_name='objects.generic.traversal',
-               renderer='rest',
-               permission=nauth.ACT_SYNC_LIBRARY,
-               name='SyncPresentationAssets')
-class SyncPackagePresentationAssetsView(_AbstractSyncAllLibrariesView):
-
-    def _do_call(self):
-        package = self.context
-        site_name = get_content_package_site(package)
-        with current_site(get_host_site(site_name)):
-            return update_indices_when_content_changes(package)
 
 
 @view_config(context=IDataserverFolder)
