@@ -9,8 +9,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-import six
-
 from requests.structures import CaseInsensitiveDict
 
 from zope import component
@@ -62,13 +60,6 @@ from nti.site.hostpolicy import get_host_site
 ITEMS = StandardExternalFields.ITEMS
 TOTAL = StandardExternalFields.TOTAL
 ITEM_COUNT = StandardExternalFields.ITEM_COUNT
-
-
-def _get_package_ntiids(values):
-    ntiids = values.get('ntiid') or values.get('ntiids')
-    if ntiids and isinstance(ntiids, six.string_types):
-        ntiids = ntiids.split()
-    return ntiids
 
 
 def _read_input(request):
