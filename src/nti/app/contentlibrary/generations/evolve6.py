@@ -14,17 +14,16 @@ generation = 6
 from zope import component
 from zope import interface
 
-from zope.catalog.interfaces import ICatalog
-
 from zope.component.hooks import site
 from zope.component.hooks import setHooks
 
-from nti.contentlibrary.index import CATALOG_INDEX_NAME
+from zope.intid.interfaces import IIntIds
+
+from nti.contenttypes.presentation.index import install_assets_library_catalog
 
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IOIDResolver
 
-OLD_REG_NAME = '++etc++contentlibrary.catalog'
 
 @interface.implementer(IDataserver)
 class MockDataserver(object):
@@ -55,12 +54,9 @@ def do_evolve(context, generation=generation):
                 "Hooks not installed?"
 
         lsm = ds_folder.getSiteManager()
+        intids = lsm.getUtility(IIntIds)
 
-        catalog = lsm.queryUtility(ICatalog, name=OLD_REG_NAME)
-        if catalog is not None:
-            lsm.unregisterUtility(catalog, provided=ICatalog, name=OLD_REG_NAME)
-            lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_INDEX_NAME)
-       
+        install_assets_library_catalog(ds_folder, intids)
         logger.info('Dataserver evolution %s done.', generation)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
@@ -69,6 +65,6 @@ def do_evolve(context, generation=generation):
 
 def evolve(context):
     """
-    Evolve to gen 6 by changing the registration name of the library catalog
+    Evolve to gen 6 by installing the new library asset catalog.
     """
-    do_evolve(context)
+    # do_evolve(context) DON"T Install YET
