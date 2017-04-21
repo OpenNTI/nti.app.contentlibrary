@@ -55,11 +55,11 @@ def do_evolve(context, generation=generation):
                 "Hooks not installed?"
 
         lsm = ds_folder.getSiteManager()
-
         catalog = lsm.queryUtility(ICatalog, name=OLD_REG_NAME)
         if catalog is not None:
-            lsm.unregisterUtility(catalog, provided=ICatalog, name=OLD_REG_NAME)
+            lsm.unregisterUtility(provided=ICatalog, name=OLD_REG_NAME)
             lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_INDEX_NAME)
+            catalog.__name__ = CATALOG_INDEX_NAME
        
         logger.info('Dataserver evolution %s done.', generation)
 
