@@ -18,6 +18,8 @@ from requests.structures import CaseInsensitiveDict
 from zope import component
 from zope import lifecycleevent
 
+from zope.cachedescriptors.property import Lazy
+
 from zope.component.hooks import site as current_site
 
 from zope.file.download import getHeaders

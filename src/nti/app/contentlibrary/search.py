@@ -12,6 +12,8 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import Lazy
+
 from pyramid.threadlocal import get_current_request
 
 from nti.appserver.pyramid_authorization import has_permission
@@ -39,8 +41,6 @@ from nti.ntiids.ntiids import ROOT
 from nti.ntiids.ntiids import TYPE_OID
 from nti.ntiids.ntiids import is_ntiid_of_type
 from nti.ntiids.ntiids import find_object_with_ntiid
-
-from nti.property.property import Lazy
 
 CONTAINER_ID = StandardExternalFields.CONTAINER_ID
 

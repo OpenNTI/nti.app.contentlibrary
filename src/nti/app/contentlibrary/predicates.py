@@ -13,6 +13,8 @@ from functools import partial
 
 from zope import component
 
+from zope.cachedescriptors.property import Lazy
+
 from zope.intid.interfaces import IIntIds
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -22,8 +24,6 @@ from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import ISystemUserPrincipal
 
 from nti.metadata.predicates import BasePrincipalObjects
-
-from nti.property.property import Lazy
 
 from nti.site.hostpolicy import run_job_in_all_host_sites
 

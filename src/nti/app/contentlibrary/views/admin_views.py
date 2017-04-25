@@ -13,6 +13,8 @@ import time
 
 from zope import component
 
+from zope.cachedescriptors.property import Lazy
+
 from zope.intid.interfaces import IIntIds
 
 from requests.structures import CaseInsensitiveDict
@@ -52,8 +54,6 @@ from nti.externalization.externalization import StandardExternalFields
 from nti.externalization.interfaces import LocatedExternalDict
 
 from nti.links.links import Link
-
-from nti.property.property import Lazy
 
 CLASS = StandardExternalFields.CLASS
 ITEMS = StandardExternalFields.ITEMS

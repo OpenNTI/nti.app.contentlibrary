@@ -14,6 +14,8 @@ import hashlib
 
 from zope import component
 
+from zope.cachedescriptors.property import Lazy
+
 from zope.component import hooks
 
 from zope.traversing.interfaces import IEtcNamespace
@@ -25,8 +27,6 @@ from nti.appserver.pyramid_authorization import is_readable
 from nti.contentlibrary.interfaces import INoAutoSync
 
 from nti.dataserver.interfaces import IMemcacheClient
-
-from nti.property.property import Lazy
 
 #: Default memcached expiration time in secs
 EXP_TIME = 86400

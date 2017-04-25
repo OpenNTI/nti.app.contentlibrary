@@ -27,6 +27,8 @@ except ImportError:
 from zope import component
 from zope import exceptions
 
+from zope.cachedescriptors.property import Lazy
+
 from zope.component.hooks import site as current_site
 
 from zope.security.management import endInteraction
@@ -75,8 +77,6 @@ from nti.dataserver.interfaces import IDataserverFolder
 from nti.dataserver.authorization import ACT_SYNC_LIBRARY
 
 from nti.externalization.interfaces import LocatedExternalDict
-
-from nti.property.property import Lazy
 
 from nti.site.hostpolicy import get_host_site
 

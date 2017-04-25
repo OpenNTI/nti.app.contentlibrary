@@ -13,6 +13,8 @@ from urllib import unquote
 
 from zope import interface
 
+from zope.cachedescriptors.property import Lazy
+
 from zope.container.contained import Contained
 
 from zope.traversing.interfaces import IPathAdapter
@@ -39,8 +41,6 @@ from nti.dataserver.interfaces import ALL_PERMISSIONS
 from nti.dataserver.interfaces import EVERYONE_GROUP_NAME
 
 from nti.ntiids.ntiids import find_object_with_ntiid
-
-from nti.property.property import Lazy
 
 
 @interface.implementer(IPathAdapter)
