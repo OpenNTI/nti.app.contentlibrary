@@ -77,8 +77,6 @@ from nti.externalization.externalization import StandardExternalFields
 
 from nti.links.links import Link
 
-from nti.property.property import Lazy
-
 from nti.recorder.interfaces import TRX_TYPE_CREATE
 
 from nti.recorder.interfaces import IRecordable
