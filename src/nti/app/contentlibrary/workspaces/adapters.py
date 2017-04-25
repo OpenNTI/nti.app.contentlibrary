@@ -16,6 +16,8 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import CachedProperty
+
 from zope.container.interfaces import IContained
 
 from zope.proxy.decorator import ProxyBase
@@ -34,7 +36,6 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.property.property import alias
-from nti.property.property import CachedProperty
 
 
 class _PermissionedContentPackageLibrary(ProxyBase,
