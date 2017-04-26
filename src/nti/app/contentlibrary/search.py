@@ -29,8 +29,6 @@ from nti.contentsearch.interfaces import ISearchPackageResolver
 
 from nti.contentsearch.predicates import DefaultSearchHitPredicate
 
-from nti.coremetadata.interfaces import IPublishable
-
 from nti.dataserver.authorization import ACT_READ
 
 from nti.externalization.interfaces import StandardExternalFields
@@ -41,6 +39,8 @@ from nti.ntiids.ntiids import ROOT
 from nti.ntiids.ntiids import TYPE_OID
 from nti.ntiids.ntiids import is_ntiid_of_type
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.publishing.interfaces import IPublishable
 
 CONTAINER_ID = StandardExternalFields.CONTAINER_ID
 

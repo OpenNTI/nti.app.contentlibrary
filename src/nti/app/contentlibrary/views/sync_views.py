@@ -69,14 +69,14 @@ from nti.contentlibrary.synchronize import ContentPackageSyncResults
 
 from nti.contentlibrary.utils import get_content_package_site
 
-from nti.coremetadata.interfaces import IPublishable
-
 from nti.dataserver.interfaces import IRedisClient
 from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.dataserver.authorization import ACT_SYNC_LIBRARY
 
 from nti.externalization.interfaces import LocatedExternalDict
+
+from nti.publishing.interfaces import IPublishable
 
 from nti.site.hostpolicy import get_host_site
 
