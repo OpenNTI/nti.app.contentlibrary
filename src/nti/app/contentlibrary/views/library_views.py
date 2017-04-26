@@ -84,7 +84,6 @@ from nti.dataserver.contenttypes.forums.interfaces import IPersonalBlog
 
 from nti.dataserver.interfaces import IHighlight
 from nti.dataserver.interfaces import IDataserver
-from nti.dataserver.interfaces import IPublishable
 from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.recorder.interfaces import TRX_TYPE_CREATE
@@ -104,6 +103,8 @@ from nti.mimetype.mimetype import nti_mimetype_with_class
 from nti.ntiids.ntiids import ROOT
 from nti.ntiids.ntiids import is_valid_ntiid_string
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.publishing.interfaces import IPublishable
 
 from nti.traversal.traversal import find_interface
 
