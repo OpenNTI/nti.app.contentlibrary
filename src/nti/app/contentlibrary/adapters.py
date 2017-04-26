@@ -179,7 +179,8 @@ from persistent.mapping import PersistentMapping
 deprecated('_PresentationAssetContainer', 'no longer used')
 class _PresentationAssetContainer(PersistentMapping,
                                   PersistentCreatedAndModifiedTimeObject):
-    pass
+    def assets(self):
+        return ()
 
 
 @interface.implementer(IPresentationAssetContainer, IContained)
