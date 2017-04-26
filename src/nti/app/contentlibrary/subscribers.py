@@ -62,8 +62,6 @@ from nti.contenttypes.presentation.utils import create_ntivideo_from_external
 from nti.contenttypes.presentation.utils import create_timelime_from_external
 from nti.contenttypes.presentation.utils import create_relatedwork_from_external
 
-from nti.coremetadata.interfaces import IObjectUnpublishedEvent
-
 from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import ACT_UPDATE
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
@@ -75,6 +73,8 @@ from nti.intid.common import addIntId
 from nti.intid.common import removeIntId
 
 from nti.ntiids.ntiids import is_valid_ntiid_string
+
+from nti.publishing.interfaces import IObjectUnpublishedEvent
 
 from nti.recorder.interfaces import IRecordable
 
