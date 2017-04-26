@@ -114,7 +114,7 @@ from nti.dataserver import users
 
 from nti.dataserver.contenttypes.forums.topic import GeneralHeadlineTopic
 
-from nti.dataserver.interfaces import IDefaultPublished
+from nti.publishing.interfaces import IDefaultPublished
 
 
 @interface.implementer(IContentHeadlineTopic)
