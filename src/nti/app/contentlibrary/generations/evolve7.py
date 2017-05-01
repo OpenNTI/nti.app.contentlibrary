@@ -9,7 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-generation = 6
+generation = 7
 
 from zope import component
 from zope import interface
@@ -19,13 +19,11 @@ from zope.component.hooks import setHooks
 
 from zope.intid.interfaces import IIntIds
 
-from nti.contentlibrary.index import install_library_catalog
+from nti.contenttypes.presentation.index import install_assets_library_catalog
 
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IOIDResolver
 
-IX_CREATEDTIME = 'createdTime'
-IX_LASTMODIFIED = 'lastModified'
 
 @interface.implementer(IDataserver)
 class MockDataserver(object):
@@ -58,14 +56,7 @@ def do_evolve(context, generation=generation):
         lsm = ds_folder.getSiteManager()
         intids = lsm.getUtility(IIntIds)
 
-        catalog = install_library_catalog(ds_folder, intids)
-        for name in (IX_CREATEDTIME, IX_LASTMODIFIED):
-            if name in catalog:
-                index = catalog[name]
-                intids.unregister(index)
-                del catalog[name]
-                index.__parent__ = None
-
+        install_assets_library_catalog(ds_folder, intids)
         logger.info('Dataserver evolution %s done.', generation)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
@@ -74,6 +65,6 @@ def do_evolve(context, generation=generation):
 
 def evolve(context):
     """
-    Evolve to gen 6 by removing lastMod, createdTime indexes from library catalog
+    Evolve to gen 7 by installing the new library asset catalog.
     """
-    do_evolve(context)
+    # do_evolve(context) DON"T Install YET
