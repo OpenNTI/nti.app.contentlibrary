@@ -62,6 +62,7 @@ def do_evolve(context, generation=generation):
         for name in (IX_CREATEDTIME, IX_LASTMODIFIED):
             if name in catalog:
                 index = catalog[name]
+                index.index.clear()
                 intids.unregister(index)
                 del catalog[name]
                 index.__parent__ = None
