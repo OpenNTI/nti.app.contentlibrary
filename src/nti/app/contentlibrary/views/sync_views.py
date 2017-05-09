@@ -154,7 +154,8 @@ class _SetSyncLockView(AbstractAuthenticatedView):
                          hexc.HTTPLocked,
                          {
                              'message': _('Sync in progress'),
-                             'code': 'Exception'},
+                             'code': 'Exception'
+                         },
                          None)
 
     def __call__(self):
@@ -225,7 +226,7 @@ class _AbstractSyncAllLibrariesView(_SetSyncLockView,
         try:
             logger.info('Starting sync %s', self._txn_id())
             return self._do_call()
-        except Exception as e: # FIXME: Way too broad an exception
+        except Exception as e:  # FIXME: Way too broad an exception
             logger.exception("Failed to Sync %s", self._txn_id())
             exc_type, exc_value, exc_traceback = sys.exc_info()
             result = LocatedExternalDict()
@@ -385,6 +386,7 @@ class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
                              hexc.HTTPUnprocessableEntity,
                              {
                                  'message': _('Content has not been published'),
-                                 'code': 'Exception'},
+                                 'code': 'Exception'
+                             },
                              None)
         return self._process_package(package)
