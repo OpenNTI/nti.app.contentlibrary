@@ -205,12 +205,28 @@ class _AbstractSyncAllLibrariesView(_SetSyncLockView,
 
     def __call__(self):
         logger.info('Acquiring sync lock')
+        # Unfortunately, zope.dublincore includes a global subscriber registration
+        # (zope.dublincore.creatorannotator.CreatorAnnotator)
+        # that will update the `creators` property of IZopeDublinCore to include
+        # the current principal when any ObjectCreated /or/ ObjectModified event
+        # is fired, if there is a current interaction. Normally we want this,
+        # but here we care specifically about getting the dublincore metadata
+        # we specifically defined in the libraries, and not the requesting principal.
+        # Our simple-minded approach is to simply void the interaction during this process
+        # (which works so long as zope.securitypolicy doesn't get involved...)
+        # This is somewhat difficult to test the side-effects of, sadly.
+
+        # JZ - 8.2015 - Disabling interaction also prevents stream changes
+        # from being broadcast (specifically topic creations). We've seen such
+        # changes end up causing conflict issues when managing sessions. These
+        # retries cause syncs to take much longer to perform.
         endInteraction()
         lock = self.acquire()
         try:
             logger.info('Starting sync %s', self._txn_id())
             return self._do_call()
-        except Exception as e:
+        except Exception as e: # FIXME: Way too broad an exception
+            logger.exception("Failed to Sync %s", self._txn_id())
             exc_type, exc_value, exc_traceback = sys.exc_info()
             result = LocatedExternalDict()
             result['message'] = str(e)
@@ -220,7 +236,7 @@ class _AbstractSyncAllLibrariesView(_SetSyncLockView,
                                                                    exc_traceback,
                                                                    with_filenames=True))
             raise_json_error(self.request,
-                             hexc.HTTPServerError,
+                             hexc.HTTPUnprocessableEntity,
                              result,
                              exc_traceback)
         finally:
@@ -246,54 +262,19 @@ class _SyncContentPackagesMixin(_AbstractSyncAllLibrariesView):
         now = time.time()
         result = LocatedExternalDict()
         result['Transaction'] = self._txn_id()
-        try:
-            params, results = self._executable(sleep=self._SLEEP,
-                                               site=site,
-                                               *args,
-                                               **kwargs)
-            result['Params'] = params
-            result['Results'] = results
-            result['SyncTime'] = time.time() - now
-        except Exception as e:  # FIXME: Way too broad an exception
-            logger.exception("Failed to Sync %s", self._txn_id())
-
-            transaction.doom()  # cancel changes
-
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            result['code'] = e.__class__.__name__
-            result['message'] = str(e)
-            # XXX: No, we should not expose the traceback over the web. Ever,
-            # unless the exception catching middleware is installed, which is only
-            # in devmode.
-            result['traceback'] = repr(exceptions.format_exception(exc_type,
-                                                                   exc_value,
-                                                                   exc_traceback,
-                                                                   with_filenames=True))
-            raise_json_error(self.request,
-                             hexc.HTTPUnprocessableEntity,
-                             result,
-                             exc_traceback)
+        params, results = self._executable(sleep=self._SLEEP,
+                                           site=site,
+                                           *args,
+                                           **kwargs)
+        result['Params'] = params
+        result['Results'] = results
+        result['SyncTime'] = time.time() - now
         return result
 
     def _do_call(self):
         values = self.readInput()
         # parse params
         site = values.get('site')
-        # Unfortunately, zope.dublincore includes a global subscriber registration
-        # (zope.dublincore.creatorannotator.CreatorAnnotator)
-        # that will update the `creators` property of IZopeDublinCore to include
-        # the current principal when any ObjectCreated /or/ ObjectModified event
-        # is fired, if there is a current interaction. Normally we want this,
-        # but here we care specifically about getting the dublincore metadata
-        # we specifically defined in the libraries, and not the requesting principal.
-        # Our simple-minded approach is to simply void the interaction during this process
-        # (which works so long as zope.securitypolicy doesn't get involved...)
-        # This is somewhat difficult to test the side-effects of, sadly.
-
-        # JZ - 8.2015 - Disabling interaction also prevents stream changes
-        # from being broadcast (specifically topic creations). We've seen such
-        # changes end up causing conflict issues when managing sessions. These
-        # retries cause syncs to take much longer to perform.
         return self._do_sync(site=site)
 
 
