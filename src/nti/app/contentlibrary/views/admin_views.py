@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -14,6 +14,8 @@ import time
 from zope import component
 
 from zope.cachedescriptors.property import Lazy
+
+from zope.component.hooks import site as current_site
 
 from zope.intid.interfaces import IIntIds
 
@@ -38,6 +40,7 @@ from nti.common.string import is_true
 
 from nti.contentlibrary import ALL_CONTENT_MIMETYPES
 
+from nti.contentlibrary.index import create_library_catalog
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
 from nti.contentlibrary.interfaces import IContentPackage
@@ -55,6 +58,8 @@ from nti.externalization.interfaces import LocatedExternalDict
 
 from nti.links.links import Link
 
+from nti.site.hostpolicy import get_all_host_sites
+
 CLASS = StandardExternalFields.CLASS
 ITEMS = StandardExternalFields.ITEMS
 LINKS = StandardExternalFields.LINKS
@@ -71,8 +76,7 @@ ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 class ContentPackageDeleteView(AbstractAuthenticatedView):
 
     CONFIRM_CODE = 'ContentPackageDelete'
-    CONFIRM_MSG = _(
-        'This content has associations. Are you sure you want to delete?')
+    CONFIRM_MSG = _('This content has associations. Are you sure you want to delete?')
 
     @Lazy
     def _library(self):
@@ -213,7 +217,7 @@ class ReindexAllContentPackagesView(AbstractAuthenticatedView):
             pass
 
     def __call__(self):
-        library  = self._library
+        library = self._library
         if library is not None:
             intids = component.getUtility(IIntIds)
             catalog = get_contentlibrary_catalog()
@@ -224,3 +228,40 @@ class ReindexAllContentPackagesView(AbstractAuthenticatedView):
                 catalog.index_doc(doc_id, package)
                 self._process_meta(package)
         return hexc.HTTPNoContent()
+
+
+@view_config(context=LibraryPathAdapter)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='POST',
+               name="RebuildContentLibraryCatalog",
+               permission=nauth.ACT_NTI_ADMIN)
+class RebuildContentPackageCatalogView(AbstractAuthenticatedView):
+
+    def __call__(self):
+        intids = component.getUtility(IIntIds)
+        # remove indexes
+        catalog = get_contentlibrary_catalog()
+        for name, index in list(catalog.items()):
+            intids.unregister(index)
+            del catalog[name]
+        # recreate indexes
+        catalog = create_library_catalog(catalog=catalog, family=intids.family)
+        for index in catalog.values():
+            intids.register(index)
+        # reindex
+        seen = set()
+        for host_site in get_all_host_sites():  # check all sites
+            logger.info("Processing site %s", host_site.__name__)
+            with current_site(host_site):
+                library = component.queryUtility(IContentPackageLibrary)
+                pacakges = library.contentPackages if library else ()
+                for pacakge in pacakges:
+                    doc_id = intids.queryId(pacakge)
+                    if doc_id is None or doc_id in seen:
+                        continue
+                    seen.add(doc_id)
+                    catalog.index_doc(doc_id, pacakge)
+        result = LocatedExternalDict()
+        result[ITEM_COUNT] = result[TOTAL] = len(seen)
+        return result
