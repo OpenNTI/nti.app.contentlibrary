@@ -33,7 +33,7 @@ class MockDataserver(object):
     def get_by_oid(self, oid, ignore_creator=False):
         resolver = component.queryUtility(IOIDResolver)
         if resolver is None:
-            logger.warn("sing dataserver without a proper ISiteManager.")
+            logger.warn("Using dataserver without a proper ISiteManager.")
         else:
             return resolver.get_object_by_oid(oid, ignore_creator=ignore_creator)
         return None
