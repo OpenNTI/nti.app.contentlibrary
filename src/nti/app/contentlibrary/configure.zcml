@@ -208,10 +208,10 @@
 	<!-- Metadata -->
 	<configure zcml:condition="installed nti.metadata">
 		<subscriber	factory=".predicates._SystemContentPackages"
-					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
+					provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
 
 		<subscriber	factory=".predicates._UserContentPackages"
-					provides="nti.dataserver.interfaces.IPrincipalMetadataObjects" />
+					provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
 	</configure>
 
 </configure>

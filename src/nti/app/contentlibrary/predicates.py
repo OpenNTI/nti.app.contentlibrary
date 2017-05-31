@@ -23,7 +23,7 @@ from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import ISystemUserPrincipal
 
-from nti.metadata.predicates import BasePrincipalObjects
+from nti.dataserver.metadata.predicates import BasePrincipalObjects
 
 from nti.site.hostpolicy import run_job_in_all_host_sites
 
