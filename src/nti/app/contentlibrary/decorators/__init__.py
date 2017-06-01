@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 
 __docformat__ = "restructuredtext en"
 
@@ -48,7 +48,6 @@ class AbstractLibraryPathLinkDecorator(object):
 def get_ds2(request=None):
     request = request if request else get_current_request()
     try:
-        # e.g. /dataserver2
         result = request.path_info_peek() if request else None
     except AttributeError:  # in unit test we may see this
         result = None
