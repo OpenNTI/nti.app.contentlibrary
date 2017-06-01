@@ -143,6 +143,10 @@ def _create_page_info(request, href, ntiid, last_modified=0, jsonp_href=None):
         info.extra_links = info.extra_links + (link,)  # TODO: The rel?
 
     info.contentUnit = request.context
+    package = find_interface(info.contentUnit, IContentPackage, strict=False)
+    if package is not None:
+        link = Link(package, rel='package')
+        info.extra_links = info.extra_links + (link,) 
     if last_modified:
         # FIXME: Need to take into account the assessment item times as well
         # This is probably not huge, because right now they both change at the
