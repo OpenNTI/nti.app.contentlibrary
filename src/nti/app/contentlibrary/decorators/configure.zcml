@@ -1,7 +1,6 @@
 <!-- -*- mode: nxml -*- -->
 <configure	xmlns="http://namespaces.zope.org/zope"
 			xmlns:i18n="http://namespaces.zope.org/i18n"
-			xmlns:ext="http://nextthought.com/ntp/ext"
 			xmlns:zcml="http://namespaces.zope.org/zcml">
 
 	<subscriber factory=".ipad._IPad120BundleContentPackagesAdjuster"
@@ -21,16 +20,6 @@
 	<subscriber factory=".userdata._UGDLibraryPathLinkDecorator"
 				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
 
-	<subscriber factory=".contentunit._ContentUnitInfoDecorator"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-				for="..interfaces.IContentUnitInfo
-					 pyramid.interfaces.IRequest"/>
-
-	<subscriber factory=".contentunit._ContentUnitInfoTitleDecorator"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-				for="..interfaces.IContentUnitInfo
-					 pyramid.interfaces.IRequest"/>
-
 	<subscriber factory=".contentunit._ContentBundlePagesLinkDecorator"
 				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
 
@@ -49,4 +38,9 @@
                 for="nti.app.contentlibrary.interfaces.IContentUnitContents
                      pyramid.interfaces.IRequest"/>
 
+	<subscriber factory=".pageinfo._ContentUnitInfoDecorator"
+				provides="nti.externalization.interfaces.IExternalMappingDecorator"
+				for="..interfaces.IContentUnitInfo
+					 pyramid.interfaces.IRequest" />
+					 
 </configure>
