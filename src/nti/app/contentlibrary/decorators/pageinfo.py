@@ -47,7 +47,7 @@ class _ContentUnitInfoDecorator(AbstractAuthenticatedRequestAwareDecorator):
         package = find_interface(unit, IContentPackage, strict=False)
         if package is not None:
             try:
-                mapper = IContentUnitHrefMapper(package.key, None)
+                mapper = IContentUnitHrefMapper(package.key.bucket, None)
                 if mapper is not None:
                     result['ContentPackageROOT'] = mapper.href
             except AttributeError:

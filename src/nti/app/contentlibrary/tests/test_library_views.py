@@ -107,9 +107,16 @@ class TestApplicationContent(ApplicationLayerTest):
 
 		res = self.testapp.get(href,
 							   headers={b"Accept": b'application/json' })
-
+		
 		href = self.require_link_href_with_rel(res.json_body, 'content')
 		assert_that( href, is_('/TestFilesystem/tag_nextthought_com_2011-10_USSC-HTML-Cohen_18.html#22') )
+		
+		self.require_link_href_with_rel(res.json_body, 'package')
+		assert_that(res.json_body, 
+					has_entry('ContentPackageNTIID', 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'))
+	
+		assert_that(res.json_body, 
+					has_entry('ContentPackageROOT', '/TestFilesystem/'))
 
 from hamcrest import contains
 
