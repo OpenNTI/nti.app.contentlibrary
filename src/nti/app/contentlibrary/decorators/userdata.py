@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -15,6 +15,8 @@ from zope import interface
 from zope.location.interfaces import ILocation
 
 from nti.app.contentlibrary import LIBRARY_PATH_GET_VIEW
+
+from nti.app.contentlibrary.decorators import get_ds2
 
 from nti.dataserver.interfaces import IHighlight
 
@@ -54,7 +56,7 @@ class _UGDLibraryPathLinkDecorator(object):
             external_ntiid = to_external_ntiid_oid(context)
 
         if external_ntiid is not None:
-            path = '/dataserver2/%s' % LIBRARY_PATH_GET_VIEW
+            path = '/%s/%s' % (get_ds2(), LIBRARY_PATH_GET_VIEW)
             link = Link(path,
                         rel=LIBRARY_PATH_GET_VIEW,
                         method='GET',
