@@ -123,7 +123,7 @@ class TestApplicationContent(ApplicationLayerTest):
         href = '/dataserver2/NTIIDs/tag:nextthought.com,2011-10:USSC-HTML-Cohen.22'
 
         res = self.testapp.get(href,
-                               headers={b"Accept": b'application/json'})
+                               headers={"Accept": 'application/json'})
 
         href = self.require_link_href_with_rel(res.json_body, 'content')
         assert_that(href, 
@@ -134,7 +134,7 @@ class TestApplicationContent(ApplicationLayerTest):
                     has_entry('ContentPackageNTIID', 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'))
 
         assert_that(res.json_body,
-                    has_entry('ContentPackageROOT', '/TestFilesystem/'))
+                    has_entry('RootURL', '/TestFilesystem/'))
 
 
 class TestApplicationBundles(ApplicationLayerTest):

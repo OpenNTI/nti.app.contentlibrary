@@ -49,7 +49,7 @@ class _ContentUnitInfoDecorator(AbstractAuthenticatedRequestAwareDecorator):
             try:
                 mapper = IContentUnitHrefMapper(package.key.bucket, None)
                 if mapper is not None:
-                    result['ContentPackageROOT'] = mapper.href
+                    result['RootURL'] = mapper.href
             except AttributeError:
                 pass
 
