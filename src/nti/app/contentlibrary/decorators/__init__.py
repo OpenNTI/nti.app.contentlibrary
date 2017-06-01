@@ -52,5 +52,5 @@ def get_ds2(request=None):
         result = request.path_info_peek() if request else None
     except AttributeError:  # in unit test we may see this
         result = None
-    return result or u"dataserver2"
+    return result or "dataserver2"
 get_path_info = get_ds2
