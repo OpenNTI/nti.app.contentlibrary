@@ -45,7 +45,7 @@ from nti.contenttypes.presentation.interfaces import INTIRelatedWorkRef
 from nti.contenttypes.presentation.utils import create_object_from_external
 from nti.contenttypes.presentation.utils import create_ntivideo_from_external
 from nti.contenttypes.presentation.utils import create_ntitimelime_from_external
-from nti.contenttypes.presentation.utils import create_relatedwork_from_external
+from nti.contenttypes.presentation.utils import create_relatedworkref_from_external
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
@@ -214,7 +214,7 @@ class TestSubscribers(ApplicationLayerTest):
 	def test_related_content_index(self, mock_sites):
 		mock_sites.is_callable().returns(None)
 		self._test_feed('related_content_index.json', INTIRelatedWorkRef, 372,
-						create_relatedwork_from_external)
+						create_relatedworkref_from_external)
 
 	@WithMockDSTrans
 	@fudge.patch('nti.app.contentlibrary.subscribers.get_component_hierarchy_names')

@@ -60,7 +60,7 @@ from nti.contenttypes.presentation.utils import create_object_from_external
 from nti.contenttypes.presentation.utils import create_ntiaudio_from_external
 from nti.contenttypes.presentation.utils import create_ntivideo_from_external
 from nti.contenttypes.presentation.utils import create_ntitimelime_from_external
-from nti.contenttypes.presentation.utils import create_relatedwork_from_external
+from nti.contenttypes.presentation.utils import create_relatedworkref_from_external
 
 from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import ACT_UPDATE
@@ -95,7 +95,7 @@ INDICES = (
     ('video_index.json', INTIVideo, create_ntivideo_from_external),
     ('slidedeck_index.json', INTISlideDeck, create_object_from_external),
 	('timeline_index.json', INTITimeline, create_ntitimelime_from_external),
-    ('related_content_index.json', INTIRelatedWorkRef, create_relatedwork_from_external)
+    ('related_content_index.json', INTIRelatedWorkRef, create_relatedworkref_from_external)
 )
 
 
