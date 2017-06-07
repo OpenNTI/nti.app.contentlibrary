@@ -7,7 +7,7 @@ functionality for items in the content library.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -30,10 +30,10 @@ def ContentMetadataFromContentUnit(content_unit):
     # TODO: Is this the right level at which to externalize the hrefs?
     mapper = IContentUnitHrefMapper(content_unit, None)
     contentLocation = mapper.href if mapper is not None else None
-    result = ContentMetadata(title=content_unit.title,
-                             description=content_unit.description,
+    result = ContentMetadata(mimeType=u'text/html',
+                             title=content_unit.title,
                              contentLocation=contentLocation,
-                             mimeType='text/html')
+                             description=content_unit.description,)
     result.__name__ = '@@metadata'
     result.__parent__ = content_unit  # for ACL
 
