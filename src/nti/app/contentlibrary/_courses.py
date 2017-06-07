@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -32,7 +32,7 @@ from nti.contenttypes.courses.utils import get_courses_for_packages
 from nti.traversal.traversal import find_interface
 
 
-def _on_operation_on_scope_membership(record, event):
+def _on_operation_on_scope_membership(record, unused_event):
     principal = record.Principal
     if principal is not None:
         pid = IPrincipal(principal).id
