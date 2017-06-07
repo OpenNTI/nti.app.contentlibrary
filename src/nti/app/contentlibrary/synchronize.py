@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -36,7 +36,7 @@ from nti.site.hostpolicy import synchronize_host_policies
 
 def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True):
     results = SynchronizationResults()
-    params = SynchronizationParams(ntiids=ntiids or (), 
+    params = SynchronizationParams(ntiids=ntiids or (),
                                    allowRemoval=allowRemoval)
 
     # notify
@@ -99,4 +99,4 @@ def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True):
 
 def syncContentPackages(sleep=None, allowRemoval=True, site=None, ntiids=()):
     return _do_synchronize(sleep, site, ntiids, allowRemoval)
-synchronize = syncContentPackages
+synchronize = sync_content_packages = syncContentPackages

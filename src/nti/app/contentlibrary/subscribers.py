@@ -144,7 +144,6 @@ def _was_utility_registered(item, item_iface, ntiid, registry=None):
 def _load_and_register_items(item_iterface,
                              items,
                              registry=None,
-                             content_package=None,
                              external_object_creator=create_object_from_external):
     result = []
     registry = get_site_registry(registry)
@@ -158,14 +157,12 @@ def _load_and_register_items(item_iterface,
 def _load_and_register_json(item_iterface,
                             jtext,
                             registry=None,
-                            content_package=None,
                             external_object_creator=create_object_from_external):
     index = simplejson.loads(prepare_json_text(jtext))
     items = index.get(ITEMS) or {}
     result = _load_and_register_items(item_iterface,
                                       items,
                                       registry=registry,
-                                      content_package=content_package,
                                       external_object_creator=external_object_creator)
     return result
 
@@ -187,7 +184,6 @@ def _canonicalize(items, item_iface, registry):
 
 def _load_and_register_slidedeck_json(jtext,
                                       registry=None,
-                                      content_package=None,
                                       object_creator=create_object_from_external):
     result = []
     registry = get_site_registry(registry)
@@ -463,13 +459,11 @@ def _update_index_when_content_changes(content_package,
 
         added = _load_and_register_slidedeck_json(index_text,
                                                   registry=registry,
-                                                  object_creator=object_creator,
-                                                  content_package=content_package)
+                                                  object_creator=object_creator)
     elif object_creator is not None:
         added = _load_and_register_json(item_iface,
                                         index_text,
                                         registry=registry,
-                                        content_package=content_package,
                                         external_object_creator=object_creator)
     registered_count = len(added)
     removed_count = len(removed)
