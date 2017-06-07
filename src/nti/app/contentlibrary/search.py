@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -55,7 +55,7 @@ class _DefaultSearchPacakgeResolver(object):
     def __init__(self, *args):
         pass
 
-    def resolve(self, user, ntiid=None):
+    def resolve(self, unused_user, ntiid=None):
         result = ()
         if ntiid != ROOT:
             if bool(is_ntiid_of_type(ntiid, TYPE_OID)):
@@ -97,11 +97,11 @@ class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
     def request(self):
         return get_current_request()
 
-    def allow(self, item, score, query):
+    def allow(self, item, unused_score, unused_query):
         if self.principal is None:
             return True
-        return  is_published(item) \
-            and has_permission(ACT_READ, item, self.request)
+        return is_published(item) \
+           and has_permission(ACT_READ, item, self.request)
 
 
 @component.adapter(IContentUnitSearchHit)
