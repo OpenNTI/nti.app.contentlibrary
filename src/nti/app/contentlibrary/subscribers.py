@@ -88,13 +88,14 @@ from nti.site.site import get_component_hierarchy_names
 from nti.site.utils import registerUtility
 from nti.site.utils import unregisterUtility
 
+NTIID = StandardExternalFields.NTIID
 ITEMS = StandardExternalFields.ITEMS
 
 INDICES = (
     ('audio_index.json', INTIAudio, create_ntiaudio_from_external),
     ('video_index.json', INTIVideo, create_ntivideo_from_external),
     ('slidedeck_index.json', INTISlideDeck, create_object_from_external),
-	('timeline_index.json', INTITimeline, create_ntitimeline_from_external),
+    ('timeline_index.json', INTITimeline, create_ntitimeline_from_external),
     ('related_content_index.json', INTIRelatedWorkRef, create_relatedworkref_from_external)
 )
 
@@ -141,6 +142,19 @@ def _was_utility_registered(item, item_iface, ntiid, registry=None):
     return result
 
 
+def _load_and_register_item(item_iterface,
+                            ntiid,
+                            ext_obj,
+                            registry=None,
+                            external_object_creator=create_object_from_external):
+    result = None
+    registry = get_site_registry(registry)
+    internal = external_object_creator(ext_obj, notify=False)
+    if _was_utility_registered(internal, item_iterface, ntiid, registry=registry):
+        result = internal
+    return result
+
+
 def _load_and_register_items(item_iterface,
                              items,
                              registry=None,
@@ -148,8 +162,12 @@ def _load_and_register_items(item_iterface,
     result = []
     registry = get_site_registry(registry)
     for ntiid, data in items.items():
-        internal = external_object_creator(data, notify=False)
-        if _was_utility_registered(internal, item_iterface, ntiid, registry=registry):
+        internal = _load_and_register_item(item_iterface, 
+                                           ntiid,
+                                           data, 
+                                           registry=registry,
+                                           external_object_creator=external_object_creator)
+        if internal is not None:
             result.append(internal)
     return result
 
@@ -164,6 +182,42 @@ def _load_and_register_json(item_iterface,
                                       items,
                                       registry=registry,
                                       external_object_creator=external_object_creator)
+    return result
+
+
+def load_and_register_media_item(item_iterface,
+                                 ext_obj,
+                                 ntiid=None,
+                                 registry=None,
+                                 external_object_creator=create_object_from_external):
+    ntiid = ntiid or ext_obj.get(NTIID) or ext_obj.get('ntiid')
+    internal = _load_and_register_item(item_iterface, 
+                                       ntiid,
+                                       ext_obj, 
+                                       registry=registry,
+                                       external_object_creator=external_object_creator)
+    if internal is not None:
+        return internal
+    return None
+_load_and_register_media_item = load_and_register_media_item
+
+
+def _load_and_register_media_json(item_iterface,
+                                  jtext,
+                                  registry=None,
+                                  external_object_creator=create_object_from_external):
+    result = []
+    registry = get_site_registry(registry)
+    index = simplejson.loads(prepare_json_text(jtext))
+    items = index.get(ITEMS) or {}
+    for ntiid, data in items.items(): # parse media
+        internal = _load_and_register_media_item(item_iterface, 
+                                                 ntiid=ntiid,
+                                                 ext_obj=data, 
+                                                 registry=registry,
+                                                 external_object_creator=external_object_creator)
+        if internal is not None:
+            result.append(internal)
     return result
 
 
@@ -199,9 +253,9 @@ def _load_and_register_slidedeck_json(jtext,
             result.append(internal)
         elif INTISlideDeck.providedBy(internal):
             result.extend(_canonicalize(internal.Slides, INTISlide, registry))
-            result.extend( _canonicalize(internal.Videos,
-                                         INTISlideVideo,
-                                         registry))
+            result.extend(_canonicalize(internal.Videos,
+                                        INTISlideVideo,
+                                        registry))
             if _was_utility_registered(internal, INTISlideDeck, ntiid, registry):
                 result.append(internal)
     return result
@@ -284,7 +338,7 @@ def _remove_from_registry(namespace=None,
 
 def _get_container_tree(container_id):
     library = component.queryUtility(IContentPackageLibrary)
-    paths = library.pathToNTIID(container_id)
+    paths = library.pathToNTIID(container_id) if library else ()
     results = {path.ntiid for path in paths} if paths else ()
     return results
 
@@ -446,7 +500,7 @@ def _update_index_when_content_changes(content_package,
     # Load our json index files
     # We should not need to register our global, non-persistent catalog.
     added = ()
-    if item_iface == INTISlideDeck:
+    if item_iface.isOrExtends(INTISlideDeck):
         # Also remove our other slide types
         for provided in (INTISlide, INTISlideVideo):
             _clear_assets_by_interface(content_package, provided)
@@ -460,6 +514,11 @@ def _update_index_when_content_changes(content_package,
         added = _load_and_register_slidedeck_json(index_text,
                                                   registry=registry,
                                                   object_creator=object_creator)
+    elif item_iface.isOrExtends(INTIAudio) or item_iface.isOrExtends(INTIVideo):
+        added = _load_and_register_media_json(item_iface,
+                                              index_text,
+                                              registry=registry,
+                                              external_object_creator=object_creator)
     elif object_creator is not None:
         added = _load_and_register_json(item_iface,
                                         index_text,
@@ -526,6 +585,7 @@ def _clear_last_modified(content_package, catalog=None):
         catalog.remove_last_modified(namespace)
 clear_namespace_last_modified = _clear_last_modified
 
+
 # update events
 
 
@@ -580,7 +640,7 @@ def _update_container(old_unit, new_unit, new_children_dict, new_package=None):
         item.__parent__ = new_unit
         new_container[item.ntiid] = item
     # Now recursively on children.
-    for old_child in old_unit.children:
+    for old_child in old_unit.children or ():
         # Get the corresponding new unit from our dict, if available. If non-existent,
         # use the content package to make sure we keep any created items.
         new_child = new_children_dict.get(old_child.ntiid, new_package)
@@ -589,7 +649,6 @@ def _update_container(old_unit, new_unit, new_children_dict, new_package=None):
 
 def _get_children_dict(new_package):
     accum = dict()
-
     def _recur(obj, accum):
         accum[obj.ntiid] = obj
         for child in obj.children:
@@ -608,7 +667,7 @@ def _update_indices_when_content_changes(content_package, event):
 
 
 @component.adapter(IRenderableContentPackage, IContentPackageRenderedEvent)
-def _on_content_package_rendered(content_package, event):
+def _on_content_package_rendered(content_package, unused_event):
     if content_package.is_published():
         update_indices_when_content_changes(content_package)
 
@@ -661,13 +720,14 @@ clear_content_package_assets = _clear_when_removed
 
 
 @component.adapter(IContentPackage, IObjectRemovedEvent)
-def _clear_index_when_content_removed(content_package, event):
+def _clear_index_when_content_removed(content_package, unused_event):
     return _clear_when_removed(content_package)
 
 
 @component.adapter(IContentPackage, IObjectUnpublishedEvent)
-def _clear_index_when_content_unpublished(content_package, event):
+def _clear_index_when_content_unpublished(content_package, unused_event):
     return _clear_when_removed(content_package, force=True)
+
 
 # role events
 
@@ -690,12 +750,12 @@ def _initialize_content_package_roles(package):
 
 
 @component.adapter(IContentPackage, IContentPackageAddedEvent)
-def _initialize_package_roles(content_package, event):
+def _initialize_package_roles(content_package, unused_event):
     _initialize_content_package_roles(content_package)
 
 
 @component.adapter(IContentPackage, IContentPackageReplacedEvent)
-def _update_package_roles(content_package, event):
+def _update_package_roles(content_package, unused_event):
     _initialize_content_package_roles(content_package)
 
 
@@ -703,7 +763,7 @@ def _update_package_roles(content_package, event):
 
 
 @component.adapter(IContentPackageLibrary, IContentPackageLibraryDidSyncEvent)
-def _on_content_pacakge_library_synced(library, event):
+def _on_content_pacakge_library_synced(library, unused_event):
     site = library.__parent__
     if IHostPolicySiteManager.providedBy(site):
         bundle_library = site.getUtility(IContentPackageBundleLibrary)
