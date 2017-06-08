@@ -110,8 +110,8 @@ class ContentPackageDeleteView(AbstractAuthenticatedView):
             self.request,
             hexc.HTTPConflict,
             {
-                u'code': code,
-                u'message': message,
+                'code': code,
+                'message': message,
                 CLASS: 'DestructiveChallenge',
                 LINKS: to_external_object(links),
                 MIMETYPE: 'application/vnd.nextthought.destructivechallenge'
