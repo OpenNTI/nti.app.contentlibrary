@@ -205,6 +205,15 @@ def parse_embedded_transcript(trx_ext):
                          filename="transcript" + ext)
 
 
+def parse_embedded_transcripts(internal, ext_obj):
+    for idx, trx_ext in enumerate(ext_obj.get('transcripts') or ()):
+        if not 'contents' in trx_ext:
+            continue
+        transcript = internal.transcripts[idx]
+        transcript.src = parse_embedded_transcript(trx_ext)
+    return internal
+
+
 def load_and_register_media_item(item_iterface,
                                  ext_obj,
                                  ntiid=None,
@@ -218,13 +227,7 @@ def load_and_register_media_item(item_iterface,
                                        registry=registry,
                                        external_object_creator=external_object_creator)
     if internal is not None:
-        # check for embedded transcripts
-        for idx, trx_ext in enumerate(original.get('transcripts') or ()):
-            if not 'contents' in trx_ext:
-                continue
-            transcript = internal.transcripts[idx]
-            transcript.src = parse_embedded_transcript(trx_ext)
-        # return
+        parse_embedded_transcripts(internal, original)
         return internal
     return None
 _load_and_register_media_item = load_and_register_media_item
