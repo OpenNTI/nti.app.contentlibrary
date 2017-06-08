@@ -9,6 +9,10 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import zlib
+import base64
+import mimetypes
+
 import simplejson
 
 from zope import component
@@ -71,6 +75,8 @@ from nti.externalization.interfaces import StandardExternalFields
 
 from nti.intid.common import addIntId
 from nti.intid.common import removeIntId
+
+from nti.namedfile import NamedBlobFile
 
 from nti.ntiids.ntiids import is_valid_ntiid_string
 
@@ -185,6 +191,17 @@ def _load_and_register_json(item_iterface,
     return result
 
 
+def parse_embedded_transcript(trx_ext):
+    contentType = trx_ext.get('contentType') or trx_ext.get('type')
+    contentType = contentType or "text/vtt"
+    ext = mimetypes.guess_extension(contentType) or '.vtt'
+    contents = base64.b64decode(trx_ext['contents'])
+    contents = zlib.decompress(contents)
+    return NamedBlobFile(data=contents, 
+                         contentType=contentType, 
+                         filename="transcript" + ext)
+
+
 def load_and_register_media_item(item_iterface,
                                  ext_obj,
                                  ntiid=None,
@@ -197,6 +214,13 @@ def load_and_register_media_item(item_iterface,
                                        registry=registry,
                                        external_object_creator=external_object_creator)
     if internal is not None:
+        # check for embedded transcripts
+        for idx, trx_ext in enumerate(ext_obj.get('transcripts') or ()):
+            if not 'contents' in trx_ext:
+                continue
+            transcript = internal.transcripts[idx]
+            transcript.src = parse_embedded_transcript(trx_ext)
+        # return
         return internal
     return None
 _load_and_register_media_item = load_and_register_media_item
