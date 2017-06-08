@@ -95,6 +95,8 @@ from nti.site.site import get_component_hierarchy_names
 from nti.site.utils import registerUtility
 from nti.site.utils import unregisterUtility
 
+from nti.traversal.traversal import find_interface
+
 NTIID = StandardExternalFields.NTIID
 ITEMS = StandardExternalFields.ITEMS
 
@@ -789,8 +791,8 @@ def _update_package_roles(content_package, unused_event):
 
 @component.adapter(IContentPackageLibrary, IContentPackageLibraryDidSyncEvent)
 def _on_content_pacakge_library_synced(library, unused_event):
-    site = library.__parent__
-    if IHostPolicySiteManager.providedBy(site):
+    site = find_interface(library, IHostPolicySiteManager, strict=False)
+    if site is not None:
         bundle_library = site.getUtility(IContentPackageBundleLibrary)
         for bundle in bundle_library.values():
             board = IContentBoard(bundle, None)
