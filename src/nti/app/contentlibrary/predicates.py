@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -40,6 +40,7 @@ class _PackageObjectsMixin(BasePrincipalObjects):
 
     def _content_units(self, context):
         result = []
+
         def _recur(obj):
             doc_id = self.intids.queryId(obj)
             if doc_id is not None:
