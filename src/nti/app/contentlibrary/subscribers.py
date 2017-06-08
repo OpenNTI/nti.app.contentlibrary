@@ -9,6 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import copy
 import zlib
 import base64
 import mimetypes
@@ -207,6 +208,7 @@ def load_and_register_media_item(item_iterface,
                                  ntiid=None,
                                  registry=None,
                                  external_object_creator=create_object_from_external):
+    original = copy.deepcopy(ext_obj)
     ntiid = ntiid or ext_obj.get(NTIID) or ext_obj.get('ntiid')
     internal = _load_and_register_item(item_iterface, 
                                        ntiid,
@@ -215,7 +217,7 @@ def load_and_register_media_item(item_iterface,
                                        external_object_creator=external_object_creator)
     if internal is not None:
         # check for embedded transcripts
-        for idx, trx_ext in enumerate(ext_obj.get('transcripts') or ()):
+        for idx, trx_ext in enumerate(original.get('transcripts') or ()):
             if not 'contents' in trx_ext:
                 continue
             transcript = internal.transcripts[idx]
@@ -496,7 +498,6 @@ def _update_index_when_content_changes(content_package,
         sync_results = _new_sync_results(content_package)
 
     index_text = content_package.read_contents_of_sibling_entry(index_filename)
-
     if isinstance(index_text, bytes):
         index_text = index_text.decode('utf-8')
 
