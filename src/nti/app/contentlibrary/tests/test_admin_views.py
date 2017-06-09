@@ -28,7 +28,7 @@ class TestAdminViews(ApplicationLayerTest):
     default_origin = 'http://janux.ou.edu'
 
     @WithSharedApplicationMockDS(testapp=True, users=True)
-    def test_rebuild_eval_catalog(self):
+    def test_rebuild_library_catalog(self):
         res = self.testapp.post('/dataserver2/Library/@@RebuildContentLibraryCatalog',
                                  status=200)
         assert_that(res.json_body,
