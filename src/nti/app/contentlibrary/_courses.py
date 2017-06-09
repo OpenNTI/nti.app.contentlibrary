@@ -35,7 +35,7 @@ from nti.traversal.traversal import find_interface
 def _on_operation_on_scope_membership(record, unused_event):
     principal = IPrincipal(record.Principal, None)
     if principal is not None:
-        _set_user_ticket(principal.pid, _memcached_client())
+        _set_user_ticket(principal.id, _memcached_client())
 
 
 @component.adapter(ICourseInstanceEnrollmentRecord, IObjectAddedEvent)
