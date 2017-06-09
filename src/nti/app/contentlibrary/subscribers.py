@@ -32,6 +32,8 @@ from ZODB.interfaces import IConnection
 from nti.app.contentlibrary.interfaces import IContentBoard
 from nti.app.contentlibrary.interfaces import IContentPackageRolePermissionManager
 
+from nti.contentfile.model import ContentBlobFile
+
 from nti.contentlibrary.indexed_data import get_site_registry
 from nti.contentlibrary.indexed_data import get_library_catalog
 
@@ -76,8 +78,6 @@ from nti.externalization.interfaces import StandardExternalFields
 
 from nti.intid.common import addIntId
 from nti.intid.common import removeIntId
-
-from nti.namedfile import NamedBlobFile
 
 from nti.ntiids.ntiids import is_valid_ntiid_string
 
@@ -200,9 +200,9 @@ def parse_embedded_transcript(trx_ext):
     ext = mimetypes.guess_extension(contentType) or '.vtt'
     contents = base64.b64decode(trx_ext['contents'])
     contents = zlib.decompress(contents)
-    return NamedBlobFile(data=contents, 
-                         contentType=contentType, 
-                         filename="transcript" + ext)
+    return ContentBlobFile(data=contents, 
+                           contentType=contentType, 
+                           filename="transcript" + ext)
 
 
 def parse_embedded_transcripts(internal, ext_obj):
