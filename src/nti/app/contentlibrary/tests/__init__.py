@@ -312,10 +312,9 @@ class PersistentApplicationTestLayer(ApplicationTestLayer):
 
     @staticmethod
     def _setup_library(layer, *args, **kwargs):
-        from nti.contentlibrary.filesystem import CachedNotifyingStaticFilesystemLibrary as Library
         path = os.path.join(os.path.dirname(__file__),
                             layer._library_path)
-        return Library(paths=(path,))
+        return FileLibrary(path)
 
     @staticmethod
     def _install_library(layer, *args, **kwargs):

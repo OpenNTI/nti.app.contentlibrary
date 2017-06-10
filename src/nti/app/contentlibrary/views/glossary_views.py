@@ -29,7 +29,7 @@ times).
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -144,9 +144,9 @@ class GlossaryView(object):
 
         # Save a unicode string into the body
         request.response.text = info.toXMLString(encoding=None)
-        request.response.content_type = b'text/xml'
+        request.response.content_type = 'text/xml'
         # Let the web layer encode to utf-8 (the default for XML)
-        request.response.charset = b'utf-8'
+        request.response.charset = 'utf-8'
         request.response.status_int = 200
         return request.response
 

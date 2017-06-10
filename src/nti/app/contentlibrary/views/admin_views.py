@@ -76,7 +76,7 @@ ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 class ContentPackageDeleteView(AbstractAuthenticatedView):
 
     CONFIRM_CODE = 'ContentPackageDelete'
-    CONFIRM_MSG = _('This content has associations. Are you sure you want to delete?')
+    CONFIRM_MSG = _(u'This content has associations. Are you sure you want to delete?')
 
     @Lazy
     def _library(self):

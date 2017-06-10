@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -149,20 +149,20 @@ class ContentPackageMixin(object):
         if version is not None and version != self.context.version:
             # Provide links to overwrite (force flag) or refresh on conflict.
             links = []
-            link = Link(self.request.path, rel='overwrite',
-                        params={'force': True}, method='PUT')
+            link = Link(self.request.path, rel=u'overwrite',
+                        params={u'force': True}, method=u'PUT')
             links.append(link)
-            link = Link(self.context, rel='refresh',
-                        method='GET',
-                        elements=('@@%s' % VIEW_PACKAGE_WITH_CONTENTS,))
+            link = Link(self.context, rel=u'refresh',
+                        method=u'GET',
+                        elements=(u'@@%s' % VIEW_PACKAGE_WITH_CONTENTS,))
             links.append(link)
             raise_json_error(
                 self.request,
                 hexc.HTTPConflict,
                 {
                     CLASS: 'DestructiveChallenge',
-                    u'message': _('The contents have been changed while you were editing.'),
-                    u'code': 'ContentVersionConflictError',
+                    'message': _(u'The contents have been changed while you were editing.'),
+                    'code': 'ContentVersionConflictError',
                     LINKS: to_external_object(links),
                     MIME_TYPE: 'application/vnd.nextthought.destructivechallenge'
                 },
@@ -198,8 +198,8 @@ class ContentPackageMixin(object):
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
                              {
-                                 u'message': _("Library not available."),
-                                 u'code': 'LibraryNotAvailable',
+                                'message': _(u"Library not available."),
+                                'code': 'LibraryNotAvailable',
                              },
                              None)
         return library
@@ -304,9 +304,9 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
             self.context.write_contents(contents, contentType)
             notify_modified(self.context,
                             {
-                                'contents': contents,
-                                'contentType': contentType,
-                                'version': version
+                                u'version': version,
+                                u'contents': contents,
+                                u'contentType': contentType,
                             })
         result = self.context
         if contents is not None:
@@ -386,7 +386,7 @@ class PackagePublishedContentsGetView(ContentPackageContentsGetView):
         result = get_published_contents(self.context)
         if result is None:
             logger.warn('No publish contents found (%s)', self.context)
-            raise hexc.HTTPNotFound(_('No publish contents found'))
+            raise hexc.HTTPNotFound(_(u'No publish contents found'))
         return result
 
 
@@ -398,11 +398,10 @@ class PackagePublishedContentsGetView(ContentPackageContentsGetView):
 class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
     LESSON_CONFIRM_CODE = 'EditableContentPackageInLessonDelete'
-    LESSON_CONFIRM_MSG = _(
-        'This content is available in lessons. Are you sure you want to delete?')
+    LESSON_CONFIRM_MSG = _(u'This content is available in lessons. Are you sure you want to delete?')
 
     CONFIRM_CODE = 'EditableContentPackageDelete'
-    CONFIRM_MSG = _('Are you sure you want to delete?')
+    CONFIRM_MSG = _(u'Are you sure you want to delete?')
 
     def _do_delete_object(self, theObject, event=True):
         library = self.get_library(context=self.context)
@@ -424,17 +423,17 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
         params = dict(self.request.params)
         params['force'] = True
         links = (
-            Link(self.request.path, rel='confirm',
-                 params=params, method='DELETE'),
+            Link(self.request.path, rel=u'confirm',
+                 params=params, method=u'DELETE'),
         )
         raise_json_error(self.request,
                          hexc.HTTPConflict,
                          {
-                             u'code': code,
-                             u'message': message,
-                             CLASS: 'DestructiveChallenge',
-                             LINKS: to_external_object(links),
-                             MIME_TYPE: 'application/vnd.nextthought.destructivechallenge'
+                            'code': code,
+                            'message': message,
+                            CLASS: 'DestructiveChallenge',
+                            LINKS: to_external_object(links),
+                            MIME_TYPE: 'application/vnd.nextthought.destructivechallenge'
                          },
                          None)
 

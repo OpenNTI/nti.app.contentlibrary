@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -41,13 +41,13 @@ from nti.dataserver.tests import mock_dataserver
 class TestEditViews(ApplicationLayerTest):
 
     layer = PersistentApplicationTestLayer
-    default_origin = b'http://platform.ou.edu'
+    default_origin = 'http://platform.ou.edu'
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_create_package(self):
         href = '/dataserver2/Library'
-        package = RenderableContentPackage(title='Bleach',
-                                           description='Manga bleach')
+        package = RenderableContentPackage(title=u'Bleach',
+                                           description=u'Manga bleach')
         ext_obj = to_external_object(package)
         ext_obj.pop('NTIID', None)
         ext_obj.pop('ntiid', None)
@@ -59,8 +59,8 @@ class TestEditViews(ApplicationLayerTest):
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_update_package(self):
         ntiid = u'tag:nextthought.com,2011-10:NTI-HTML-bleach_ichigo'
-        package = RenderableContentPackage(title='Bleach',
-                                           description='Manga bleach')
+        package = RenderableContentPackage(title=u'Bleach',
+                                           description=u'Manga bleach')
         package.ntiid = ntiid
         package.creator = self.default_username
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
@@ -83,8 +83,8 @@ class TestEditViews(ApplicationLayerTest):
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_contents(self):
         ntiid = u'tag:nextthought.com,2011-10:NTI-HTML-bleach_ichigo'
-        package = RenderableContentPackage(title='Bleach',
-                                           description='Manga bleach')
+        package = RenderableContentPackage(title=u'Bleach',
+                                           description=u'Manga bleach')
         package.ntiid = ntiid
         package.creator = self.default_username
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
@@ -102,7 +102,7 @@ class TestEditViews(ApplicationLayerTest):
         res = self.testapp.get(href, status=200)
         assert_that(res.body, has_length(6))
 
-        with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
+        with mock_dataserver.mock_db_trans(self.ds, site_name=u'platform.ou.edu'):
             package = find_object_with_ntiid(ntiid)
             assert_that(package,
                         has_property('contents', is_(b'ichigo')))
@@ -123,8 +123,8 @@ class TestEditViews(ApplicationLayerTest):
     def test_delete(self, mock_rca):
         mock_rca.is_callable().with_args().returns(('foo',))
         ntiid = u'tag:nextthought.com,2011-10:NTI-HTML-bleach_ichigo'
-        package = RenderableContentPackage(title='Bleach',
-                                           description='Manga bleach')
+        package = RenderableContentPackage(title=u'Bleach',
+                                           description=u'Manga bleach')
         package.ntiid = ntiid
         package.creator = self.default_username
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):

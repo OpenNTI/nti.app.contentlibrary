@@ -33,8 +33,6 @@ from nti.app.contentlibrary.views.sync_views import _AbstractSyncAllLibrariesVie
 
 from nti.app.externalization.internalization import read_body_as_external_object
 
-from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
-
 from nti.common.string import is_true
 
 from nti.contentlibrary.interfaces import IContentPackage
@@ -157,11 +155,7 @@ class ResetPackagePresentationAssetsView(_AbstractSyncAllLibrariesView):
                renderer='rest',
                permission=nauth.ACT_NTI_ADMIN,
                name='RemovePackageInaccessibleAssets')
-class RemovePackageInaccessibleAssetsView(AbstractAuthenticatedView,
-                                          ModeledContentUploadRequestUtilsMixin):
-
-    def readInput(self, value=None):
-        return _read_input(self.request)
+class RemovePackageInaccessibleAssetsView(AbstractAuthenticatedView):
 
     def __call__(self):
         endInteraction()
