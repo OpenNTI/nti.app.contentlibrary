@@ -309,12 +309,13 @@ class PersistentApplicationTestLayer(ApplicationTestLayer):
 
     _library_path = 'PersistentLibrary'
     _sites_names = ('platform.ou.edu',)
-
+    
+    library_path = os.path.join(os.path.dirname(__file__),
+                                _library_path)
+    
     @staticmethod
     def _setup_library(layer, *args, **kwargs):
-        path = os.path.join(os.path.dirname(__file__),
-                            layer._library_path)
-        return FileLibrary(path)
+        return FileLibrary(layer.library_path)
 
     @staticmethod
     def _install_library(layer, *args, **kwargs):
