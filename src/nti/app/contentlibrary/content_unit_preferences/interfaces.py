@@ -9,7 +9,7 @@ __docformat__ = "restructuredtext en"
 
 from zope.location.interfaces import ILocation
 
-from dolmen.builtins import IUnicode
+from nti.base.interfaces import IUnicode
 
 from nti.dataserver.interfaces import ILastModified
 
