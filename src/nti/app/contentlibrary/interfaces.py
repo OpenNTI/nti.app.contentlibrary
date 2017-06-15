@@ -89,7 +89,7 @@ class IContentCommentPost(IGeneralForumComment):
 
 from zope.location.interfaces import ILocation
 
-from nti.base.interfaces import IUnicode
+from nti.contentfragments.interfaces import IUnicode
 
 from nti.dataserver.interfaces import ILastModified
 
