@@ -40,7 +40,6 @@ from nti.common.string import is_true
 
 from nti.contentlibrary import ALL_CONTENT_MIMETYPES
 
-from nti.contentlibrary.index import create_library_catalog
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
 from nti.contentlibrary.interfaces import IContentPackage
@@ -242,13 +241,8 @@ class RebuildContentPackageCatalogView(AbstractAuthenticatedView):
         intids = component.getUtility(IIntIds)
         # remove indexes
         catalog = get_contentlibrary_catalog()
-        for name, index in list(catalog.items()):
-            intids.unregister(index)
-            del catalog[name]
-        # recreate indexes
-        catalog = create_library_catalog(catalog=catalog, family=intids.family)
         for index in catalog.values():
-            intids.register(index)
+            index.clear()
         # reindex
         seen = set()
         for host_site in get_all_host_sites():  # check all sites
