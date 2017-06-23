@@ -29,6 +29,7 @@ from nti.app.contentlibrary import VIEW_PACKAGE_WITH_CONTENTS
 from nti.app.contentlibrary import MessageFactory
 
 from nti.contentlibrary.interfaces import IContentUnit
+from nti.contentlibrary.interfaces import IContentPackageBundle
 
 from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import ROLE_ADMIN
@@ -58,7 +59,8 @@ class LibraryPathAdapter(Contained):
             raise hexc.HTTPNotFound()
         ntiid = unquote(ntiid)
         result = find_object_with_ntiid(ntiid)
-        if IContentUnit.providedBy(result):
+        if     IContentUnit.providedBy(result) \
+            or IContentPackageBundle.providedBy(result):
             return result
         raise KeyError(ntiid)
 
