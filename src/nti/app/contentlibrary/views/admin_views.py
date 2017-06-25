@@ -44,6 +44,7 @@ from nti.contentlibrary.index import get_contentlibrary_catalog
 
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.contentlibrary.utils import get_content_packages
@@ -75,7 +76,8 @@ ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 class ContentPackageDeleteView(AbstractAuthenticatedView):
 
     CONFIRM_CODE = 'ContentPackageDelete'
-    CONFIRM_MSG = _(u'This content has associations. Are you sure you want to delete?')
+    CONFIRM_MSG = _(
+        u'This content has associations. Are you sure you want to delete?')
 
     @Lazy
     def _library(self):
@@ -198,35 +200,29 @@ class AllContentPackagesView(AbstractAuthenticatedView,
 @view_config(context=LibraryPathAdapter)
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
-               request_method='POST',
-               name="ReindexAllContentPackages",
+               request_method='GET',
+               name="AllContentPackageBundles",
                permission=nauth.ACT_NTI_ADMIN)
-class ReindexAllContentPackagesView(AbstractAuthenticatedView):
+class AllContentPackageBundlesView(AbstractAuthenticatedView,
+                                   BatchingUtilsMixin):
 
-    @Lazy
-    def _library(self):
-        library = component.queryUtility(IContentPackageLibrary)
-        return library
-
-    def _process_meta(self, package):
-        try:
-            from nti.metadata import queue_add
-            queue_add(package)
-        except ImportError:
-            pass
+    _DEFAULT_BATCH_SIZE = 30
+    _DEFAULT_BATCH_START = 0
 
     def __call__(self):
-        library = self._library
+        result = LocatedExternalDict()
+        result.__name__ = self.request.view_name
+        result.__parent__ = self.request.context
+        library = component.queryUtility(IContentPackageBundleLibrary)
         if library is not None:
-            intids = component.getUtility(IIntIds)
-            catalog = get_contentlibrary_catalog()
-            for package in library.contentPackages or ():
-                doc_id = intids.queryId(package)
-                if doc_id is None:
-                    continue
-                catalog.index_doc(doc_id, package)
-                self._process_meta(package)
-        return hexc.HTTPNoContent()
+            bundles = list(library.getBundles())
+        else:
+            bundles = ()
+        bundles.sort(key=lambda p: p.ntiid)
+        result['TotalItemCount'] = len(bundles)
+        self._batch_items_iterable(result, bundles)
+        result[ITEM_COUNT] = len(result[ITEMS])
+        return result
 
 
 @view_config(context=LibraryPathAdapter)
@@ -236,6 +232,13 @@ class ReindexAllContentPackagesView(AbstractAuthenticatedView):
                name="RebuildContentLibraryCatalog",
                permission=nauth.ACT_NTI_ADMIN)
 class RebuildContentPackageCatalogView(AbstractAuthenticatedView):
+
+    def _process_meta(self, package):
+        try:
+            from nti.metadata import queue_add
+            queue_add(package)
+        except ImportError:
+            pass
 
     def __call__(self):
         intids = component.getUtility(IIntIds)
@@ -249,13 +252,14 @@ class RebuildContentPackageCatalogView(AbstractAuthenticatedView):
             logger.info("Processing site %s", host_site.__name__)
             with current_site(host_site):
                 library = component.queryUtility(IContentPackageLibrary)
-                pacakges = library.contentPackages if library else ()
-                for pacakge in pacakges:
-                    doc_id = intids.queryId(pacakge)
+                packages = library.contentPackages if library else ()
+                for package in packages:
+                    doc_id = intids.queryId(package)
                     if doc_id is None or doc_id in seen:
                         continue
                     seen.add(doc_id)
-                    catalog.index_doc(doc_id, pacakge)
+                    catalog.index_doc(doc_id, package)
+                    self._process_meta(package)
         result = LocatedExternalDict()
         result[ITEM_COUNT] = result[TOTAL] = len(seen)
         return result
