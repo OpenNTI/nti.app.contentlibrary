@@ -189,7 +189,11 @@ class AllContentPackagesView(AbstractAuthenticatedView,
         result = LocatedExternalDict()
         result.__name__ = self.request.view_name
         result.__parent__ = self.request.context
-        packages = get_content_packages(mime_types=ALL_CONTENT_MIMETYPES)
+        library = component.queryUtility(IContentPackageLibrary)
+        if library is not None:
+            packages = list(library.contentPackages)
+        else:
+            packages = ()
         packages.sort(key=lambda p: p.ntiid)
         result['TotalItemCount'] = len(packages)
         self._batch_items_iterable(result, packages)

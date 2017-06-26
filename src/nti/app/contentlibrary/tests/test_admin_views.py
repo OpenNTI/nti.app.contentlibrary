@@ -34,3 +34,19 @@ class TestAdminViews(ApplicationLayerTest):
         assert_that(res.json_body,
                     has_entries('Total', is_(greater_than_or_equal_to(0)),
                                 'ItemCount', is_(greater_than_or_equal_to(0))))
+        
+    @WithSharedApplicationMockDS(testapp=True, users=True)
+    def test_all_content_packages(self):
+        res = self.testapp.get('/dataserver2/Library/@@AllContentPackages',
+                               status=200)
+        assert_that(res.json_body,
+                    has_entries('TotalItemCount', is_(greater_than_or_equal_to(0)),
+                                'ItemCount', is_(greater_than_or_equal_to(0))))
+
+    @WithSharedApplicationMockDS(testapp=True, users=True)
+    def test_all_content_package_bundles(self):
+        res = self.testapp.get('/dataserver2/Library/@@AllContentPackageBundles',
+                               status=200)
+        assert_that(res.json_body,
+                    has_entries('TotalItemCount', is_(greater_than_or_equal_to(0)),
+                                'ItemCount', is_(greater_than_or_equal_to(0))))
