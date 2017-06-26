@@ -40,6 +40,7 @@ from nti.contentlibrary.indexed_data import get_library_catalog
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageAddedEvent
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageSyncResults
@@ -171,9 +172,9 @@ def _load_and_register_items(item_iterface,
     result = []
     registry = get_site_registry(registry)
     for ntiid, data in items.items():
-        internal = _load_and_register_item(item_iterface, 
+        internal = _load_and_register_item(item_iterface,
                                            ntiid,
-                                           data, 
+                                           data,
                                            registry=registry,
                                            external_object_creator=external_object_creator)
         if internal is not None:
@@ -200,8 +201,8 @@ def parse_embedded_transcript(trx_ext):
     ext = mimetypes.guess_extension(contentType) or '.vtt'
     contents = base64.b64decode(trx_ext['contents'])
     contents = zlib.decompress(contents)
-    return ContentBlobFile(data=contents, 
-                           contentType=contentType, 
+    return ContentBlobFile(data=contents,
+                           contentType=contentType,
                            filename="transcript" + ext)
 
 
@@ -221,9 +222,9 @@ def load_and_register_media_item(item_iterface,
                                  external_object_creator=create_object_from_external):
     original = copy.deepcopy(ext_obj)
     ntiid = ntiid or ext_obj.get(NTIID) or ext_obj.get('ntiid')
-    internal = _load_and_register_item(item_iterface, 
+    internal = _load_and_register_item(item_iterface,
                                        ntiid,
-                                       ext_obj, 
+                                       ext_obj,
                                        registry=registry,
                                        external_object_creator=external_object_creator)
     if internal is not None:
@@ -242,9 +243,9 @@ def _load_and_register_media_json(item_iterface,
     index = simplejson.loads(prepare_json_text(jtext))
     items = index.get(ITEMS) or {}
     for ntiid, data in items.items(): # parse media
-        internal = _load_and_register_media_item(item_iterface, 
+        internal = _load_and_register_media_item(item_iterface,
                                                  ntiid=ntiid,
-                                                 ext_obj=data, 
+                                                 ext_obj=data,
                                                  registry=registry,
                                                  external_object_creator=external_object_creator)
         if internal is not None:
@@ -256,9 +257,9 @@ def _canonicalize(items, item_iface, registry):
     recorded = []
     for idx, item in enumerate(items or ()):
         ntiid = item.ntiid
-        result, registered = _register_utility(item, 
-                                               item_iface, 
-                                               ntiid, 
+        result, registered = _register_utility(item,
+                                               item_iface,
+                                               ntiid,
                                                registry)
         if result:
             recorded.append(item)
@@ -710,6 +711,10 @@ def _clear_when_removed(content_package, force=True, process_global=False):
     Because we don't know where the data is stored, when a
     content package is removed we need to clear its data.
     """
+    # XXX: Probably want content package assets to be cleaned up,
+    # but for now, let's leave them.
+    if IEditableContentPackage.providedBy(content_package):
+        return
     result = []
     catalog = get_library_catalog()
     _clear_assets(content_package, force)
