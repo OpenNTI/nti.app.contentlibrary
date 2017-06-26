@@ -40,6 +40,7 @@ from nti.common.string import is_true
 
 from nti.contentlibrary import ALL_CONTENT_MIMETYPES
 
+from nti.contentlibrary.index import get_contentbundle_catalog
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
 from nti.contentlibrary.interfaces import IContentPackage
@@ -264,6 +265,46 @@ class RebuildContentPackageCatalogView(AbstractAuthenticatedView):
                     seen.add(doc_id)
                     catalog.index_doc(doc_id, package)
                     self._process_meta(package)
+        result = LocatedExternalDict()
+        result[ITEM_COUNT] = result[TOTAL] = len(seen)
+        return result
+
+
+@view_config(context=LibraryPathAdapter)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='POST',
+               name="RebuildContentBundleCatalog",
+               permission=nauth.ACT_NTI_ADMIN)
+class RebuildContentBundleCatalogView(AbstractAuthenticatedView):
+
+    def _process_meta(self, package):
+        try:
+            from nti.metadata import queue_add
+            queue_add(package)
+        except ImportError:
+            pass
+
+    def __call__(self):
+        intids = component.getUtility(IIntIds)
+        # remove indexes
+        catalog = get_contentbundle_catalog()
+        for index in catalog.values():
+            index.clear()
+        # reindex
+        seen = set()
+        for host_site in get_all_host_sites():  # check all sites
+            logger.info("Processing site %s", host_site.__name__)
+            with current_site(host_site):
+                library = component.queryUtility(IContentPackageBundleLibrary)
+                bundles = library.getBundles() if library else ()
+                for bundle in bundles:
+                    doc_id = intids.queryId(bundle)
+                    if doc_id is None or doc_id in seen:
+                        continue
+                    seen.add(doc_id)
+                    catalog.index_doc(doc_id, bundle)
+                    self._process_meta(bundle)
         result = LocatedExternalDict()
         result[ITEM_COUNT] = result[TOTAL] = len(seen)
         return result
