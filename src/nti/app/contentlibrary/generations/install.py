@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -20,6 +20,7 @@ from zope.generations.interfaces import IInstallableSchemaManager
 from zope.intid.interfaces import IIntIds
 
 from nti.contentlibrary.index import install_library_catalog
+from nti.contentlibrary.index import install_contentbundle_catalog
 
 from nti.contentlibrary.indexed_data.index import install_container_catalog
 
@@ -48,3 +49,5 @@ def evolve(context):
     intids = lsm.getUtility(IIntIds)
     install_library_catalog(dataserver_folder, intids)
     install_container_catalog(dataserver_folder, intids)
+    install_contentbundle_catalog(dataserver_folder, intids)
+

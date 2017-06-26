@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -25,6 +25,7 @@ from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IOIDResolver
 
 OLD_REG_NAME = '++etc++contentlibrary.catalog'
+
 
 @interface.implementer(IDataserver)
 class MockDataserver(object):
@@ -51,20 +52,19 @@ def do_evolve(context, generation=generation):
     component.provideUtility(mock_ds, IDataserver)
 
     with site(ds_folder):
-        assert  component.getSiteManager() == ds_folder.getSiteManager(), \
-                "Hooks not installed?"
+        assert component.getSiteManager() == ds_folder.getSiteManager(), \
+               "Hooks not installed?"
 
         lsm = ds_folder.getSiteManager()
         catalog = lsm.queryUtility(ICatalog, name=OLD_REG_NAME)
         if catalog is not None:
             lsm.unregisterUtility(provided=ICatalog, name=OLD_REG_NAME)
-            lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_INDEX_NAME)
+            lsm.registerUtility(catalog, provided=ICatalog,
+                                name=CATALOG_INDEX_NAME)
             catalog.__name__ = CATALOG_INDEX_NAME
-       
-        logger.info('Dataserver evolution %s done.', generation)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
-    logger.info('Dataserver evolution %s done.', generation)
+    logger.info('Content library evolution %s done.', generation)
 
 
 def evolve(context):

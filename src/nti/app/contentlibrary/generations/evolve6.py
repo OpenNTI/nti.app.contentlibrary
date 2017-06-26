@@ -67,10 +67,8 @@ def do_evolve(context, generation=generation):
                 del catalog[name]
                 index.__parent__ = None
 
-        logger.info('Dataserver evolution %s done.', generation)
-
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
-    logger.info('Dataserver evolution %s done.', generation)
+    logger.info('Content library evolution %s done.', generation)
 
 
 def evolve(context):

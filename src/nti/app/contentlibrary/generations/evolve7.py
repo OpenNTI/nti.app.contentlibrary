@@ -9,7 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-generation = 2
+generation = 7
 
 from zope import component
 from zope import interface
@@ -17,9 +17,11 @@ from zope import interface
 from zope.component.hooks import site
 from zope.component.hooks import setHooks
 
-from BTrees.OOBTree import OOBTree
+from zope.intid.interfaces import IIntIds
 
-from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.index import install_contentbundle_catalog
+
+from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IOIDResolver
@@ -41,7 +43,19 @@ class MockDataserver(object):
         return None
 
 
-def do_evolve(context):
+def index_site(current_site, catalog, intids,  seen):
+    with site(current_site):
+        library = component.queryUtility(IContentPackageBundleLibrary)
+        if library is None:
+            return
+        for bundle in library.getBundles() or ():
+            doc_id = intids.queryId(intids)
+            if doc_id is None or doc_id in seen:
+                continue
+            catalog.index_doc(doc_id, bundle)
+
+
+def do_evolve(context, generation=generation):
     setHooks()
     conn = context.connection
     root = conn.root()
@@ -55,36 +69,13 @@ def do_evolve(context):
         assert component.getSiteManager() == ds_folder.getSiteManager(), \
                "Hooks not installed?"
 
+        lsm = ds_folder.getSiteManager()
+        intids = lsm.getUtility(IIntIds)
+
+        seen = set()
+        catalog = install_contentbundle_catalog(ds_folder, intids)
         for current_site in get_all_host_sites():
-            with site(current_site):
-                library = component.queryUtility(IContentPackageLibrary)
-                if library is None:
-                    continue
-                last_modified = 0
-                contentPackages = OOBTree()
-                contentUnitsByNTIID = OOBTree()
-
-                for package in library._contentPackages or ():
-                    contentPackages[package.ntiid] = package
-                    index_lm = getattr(package, 'index_last_modified', None)
-                    last_modified = max(last_modified, index_lm or -1)
-
-                def _recur(unit):
-                    contentUnitsByNTIID[unit.ntiid] = unit
-                    for child in unit.children:
-                        _recur(child)
-                for package in library._contentPackages or ():
-                    _recur(package)
-
-                library._last_modified = last_modified
-                library._contentPackages = contentPackages
-                library._contentUnitsByNTIID = contentUnitsByNTIID
-
-                for name in ('_content_packages_by_ntiid', '_content_units_by_ntiid'):
-                    try:
-                        delattr(library, name)
-                    except AttributeError:
-                        pass
+            index_site(current_site, catalog, intids, seen)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
     logger.info('Content library evolution %s done.', generation)
@@ -92,6 +83,6 @@ def do_evolve(context):
 
 def evolve(context):
     """
-    Evolve to gen 2 by migrating content pacakge storage in libraries
+    Evolve to gen 7 by installing the content bundle catalog
     """
     do_evolve(context)
