@@ -182,11 +182,12 @@ class _AbstractSyncAllLibrariesView(SetSyncLockView,
 
     def readInput(self, value=None):
         result = CaseInsensitiveDict()
-        if self.request.body:
-            values = super(_AbstractSyncAllLibrariesView, self).readInput(value)
-        else:
-            values = self.request.params
-        result.update(values)
+        if self.request:
+            if self.request.body:
+                values = super(_AbstractSyncAllLibrariesView, self).readInput(value)
+            else:
+                values = self.request.params
+            result.update(values)
         return result
 
     def release(self, lock):
