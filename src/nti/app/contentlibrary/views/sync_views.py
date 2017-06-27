@@ -6,7 +6,7 @@ Sync views.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -54,8 +54,6 @@ from nti.app.contentlibrary.synchronize import syncContentPackages
 
 from nti.app.externalization.error import raise_json_error
 
-from nti.app.externalization.internalization import read_body_as_external_object
-
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
 from nti.common.string import is_true
@@ -87,7 +85,7 @@ from nti.site.hostpolicy import get_host_site
                request_method='POST',
                context=IDataserverFolder,
                name='RemoveSyncLock')
-class _RemoveSyncLockView(AbstractAuthenticatedView):
+class RemoveSyncLockView(AbstractAuthenticatedView):
 
     @Lazy
     def redis(self):
@@ -104,7 +102,7 @@ class _RemoveSyncLockView(AbstractAuthenticatedView):
                request_method='GET',
                context=IDataserverFolder,
                name='IsSyncInProgress')
-class _IsSyncInProgressView(AbstractAuthenticatedView):
+class IsSyncInProgressView(AbstractAuthenticatedView):
 
     @Lazy
     def redis(self):
@@ -136,7 +134,7 @@ class _IsSyncInProgressView(AbstractAuthenticatedView):
                request_method='POST',
                context=IDataserverFolder,
                name='SetSyncLock')
-class _SetSyncLockView(AbstractAuthenticatedView):
+class SetSyncLockView(AbstractAuthenticatedView):
 
     blocking = False
 
@@ -153,7 +151,7 @@ class _SetSyncLockView(AbstractAuthenticatedView):
         raise_json_error(self.request,
                          hexc.HTTPLocked,
                          {
-                             'message': _('Sync in progress'),
+                             'message': _(u'Sync in progress'),
                              'code': 'Exception'
                          },
                          None)
@@ -169,7 +167,7 @@ class _SetSyncLockView(AbstractAuthenticatedView):
                request_method='GET',
                context=IDataserverFolder,
                name='LastSyncTime')
-class _LastSyncTimeView(AbstractAuthenticatedView):
+class LastSyncTimeView(AbstractAuthenticatedView):
 
     def __call__(self):
         try:
@@ -179,17 +177,16 @@ class _LastSyncTimeView(AbstractAuthenticatedView):
             return 0
 
 
-class _AbstractSyncAllLibrariesView(_SetSyncLockView,
+class _AbstractSyncAllLibrariesView(SetSyncLockView,
                                     ModeledContentUploadRequestUtilsMixin):
 
     def readInput(self, value=None):
         result = CaseInsensitiveDict()
-        if self.request:
-            if self.request.body:
-                values = read_body_as_external_object(self.request)
-            else:
-                values = self.request.params
-            result.update(values)
+        if self.request.body:
+            values = super(_AbstractSyncAllLibrariesView, self).readInput(value)
+        else:
+            values = self.request.params
+        result.update(values)
         return result
 
     def release(self, lock):
@@ -322,13 +319,14 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
         return result
 
 
+
 @view_config(name='Sync')
 @view_config(name='Synchronize')
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
                context=IContentPackage,
                permission=ACT_SYNC_LIBRARY)
-class _SyncContentPackageView(_AbstractSyncAllLibrariesView):
+class SyncContentPackageView(_AbstractSyncAllLibrariesView):
     """
     A view that synchronizes a content package
     """
@@ -351,7 +349,13 @@ class _SyncContentPackageView(_AbstractSyncAllLibrariesView):
             content_packages = [
                 x for x in enumeration.enumerateContentPackages() if x.ntiid == ntiid
             ]
-            assert content_packages, _("Could not find contents in library")
+            if not content_packages:
+                raise_json_error(self.request,
+                                 hexc.HTTPUnprocessableEntity,
+                                 {
+                                     'message': _(u'Could not find contents in library.'),
+                                 },
+                                 None)
             # replace w/ new one
             library.replace(content_packages[0], results=sync_results)
         return results
@@ -360,8 +364,12 @@ class _SyncContentPackageView(_AbstractSyncAllLibrariesView):
         package = self.context
         if      IRenderableContentPackage.providedBy(package) \
             and not package.is_published():
-            raise ValueError(_('Content has not been published'))
-
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                 'message': _(u'Content has not been published.'),
+                             },
+                             None)
         return self._replace(package)
 
 
@@ -385,8 +393,7 @@ class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
                              {
-                                 'message': _('Content has not been published'),
-                                 'code': 'Exception'
+                                 'message': _(u'Content has not been published.'),
                              },
                              None)
         return self._process_package(package)
