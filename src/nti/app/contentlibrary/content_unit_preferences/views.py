@@ -8,7 +8,7 @@ In addition to providing access to the content, this
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -28,6 +28,8 @@ from nti.app.contentlibrary.content_unit_preferences.interfaces import IContentU
 
 from nti.app.contentlibrary.views.library_views import _LibraryTOCRedirectView
 from nti.app.contentlibrary.views.library_views import _RootLibraryTOCRedirectView
+
+from nti.app.externalization.error import raise_json_error
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
@@ -57,9 +59,15 @@ class _ContentUnitPreferencesPutView(AbstractAuthenticatedView,
             unit_prefs.sharedWith = externalValue['sharedWith']
             unit_prefs.lastModified = time.time()
             return unit_prefs
-        except KeyError:
+        except KeyError as e:
             exc_info = sys.exc_info()
-            raise hexc.HTTPUnprocessableEntity, exc_info[1], exc_info[2]
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                'message': str(e),
+                                'code': e.__class__.__name__
+                             },
+                             exc_info[2])
 
     def __call__(self):
         value = self.readInput()

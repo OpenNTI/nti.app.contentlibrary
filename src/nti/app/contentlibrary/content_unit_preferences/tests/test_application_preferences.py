@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -14,6 +14,7 @@ from hamcrest import has_entry
 from hamcrest import assert_that
 from hamcrest import greater_than
 from hamcrest import has_property
+
 from nti.testing.matchers import verifiably_provides
 
 from nti.app.contentlibrary.interfaces import IContentUnitInfo
@@ -29,24 +30,25 @@ from nti.contentlibrary.tests import ContentlibraryLayerTest
 
 
 class TestAppFilesystem(ContentlibraryLayerTest):
-    
+
     layer = AppTestLayer
 
     def test_adapter_prefs(self):
 
         unit = filesystem.FilesystemContentPackage(
             # filename='prealgebra/index.html',
-            href='index.html',
+            href=u'index.html',
             # root = 'prealgebra',
             # icon = 'icons/The%20Icon.png'
         )
 
         assert_that(IPrefs(unit, None), is_(none()))
 
-        unit.sharedWith = ['foo']
+        unit.sharedWith = [u'foo']
 
         assert_that(IPrefs(unit), verifiably_provides(IPrefs))
         assert_that(IPrefs(unit), has_property('__parent__', unit))
+
 
 import anyjson as json
 
@@ -78,7 +80,7 @@ from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
 class _SecurityPolicyNewRequestSharedConfiguringTestLayer(NewRequestSharedConfiguringTestLayer):
 
-    rem_username = 'foo@bar'
+    rem_username = u'foo@bar'
 
     @classmethod
     def setUp(cls):
@@ -112,7 +114,7 @@ class _SecurityPolicyNewRequestSharedConfiguringTestLayer(NewRequestSharedConfig
 
 @interface.implementer(lib_interfaces.IContentUnit)
 class ContentUnit(object):
-    href = 'prealgebra'
+    href = u'prealgebra'
     ntiid = None
     __parent__ = None
     lastModified = 0
@@ -145,6 +147,7 @@ class ContentUnitInfo(object):
     contentUnit = None
     lastModified = 0
 
+
 from pyramid.threadlocal import get_current_request
 
 
@@ -154,8 +157,8 @@ class TestContainerPrefs(NewRequestLayerTest):
 
     rem_username = layer.rem_username
 
-    def _do_check_root_inherited(
-            self, ntiid=None, sharedWith=None, state='inherited', provenance=ntiids.ROOT):
+    def _do_check_root_inherited(self, ntiid=None, sharedWith=None,
+                                 state=u'inherited', provenance=ntiids.ROOT):
         unit = ContentUnit()
         unit.ntiid = ntiid
         # Notice that the root is missing from the lineage
@@ -184,8 +187,8 @@ class TestContainerPrefs(NewRequestLayerTest):
     def test_decorate_inherit(self):
         user = users.User.create_user(username=self.rem_username)
 
-        cid = "tag:nextthought.com:foo,bar"
-        root_cid = ''
+        cid = u"tag:nextthought.com:foo,bar"
+        root_cid = u''
 
         # Create the containers
         for c in (cid, root_cid):
@@ -193,17 +196,17 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         # Add sharing prefs to the root
         prefs = IContentUnitPreferences(user.getContainer(root_cid))
-        prefs.sharedWith = ['a@b']
+        prefs.sharedWith = [u'a@b']
 
-        self._do_check_root_inherited(ntiid=cid, sharedWith=['a@b'])
+        self._do_check_root_inherited(ntiid=cid, sharedWith=[u'a@b'])
 
         # Now, if we set something at the leaf node, then it trumps
         cid_prefs = IContentUnitPreferences(user.getContainer(cid))
-        cid_prefs.sharedWith = ['leaf']
+        cid_prefs.sharedWith = [u'leaf']
 
         self._do_check_root_inherited(ntiid=cid,
-                                      sharedWith=['leaf'],
-                                      state='set',
+                                      sharedWith=[u'leaf'],
+                                      state=u'set',
                                       provenance=cid)
 
         # Even setting something blank at the leaf trumps
@@ -211,19 +214,19 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         self._do_check_root_inherited(ntiid=cid,
                                       sharedWith=[],
-                                      state='set',
+                                      state=u'set',
                                       provenance=cid)
 
         # But if we delete it from the leaf, we're back to the root
         cid_prefs.sharedWith = None
-        self._do_check_root_inherited(ntiid=cid, sharedWith=['a@b'])
+        self._do_check_root_inherited(ntiid=cid, sharedWith=[u'a@b'])
 
     @WithMockDSTrans
     def test_traverse_container_to_prefs(self):
-        user = users.User.create_user(username="foo@bar")
+        user = users.User.create_user(username=u"foo@bar")
 
         cont_obj = Note()
-        cont_obj.containerId = "tag:nextthought.com:foo,bar"
+        cont_obj.containerId = u"tag:nextthought.com:foo,bar"
 
         user.addContainedObject(cont_obj)
 
@@ -236,7 +239,7 @@ class TestContainerPrefs(NewRequestLayerTest):
         user = users.User.create_user(username=self.rem_username)
 
         cont_obj = Note()
-        cont_obj.containerId = "tag:nextthought.com:foo,bar"
+        cont_obj.containerId = u"tag:nextthought.com:foo,bar"
 
         user.addContainedObject(cont_obj)
 
@@ -257,7 +260,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         self.request.context = prefs
         self.request.body = json.dumps({"sharedWith": sharedWith})
-        self.request.content_type = 'application/json'
+        self.request.content_type = u'application/json'
 
         class Accept(object):
 
@@ -287,7 +290,7 @@ class TestContainerPrefs(NewRequestLayerTest):
         user = users.User.create_user(username=self.rem_username)
         # Make the container exist
         cont_obj = Note()
-        cont_obj.containerId = "tag:nextthought.com:foo,bar"
+        cont_obj.containerId = u"tag:nextthought.com:foo,bar"
         user.addContainedObject(cont_obj)
 
         content_unit = ContentUnit()
@@ -300,7 +303,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         _ = users.User.create_user(username=self.rem_username)
         # Note the container does not exist
-        containerId = "tag:nextthought.com:foo,bar"
+        containerId = u"tag:nextthought.com:foo,bar"
 
         content_unit = ContentUnit()
         content_unit.ntiid = containerId
@@ -314,14 +317,15 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         _ = users.User.create_user(username=self.rem_username)
         # Note the container does not exist
-        containerId = "tag:nextthought.com:foo,bar"
+        containerId = u"tag:nextthought.com:foo,bar"
 
         content_unit = ContentUnit()
         content_unit.ntiid = ntiids.ROOT
 
-        self._do_update_prefs(content_unit, sharedWith=['a', 'b'])
+        self._do_update_prefs(content_unit, sharedWith=[u'a', u'b'])
 
-        self._do_check_root_inherited(ntiid=containerId, sharedWith=['a', 'b'])
+        self._do_check_root_inherited(ntiid=containerId, 
+                                      sharedWith=[u'a', u'b'])
 
     @WithMockDSTrans
     def test_prefs_from_content_unit(self):
@@ -333,7 +337,7 @@ class TestContainerPrefs(NewRequestLayerTest):
         content_unit.ntiid = ntiids.ROOT
 
         interface.alsoProvides(content_unit, IContentUnitPreferences)
-        content_unit.sharedWith = ['2@3']
+        content_unit.sharedWith = [u'2@3']
 
         info = ContentUnitInfo()
         info.contentUnit = content_unit

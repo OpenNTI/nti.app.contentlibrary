@@ -7,7 +7,7 @@ Support functions for dealing with preferences.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -54,7 +54,7 @@ def find_prefs_for_content_and_user(starting_content_unit, remote_user):
             contentUnit = contentUnit.__parent__
         # Also include the mythical root
         # (which has an empty container name)
-        yield None, '', ntiids.ROOT
+        yield None, u'', ntiids.ROOT
 
     # We will go at least once through this loop
     contentUnit = provenance = prefs = None
@@ -72,7 +72,6 @@ def find_prefs_for_content_and_user(starting_content_unit, remote_user):
             if not contentUnit:
                 # Don't try this for the root
                 break
-
             prefs = IContentUnitPreferences(contentUnit, None)
             if prefs_present(prefs):
                 break

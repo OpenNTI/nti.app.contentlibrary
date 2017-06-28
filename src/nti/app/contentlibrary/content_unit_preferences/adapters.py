@@ -8,7 +8,7 @@ In addition to providing access to the content, this
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -50,6 +50,7 @@ class _ContentUnitPreferences(Persistent):
         if sharedWith is not None:
             self.sharedWith = sharedWith
 
+
 # For BWC, use the old data.
 ANNOTATION_KEY = u'nti.appserver.contentlibrary.library_views._ContentUnitPreferences'
 _ContainerContentUnitPreferencesFactory = an_factory(_ContentUnitPreferences,
@@ -69,8 +70,8 @@ def _DelimitedHierarchyContentUnitPreferencesFactory(context):
         return None
 
     prefs = _ContentUnitPreferences(
-                    createdTime=time.mktime(context.created.timetuple()),
-                    lastModified=time.mktime(context.modified.timetuple()),
-                    sharedWith=context.sharedWith)
+        createdTime=time.mktime(context.created.timetuple()),
+        lastModified=time.mktime(context.modified.timetuple()),
+        sharedWith=context.sharedWith)
     prefs.__parent__ = context
     return prefs
