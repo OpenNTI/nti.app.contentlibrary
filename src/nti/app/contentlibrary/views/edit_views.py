@@ -49,6 +49,8 @@ from nti.app.contentlibrary.views import VIEW_PACKAGE_WITH_CONTENTS
 
 from nti.app.contentlibrary.views import LibraryPathAdapter
 
+from nti.appserver.policies.interfaces import ISitePolicyUserEventListener
+
 from nti.appserver.ugd_edit_views import UGDPutView
 
 from nti.base._compat import bytes_
@@ -62,7 +64,7 @@ from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.contentlibrary.library import register_content_units
 
-from nti.contentlibrary.utils import make_package_ntiid
+from nti.contentlibrary.utils import NTI
 from nti.contentlibrary.utils import get_published_contents
 from nti.contentlibrary.utils import make_content_package_ntiid
 
@@ -205,8 +207,10 @@ class ContentPackageMixin(object):
         return library
 
     @classmethod
-    def make_package_ntiid(cls, provider=None, base=None, extra=None):
-        return make_package_ntiid(provider, base, extra)
+    def make_package_ntiid(cls, context, provider=None, base=None, extra=None):
+        policy = component.queryUtility(ISitePolicyUserEventListener)
+        provider = provider or getattr(policy, 'PROVIDER', None) or NTI
+        return make_content_package_ntiid(context, provider, base, extra)
 
 
 @view_config(context=LibraryPathAdapter)
@@ -221,7 +225,7 @@ class LibraryPostView(AbstractAuthenticatedView,
     content_predicate = IEditableContentPackage
 
     def _set_ntiid(self, context):
-        context.ntiid = make_content_package_ntiid(context)
+        context.ntiid = self.make_package_ntiid(context)
 
     def _do_call(self):
         library = self.get_library()
