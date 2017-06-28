@@ -8,7 +8,7 @@ This also handles external permissioning of entries in the library.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -67,6 +67,7 @@ class _PermissionedContentPackageLibrary(ProxyBase,
                                                   self.library.contentPackages))
         return self._v_contentPackages
 
+
 # A chain for getting the library that a user can view
 # during workspace access.
 # The chain is a bit convoluted, but very flexible. (note that the
@@ -112,8 +113,8 @@ def _library_workspace_for_user(user, request):
         return ws
 
 
-@interface.implementer(IWorkspace)
 @component.adapter(IUserService)
+@interface.implementer(IWorkspace)
 def _library_workspace(user_service):
     request = get_current_request()
     user = user_service.user
@@ -185,41 +186,12 @@ class LibraryCollection(object):
         return ()
 
 
-@interface.implementer(IWorkspace)
-@component.adapter(IUserService)
-# take request so we can fit the common multi-adapt pattern
-def _bundle_workspace(user_service, request=None):
-    # request = get_current_request()
-    user = getattr(user_service, 'user', user_service)  # also for multi-adapt
-    # Note that, instead of doing the complicated thing that
-    # the library above does, for simplicity to start with we're doing
-    # the simple thing and directly instantiating the object.
-
-    # Right now, we're assuming that any given bundle
-    # is visible to the user.
-
-    # In the (near) future, we expect to have multiple
-    # collections in the library. The idea is similar to the
-    # class workspace, with Available and Enrolled courses:
-    # * visible (purchased?) bundles, aka Enrolled
-    # * available bundles
-    # But naming is hard. "available" is ambiguous (it could mean
-    # the ones you already have access to)..."active" could be used in the
-    # future as a contrast to "archived"
-    # For now we go with visible
-
-    bundle_library = component.queryUtility(IContentPackageBundleLibrary)
-    if bundle_library is not None:
-        ws = _BundleLibraryWorkspace(bundle_library)
-        ws.__parent__ = user
-        return ws
-
-_bundle_workspace_for_user = _bundle_workspace
+# bundles
 
 
 @interface.implementer(ILibraryCollection)
 @component.adapter(IContentPackageBundleLibrary)
-class _BundleLibraryCollection(LibraryCollection):
+class BundleLibraryCollection(LibraryCollection):
 
     __name__ = 'VisibleContentBundles'
 
@@ -228,6 +200,49 @@ class _BundleLibraryCollection(LibraryCollection):
         return self.library.getBundles()
 
 
-class _BundleLibraryWorkspace(LibraryWorkspace):
-
+class BundleLibraryWorkspace(LibraryWorkspace):
     __name__ = 'ContentBundles'
+
+
+@interface.implementer(IContentPackageBundleLibrary)
+def _bundle_for_library(bundle_library, request):
+    return bundle_library
+
+
+@interface.implementer(IContentPackageBundleLibrary)
+def _bundle_for_user(user, request):
+    bundle_library = component.queryUtility(IContentPackageBundleLibrary)
+    return component.queryMultiAdapter((bundle_library, request),
+                                       IContentPackageBundleLibrary)
+
+
+@interface.implementer(IWorkspace)
+def _bundle_workspace_for_library(bundle_library, request):
+    bundle_library = component.getMultiAdapter((bundle_library, request),
+                                               IContentPackageBundleLibrary)
+    if bundle_library is not None:
+        return BundleLibraryWorkspace(bundle_library)
+
+
+@interface.implementer(IWorkspace)
+def _bundle_workspace_for_user(user, request):
+    bundle_library = component.queryMultiAdapter((user, request),
+                                                 IContentPackageBundleLibrary)
+    if bundle_library is not None:
+        ws = BundleLibraryWorkspace(bundle_library)
+        ws.__parent__ = user
+        return ws
+
+
+@component.adapter(IUserService)
+@interface.implementer(IWorkspace)
+def _bundle_workspace(user_service):
+    request = get_current_request()
+    user = user_service.user
+    ws = component.queryMultiAdapter((user, request),
+                                     IWorkspace,
+                                     name='ContentBundles')
+    if ws is not None:
+        ws.__parent__ = user
+        return ws
+

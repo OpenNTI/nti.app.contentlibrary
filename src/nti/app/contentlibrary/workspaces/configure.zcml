@@ -16,7 +16,7 @@
 				provides="nti.appserver.workspaces.interfaces.IWorkspace" />
 
 	<adapter factory=".adapters.LibraryCollection" />
-	<adapter factory=".adapters._BundleLibraryCollection" />
+	<adapter factory=".adapters.BundleLibraryCollection" />
 
 	<adapter factory=".externalization.LibraryCollectionDetailExternalizer" />
 	<adapter factory=".externalization.LibraryCollectionDetailExternalizer" name="detail" />
@@ -50,6 +50,19 @@
 
 	<adapter for="nti.contentlibrary.interfaces.IContentPackageLibrary pyramid.interfaces.IRequest"
 			 factory=".adapters._library_workspace_for_library" />
+
+	<adapter name="ContentBundles"
+			 for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory=".adapters._bundle_workspace_for_user" />
+
+	<adapter for="nti.dataserver.interfaces.IUser pyramid.interfaces.IRequest"
+			 factory=".adapters._bundle_for_user" />
+
+	<adapter for="nti.contentlibrary.interfaces.IContentPackageBundleLibrary pyramid.interfaces.IRequest"
+			 factory=".adapters._bundle_for_library" />
+
+	<adapter for="nti.contentlibrary.interfaces.IContentPackageBundleLibrary pyramid.interfaces.IRequest"
+			 factory=".adapters._bundle_workspace_for_library" />
 
 	<!-- Mark classes -->
 	<class class="nti.appserver.workspaces.NTIIDEntry">
