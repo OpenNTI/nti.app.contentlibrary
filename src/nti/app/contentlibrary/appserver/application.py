@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -71,7 +71,7 @@ def _on_process_starting(event):
         library_zcml = settings['library_zcml']
     elif is_dataserver_file('etc', 'library.zcml'):
         library_zcml = dataserver_file('etc', 'library.zcml')
-    elif   '__file__' in settings \
+    elif    '__file__' in settings \
         and os.path.isfile(os.path.join(os.path.dirname(settings['__file__']), 'library.zcml')):
         library_zcml = os.path.join(os.path.dirname(settings['__file__']),
                                     'library.zcml')
