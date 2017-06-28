@@ -33,7 +33,7 @@ from nti.app.contentlibrary import MessageFactory as _
 from nti.app.contentlibrary.utils.bundle import save_bundle
 from nti.app.contentlibrary.utils.bundle import remove_bundle
 
-from nti.app.contentlibrary.views import BundlesPathAdapter
+from nti.app.contentlibrary.views import ContentBundlesPathAdapter
 
 from nti.app.externalization.error import raise_json_error
 
@@ -128,7 +128,7 @@ class ContentPackageBundleMixin(object):
 @view_config(route_name='objects.generic.traversal',
              renderer='rest',
              request_method='POST',
-             context=BundlesPathAdapter,
+             context=ContentBundlesPathAdapter,
              permission=ACT_CONTENT_EDIT)
 class ContentBundlePostView(AbstractAuthenticatedView,
                             ModeledContentUploadRequestUtilsMixin,

@@ -15,9 +15,9 @@
 			 factory=".LibraryPathAdapter"
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 
-	<adapter name="Bundles"
+	<adapter name="ContentBundles"
 			 for="nti.dataserver.interfaces.IDataserverFolder pyramid.interfaces.IRequest"
-			 factory=".BundlesPathAdapter"
+			 factory=".ContentBundlesPathAdapter"
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 
 	<!-- Content card resolution -->

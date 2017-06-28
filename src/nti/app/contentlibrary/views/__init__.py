@@ -21,9 +21,10 @@ from zope.traversing.interfaces import IPathAdapter
 
 from pyramid import httpexceptions as hexc
 
-from nti.app.contentlibrary import VIEW_CONTENTS
-from nti.app.contentlibrary import BUNDLES_ADAPTER
 from nti.app.contentlibrary import LIBRARY_ADAPTER
+from nti.app.contentlibrary import CONTENT_BUNDLES_ADAPTER
+
+from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
 from nti.app.contentlibrary import VIEW_PACKAGE_WITH_CONTENTS
 
@@ -77,9 +78,9 @@ class LibraryPathAdapter(PathAdapterMixin):
         raise KeyError(ntiid)
 
 
-class BundlesPathAdapter(PathAdapterMixin):
+class ContentBundlesPathAdapter(PathAdapterMixin):
 
-    __name__ = BUNDLES_ADAPTER
+    __name__ = CONTENT_BUNDLES_ADAPTER
 
     def __getitem__(self, ntiid):
         if not ntiid:
