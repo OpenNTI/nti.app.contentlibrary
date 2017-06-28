@@ -27,6 +27,9 @@ VIEW_PACKAGE_WITH_CONTENTS = 'PackageWithContents'
 #: Library path adapter
 LIBRARY_ADAPTER = 'Library'
 
+#: Bundles path adapter
+BUNDLES_ADAPTER = 'Bundles'
+
 #: Library Path (GET) View
 LIBRARY_PATH_GET_VIEW = 'LibraryPath'
 
