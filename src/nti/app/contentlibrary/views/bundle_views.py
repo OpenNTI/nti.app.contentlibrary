@@ -17,7 +17,10 @@ from zope import lifecycleevent
 
 from zope.cachedescriptors.property import Lazy
 
+from zope.component.hooks import site as getSite
 from zope.component.hooks import site as current_site
+
+from zope.intid.interfaces import IIntIds
 
 from pyramid import httpexceptions as hexc
 
@@ -37,6 +40,10 @@ from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtils
 from nti.appserver.policies.interfaces import ISitePolicyUserEventListener
 
 from nti.appserver.ugd_edit_views import ContainerContextUGDPostView
+
+from nti.contentlibrary.index import IX_SITE
+from nti.contentlibrary.index import IX_TITLE
+from nti.contentlibrary.index import get_contentbundle_catalog
 
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -78,10 +85,11 @@ class ContentPackageBundleMixin(object):
         request = self.request if not request else request
         sources = get_all_sources(request)
         if sources:
-            return iter(sources.values()).next()
+            source = iter(sources.values()).next()
+            source.seek(0)
+            return source
         return None
 
-    #def presentation_assets
     def get_library(self, context=None, provided=IContentPackageBundleLibrary):
         if context is None:
             library = component.queryUtility(provided)
@@ -139,20 +147,42 @@ class ContentBundlePostView(AbstractAuthenticatedView,
     def _set_ntiid(self, context):
         context.ntiid = self.make_bundle_ntiid(context)
 
+    def check_exists(self, bundle):
+        site = getSite().__name__
+        catalog = get_contentbundle_catalog()
+        query = {
+            IX_SITE: {'any_of': (site,)},
+            IX_TITLE: {'any_of': (bundle.title,)}
+        }
+        doc_ids = catalog.apply(query)
+        return bool(doc_ids)
+
     def _do_call(self):
         # make sure we can write in the library
         self.validate_content_library()
         # read incoming object
         bundle = self.readCreateUpdateContentObject(self.remoteUser, 
                                                     search_owner=False)
-        # set ntiid
-        self._set_ntiid(bundle)
-        # set creator
         bundle.creator = self.remoteUser.username
+        if self.check_exists(bundle):
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                'message': _(u"Bundle already exists."),
+                                'field': 'title',
+                             },
+                             None)
+        # register and set ntiid
+        intids = component.getUtility(IIntIds)
+        intids.register(bundle)
+        self._set_ntiid(bundle)
         # add to library
         lifecycleevent.created(bundle)
         bundle_library = self.get_library(provided=IContentPackageBundleLibrary)
         bundle_library[bundle.ntiid] = bundle
+        # handle assets
+        assets = self.get_source(self.request)
+        pass
         self.request.response.status_int = 201
         logger.info('Created new content package bundle (%s)', bundle.ntiid)
         return bundle
