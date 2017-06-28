@@ -9,9 +9,15 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 
+	<!-- Traversal -->
 	<adapter name="Library"
 			 for="nti.dataserver.interfaces.IDataserverFolder pyramid.interfaces.IRequest"
 			 factory=".LibraryPathAdapter"
+			 provides="zope.traversing.interfaces.IPathAdapter" />
+
+	<adapter name="Bundles"
+			 for="nti.dataserver.interfaces.IDataserverFolder pyramid.interfaces.IRequest"
+			 factory=".BundlesPathAdapter"
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 
 	<!-- Content card resolution -->

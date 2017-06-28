@@ -15,13 +15,14 @@ from zope import interface
 
 from zope.cachedescriptors.property import Lazy
 
-from zope.container.contained import Contained
+from zope.location.interfaces import IContained
 
 from zope.traversing.interfaces import IPathAdapter
 
 from pyramid import httpexceptions as hexc
 
 from nti.app.contentlibrary import VIEW_CONTENTS
+from nti.app.contentlibrary import BUNDLES_ADAPTER
 from nti.app.contentlibrary import LIBRARY_ADAPTER
 from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
 from nti.app.contentlibrary import VIEW_PACKAGE_WITH_CONTENTS
@@ -44,25 +45,15 @@ from nti.dataserver.interfaces import EVERYONE_GROUP_NAME
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 
-@interface.implementer(IPathAdapter)
-class LibraryPathAdapter(Contained):
+@interface.implementer(IPathAdapter, IContained)
+class PathAdapterMixin(object):
 
-    __name__ = LIBRARY_ADAPTER
+    __name__ = None
 
     def __init__(self, context, request):
         self.context = context
         self.request = request
         self.__parent__ = context
-
-    def __getitem__(self, ntiid):
-        if not ntiid:
-            raise hexc.HTTPNotFound()
-        ntiid = unquote(ntiid)
-        result = find_object_with_ntiid(ntiid)
-        if     IContentUnit.providedBy(result) \
-            or IContentPackageBundle.providedBy(result):
-            return result
-        raise KeyError(ntiid)
 
     @Lazy
     def __acl__(self):
@@ -70,3 +61,31 @@ class LibraryPathAdapter(Contained):
                 ace_allowing(ROLE_CONTENT_ADMIN, ALL_PERMISSIONS, type(self)),
                 ace_allowing(EVERYONE_GROUP_NAME, ACT_READ, type(self))]
         return acl_from_aces(aces)
+
+
+class LibraryPathAdapter(PathAdapterMixin):
+
+    __name__ = LIBRARY_ADAPTER
+
+    def __getitem__(self, ntiid):
+        if not ntiid:
+            raise hexc.HTTPNotFound()
+        ntiid = unquote(ntiid)
+        result = find_object_with_ntiid(ntiid)
+        if IContentUnit.providedBy(result):
+            return result
+        raise KeyError(ntiid)
+
+
+class BundlesPathAdapter(PathAdapterMixin):
+
+    __name__ = BUNDLES_ADAPTER
+
+    def __getitem__(self, ntiid):
+        if not ntiid:
+            raise hexc.HTTPNotFound()
+        ntiid = unquote(ntiid)
+        result = find_object_with_ntiid(ntiid)
+        if IContentPackageBundle.providedBy(result):
+            return result
+        raise KeyError(ntiid)

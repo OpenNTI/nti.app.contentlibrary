@@ -23,11 +23,12 @@ from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 
+from nti.app.base.abstract_views import get_all_sources
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
 from nti.app.contentlibrary import MessageFactory as _
 
-from nti.app.contentlibrary.views import LibraryPathAdapter
+from nti.app.contentlibrary.views import BundlesPathAdapter
 
 from nti.app.externalization.error import raise_json_error
 
@@ -38,12 +39,15 @@ from nti.appserver.policies.interfaces import ISitePolicyUserEventListener
 from nti.appserver.ugd_edit_views import ContainerContextUGDPostView
 
 from nti.contentlibrary.interfaces import IContentPackageBundle
+from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
+from nti.contentlibrary.interfaces import IFilesystemContentPackageLibrary
 
 from nti.contentlibrary.utils import NTI
 from nti.contentlibrary.utils import make_content_package_bundle_ntiid 
 
 from nti.dataserver.authorization import ACT_READ
+from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
 from nti.site.interfaces import IHostPolicyFolder
 
@@ -70,6 +74,14 @@ class ContentPackageBundleMixin(object):
     def extra(self):
         return str(uuid.uuid4()).split('-')[0].upper()
 
+    def get_source(self, request=None):
+        request = self.request if not request else request
+        sources = get_all_sources(request)
+        if sources:
+            return iter(sources.values()).next()
+        return None
+
+    #def presentation_assets
     def get_library(self, context=None, provided=IContentPackageBundleLibrary):
         if context is None:
             library = component.queryUtility(provided)
@@ -88,6 +100,18 @@ class ContentPackageBundleMixin(object):
                              None)
         return library
 
+    def validate_content_library(self, context=None):
+        library = self.get_library(context, IContentPackageLibrary)
+        if not IFilesystemContentPackageLibrary.providedBy(library):
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                'message': _(u"Library not supported."),
+                                'code': 'LibraryNotSupported',
+                             },
+                             None)
+        return library
+
     @classmethod
     def make_bundle_ntiid(cls, provider=None, base=None, extra=None):
         policy = component.queryUtility(ISitePolicyUserEventListener)
@@ -98,9 +122,8 @@ class ContentPackageBundleMixin(object):
 @view_config(route_name='objects.generic.traversal',
              renderer='rest',
              request_method='POST',
-             context=LibraryPathAdapter,
-             permission=ACT_READ,
-             name='Bundles')
+             context=BundlesPathAdapter,
+             permission=ACT_CONTENT_EDIT)
 class ContentBundlePostView(AbstractAuthenticatedView,
                             ModeledContentUploadRequestUtilsMixin,
                             ContentPackageBundleMixin):
@@ -117,7 +140,9 @@ class ContentBundlePostView(AbstractAuthenticatedView,
         context.ntiid = self.make_bundle_ntiid(context)
 
     def _do_call(self):
-        bundle_library = self.get_library(provided=IContentPackageBundleLibrary)
+        # make sure we can write in the library
+        self.validate_content_library()
+        # read incoming object
         bundle = self.readCreateUpdateContentObject(self.remoteUser, 
                                                     search_owner=False)
         # set ntiid
@@ -126,6 +151,7 @@ class ContentBundlePostView(AbstractAuthenticatedView,
         bundle.creator = self.remoteUser.username
         # add to library
         lifecycleevent.created(bundle)
+        bundle_library = self.get_library(provided=IContentPackageBundleLibrary)
         bundle_library[bundle.ntiid] = bundle
         self.request.response.status_int = 201
         logger.info('Created new content package bundle (%s)', bundle.ntiid)
