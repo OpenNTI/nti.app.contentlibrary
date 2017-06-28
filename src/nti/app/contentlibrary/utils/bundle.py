@@ -18,7 +18,13 @@ import simplejson
 
 from xml.dom import minidom
 
+from pyramid import httpexceptions as hexc
+
+from pyramid.threadlocal import get_current_request
+
 from nti.app.contentlibrary import MessageFactory as _
+
+from nti.app.externalization.error import raise_json_error
 
 from nti.contentlibrary import CONTENT_PACKAGE_BUNDLES
 
@@ -77,9 +83,21 @@ def save_bundle_to_disk(bundle, target, assets=None, name=None):
             or not os.path.isdir(assets):
             assets = is_valid_presentation_assets_source(assets)
             if not assets:
-                raise ValueError(_("Invalid presentation assets source."))
+                raise_json_error(get_current_request(),
+                                 hexc.HTTPUnprocessableEntity,
+                                 {
+                                     'message': _(u"Invalid presentation assets source."),
+                                     'code': 'LibraryNotAvailable',
+                                 },
+                                 None)
         if not os.path.isdir(assets):
-            raise ValueError(_("Invalid presentation assets directory."))
+            raise_json_error(get_current_request(),
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                'message': _(u"Invalid presentation assets directory."),
+                                'code': 'LibraryNotAvailable',
+                             },
+                             None)
         path = os.path.join(tmpdir, 'presentation-assets')
         shutil.move(assets, path)
     # save to destination
@@ -94,4 +112,30 @@ def save_bundle_to_disk(bundle, target, assets=None, name=None):
 def save_bundle(bundle, target, assets=None, name=None):
     if IFilesystemBucket.providedBy(target):
         return save_bundle_to_disk(bundle, target, assets, name)
-    raise ValueError(_("Only saving to file system is supported."))
+    raise_json_error(get_current_request(),
+                     hexc.HTTPUnprocessableEntity,
+                     {
+                        'message': _(u"Only saving to file system is supported."),
+                     },
+                     None)
+
+
+def remove_bundle_from_disk(bundle, target, name=None):
+    name = name or safe_filename(bundle.title)
+    absolute_path = getattr(target, 'absolute_path', None) or target
+    dest_path = os.path.join(absolute_path, CONTENT_PACKAGE_BUNDLES, name)
+    if os.path.exists(dest_path):
+        shutil.rmtree(dest_path, ignore_errors=False)
+        return True
+    return False
+
+
+def remove_bundle(bundle, target, name=None):
+    if IFilesystemBucket.providedBy(target):
+        return remove_bundle_from_disk(bundle, target, name)
+    raise_json_error(get_current_request(),
+                     hexc.HTTPUnprocessableEntity,
+                     {
+                        'message': _(u"Only removing from file system is supported."),
+                     },
+                     None)

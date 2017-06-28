@@ -17,7 +17,6 @@ from zope import lifecycleevent
 
 from zope.cachedescriptors.property import Lazy
 
-from zope.component.hooks import site as getSite
 from zope.component.hooks import site as current_site
 
 from zope.intid.interfaces import IIntIds
@@ -31,6 +30,9 @@ from nti.app.base.abstract_views import AbstractAuthenticatedView
 
 from nti.app.contentlibrary import MessageFactory as _
 
+from nti.app.contentlibrary.utils.bundle import save_bundle
+from nti.app.contentlibrary.utils.bundle import remove_bundle
+
 from nti.app.contentlibrary.views import BundlesPathAdapter
 
 from nti.app.externalization.error import raise_json_error
@@ -40,10 +42,6 @@ from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtils
 from nti.appserver.policies.interfaces import ISitePolicyUserEventListener
 
 from nti.appserver.ugd_edit_views import ContainerContextUGDPostView
-
-from nti.contentlibrary.index import IX_SITE
-from nti.contentlibrary.index import IX_TITLE
-from nti.contentlibrary.index import get_contentbundle_catalog
 
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -147,42 +145,29 @@ class ContentBundlePostView(AbstractAuthenticatedView,
     def _set_ntiid(self, context):
         context.ntiid = self.make_bundle_ntiid(context)
 
-    def check_exists(self, bundle):
-        site = getSite().__name__
-        catalog = get_contentbundle_catalog()
-        query = {
-            IX_SITE: {'any_of': (site,)},
-            IX_TITLE: {'any_of': (bundle.title,)}
-        }
-        doc_ids = catalog.apply(query)
-        return bool(doc_ids)
-
     def _do_call(self):
         # make sure we can write in the library
-        self.validate_content_library()
+        library = self.validate_content_library()
         # read incoming object
         bundle = self.readCreateUpdateContentObject(self.remoteUser, 
                                                     search_owner=False)
         bundle.creator = self.remoteUser.username
-        if self.check_exists(bundle):
-            raise_json_error(self.request,
-                             hexc.HTTPUnprocessableEntity,
-                             {
-                                'message': _(u"Bundle already exists."),
-                                'field': 'title',
-                             },
-                             None)
         # register and set ntiid
         intids = component.getUtility(IIntIds)
-        intids.register(bundle)
+        doc_id = intids.register(bundle)
+        # check for transaction retrial
+        jid = getattr(self.request, 'jid', None)
+        if jid is not None and doc_id != jid:
+            remove_bundle(bundle, library.root, name=str(jid))
+        self.request.jid = doc_id
         self._set_ntiid(bundle)
         # add to library
         lifecycleevent.created(bundle)
         bundle_library = self.get_library(provided=IContentPackageBundleLibrary)
         bundle_library[bundle.ntiid] = bundle
-        # handle assets
+        # handle presentation-assets and save
         assets = self.get_source(self.request)
-        pass
+        save_bundle(bundle, library.root, assets, name=str(doc_id))
         self.request.response.status_int = 201
         logger.info('Created new content package bundle (%s)', bundle.ntiid)
         return bundle
