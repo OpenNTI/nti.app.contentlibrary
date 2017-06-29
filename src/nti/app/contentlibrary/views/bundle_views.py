@@ -213,7 +213,7 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
         doc_id = intids.register(context)
         # get any presentation assets
         assets = self.get_source(self.request) \
-            or getattr(context, '_presentation_assets', None)
+              or getattr(context, '_presentation_assets', None)
         if assets is not None:
             library = self.validate_content_library(context)
             # check for transaction retrial
