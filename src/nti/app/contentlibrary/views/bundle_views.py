@@ -34,7 +34,6 @@ from nti.app.base.abstract_views import AbstractAuthenticatedView
 from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.contentlibrary.utils.bundle import save_bundle
-from nti.app.contentlibrary.utils.bundle import remove_bundle
 
 from nti.app.contentlibrary.views import ContentBundlesPathAdapter
 
@@ -215,14 +214,16 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
         assets = self.get_source(self.request) \
               or getattr(context, '_presentation_assets', None)
         if assets is not None:
+            if hasattr(assets, "seek"):
+                assets.seek(0)
             library = self.validate_content_library(context)
             # check for transaction retrial
             jid = getattr(self.request, 'jid', None)
-            if jid is not None and doc_id != jid:
-                remove_bundle(context, library.root, name=str(jid))
-            save_bundle(context, library.root, assets, name=str(doc_id))
-            if hasattr(context, '_presentation_assets'):
-                del context._presentation_assets
+            if jid is None:
+                save_bundle(context, library.root, 
+                            assets, name=str(doc_id))
+                if hasattr(context, '_presentation_assets'):
+                    del context._presentation_assets
         # save trx id
         self.request.jid = doc_id
         return context
