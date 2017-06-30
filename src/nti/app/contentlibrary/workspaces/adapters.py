@@ -24,13 +24,15 @@ from zope.proxy.decorator import ProxyBase
 
 from pyramid.threadlocal import get_current_request
 
-from nti.app.contentlibrary._permissioned import _PermissionedContentPackageMixin
-
 from nti.app.contentlibrary.workspaces.interfaces import ILibraryCollection
+
+from nti.appserver.pyramid_authorization import is_readable
 
 from nti.appserver.workspaces.interfaces import IWorkspace
 from nti.appserver.workspaces.interfaces import ICollection
 from nti.appserver.workspaces.interfaces import IUserService
+
+from nti.contentlibrary import ALL_CONTENT_MIMETYPES
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
@@ -38,8 +40,7 @@ from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.property.property import alias
 
 
-class _PermissionedContentPackageLibrary(ProxyBase,
-                                         _PermissionedContentPackageMixin):
+class _PermissionedContentPackageLibrary(ProxyBase):
     """
     A wrapper around the global library that implements
     permissioning of the available titles for the user (which in
@@ -59,6 +60,17 @@ class _PermissionedContentPackageLibrary(ProxyBase,
         self.library = base
         self._v_request = request
         self._v_contentPackages = None
+
+    def _test_is_readable(self, content_package, request=None):
+        # test readability
+        request = request or self._v_request
+        result = is_readable(content_package, request)
+        if not result:
+            # Nope. What about a top-level child? 
+            # TODO: Why we check children?
+            result = any(is_readable(x, request)
+                         for x in content_package.children or ())
+        return result
 
     @property
     def contentPackages(self):
@@ -182,8 +194,7 @@ class LibraryCollection(object):
 
     @property
     def accepts(self):
-        # TODO: Add mimetypes
-        return ()
+        return ALL_CONTENT_MIMETYPES
 
 
 # bundles
