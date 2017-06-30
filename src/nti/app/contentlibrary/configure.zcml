@@ -39,19 +39,6 @@
 	<adapter factory=".acl._TestingLibraryTOCEntryACLProvider"
 			 zcml:condition="have testmode" />
 
-
-	<configure zcml:condition="installed nti.contenttypes.courses">
-		<!-- Permissions cache -->
-		<subscriber handler="._courses._on_enroll_record" />
-		<subscriber handler="._courses._on_unenroll_record" />
-
-		<!-- Catalog -->
-		<subscriber factory="._courses._CourseContentUnitAssociations"
-					provides="nti.contentlibrary.interfaces.IContentUnitAssociations"
-					for="nti.contentlibrary.interfaces.IContentUnit" />
-
-	</configure>
-
 	<!-- Workspaces/collections -->
 	<include package=".workspaces" />
 
