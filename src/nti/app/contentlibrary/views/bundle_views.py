@@ -58,8 +58,9 @@ from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import IFilesystemContentPackageLibrary
 from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 
-from nti.contentlibrary.utils import NTI, is_valid_presentation_assets_source
+from nti.contentlibrary.utils import NTI
 from nti.contentlibrary.utils import make_content_package_bundle_ntiid
+from nti.contentlibrary.utils import is_valid_presentation_assets_source
 
 from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
