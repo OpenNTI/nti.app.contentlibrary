@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -52,6 +52,7 @@ from nti.dublincore.time_mixins import PersistentCreatedAndModifiedTimeObject
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.traversal.traversal import find_interface
+
 
 # Bundles
 
@@ -172,7 +173,9 @@ def _bundles_from_container_object(obj):
             results.add(bundle)
     return results
 
+
 # Containers
+
 
 from persistent.mapping import PersistentMapping
 

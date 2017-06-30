@@ -6,7 +6,7 @@ Discussion board/forum objects.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -46,6 +46,7 @@ from nti.traversal.traversal import find_interface
 
 @interface.implementer(IContentBoard)
 class ContentBoard(GeneralBoard):
+
     mime_type = mimeType = 'application/vnd.nextthought.forums.contentboard'
 
     # Override things related to ntiids.
@@ -67,7 +68,7 @@ class ContentBoard(GeneralBoard):
         forum = ContentForum()
         forum.creator = self.creator
         self[forum.__default_name__] = forum
-        forum.title = _('Forum')
+        forum.title = _(u'Forum')
 
         errors = schema.getValidationErrors(IContentForum, forum)
         if errors:
@@ -83,7 +84,9 @@ def ContentBoardAdapter(context):
         board.creator = system_user
     return board
 
+
 # Forum
+
 
 from nti.app.contentlibrary.interfaces import IContentForum
 
@@ -106,7 +109,9 @@ class ContentForum(GeneralForum):
         # See above about the sharing stuff
         return True
 
+
 # Topic
+
 
 from nti.app.contentlibrary.interfaces import IContentHeadlineTopic
 
@@ -163,7 +168,7 @@ class ContentHeadlineTopic(GeneralHeadlineTopic):
             # find a community in site hierarchy
             names = chain((folder.__name__,), get_component_hierarchy_names())
             for name in names:
-                comm = users.Entity.get_entity(name or u'')
+                comm = users.Entity.get_entity(name or '')
                 if ICommunity.providedBy(comm):  # we have community
                     self.publicationSharingTargets = (name,)
                     break
@@ -178,7 +183,9 @@ class ContentHeadlineTopic(GeneralHeadlineTopic):
         self.publicationSharingTargets = self.DEFAULT_SHARING_TARGETS
         return super(ContentHeadlineTopic, self).unpublish()
 
+
 # Posts
+
 
 from nti.app.contentlibrary.interfaces import IContentCommentPost
 from nti.app.contentlibrary.interfaces import IContentHeadlinePost
@@ -203,7 +210,9 @@ class ContentCommentPost(GeneralForumComment):
         # See above about the sharing stuff
         return True
 
+
 # ACLs
+
 
 from nti.dataserver.authorization import ACT_READ
 
@@ -238,7 +247,9 @@ class _ContentForumACLProvider(CommunityForumACLProvider):
     def _get_sharing_target_names(self):
         return ('Everyone', AUTHENTICATED_GROUP_NAME)
 
+
 # Forum decorators
+
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
