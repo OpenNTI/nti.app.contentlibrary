@@ -1,0 +1,31 @@
+<!-- -*- mode: nxml -*- -->
+<configure	xmlns="http://namespaces.zope.org/zope"
+			xmlns:i18n="http://namespaces.zope.org/i18n"
+			xmlns:ext="http://nextthought.com/ntp/ext"
+			xmlns:zcml="http://namespaces.zope.org/zcml">
+
+	<include package="zope.component" file="meta.zcml" />
+	<include package="zope.component" />
+
+	<subscriber handler=".subscribers._update_indices_when_content_changes"
+				for="nti.contentlibrary.interfaces.IContentPackage
+					 zope.lifecycleevent.IObjectAddedEvent" />
+
+	<subscriber handler=".subscribers._update_indices_when_content_changes"
+				for="nti.contentlibrary.interfaces.IContentPackage
+					 zope.lifecycleevent.IObjectModifiedEvent" />
+
+	<subscriber handler=".subscribers._clear_index_when_content_removed"
+				for="nti.contentlibrary.interfaces.IContentPackage
+					 zope.lifecycleevent.IObjectRemovedEvent" />
+
+	<subscriber handler=".subscribers._clear_index_when_content_unpublished"
+				for="nti.contentlibrary.interfaces.IContentPackage
+					 nti.publishing.interfaces.IObjectUnpublishedEvent" />
+
+	<!-- publishing -->
+	<subscriber handler=".subscribers._on_content_package_rendered"
+				for="nti.contentlibrary.interfaces.IRenderableContentPackage
+					 nti.contentlibrary.interfaces.IContentPackageRenderedEvent" />
+
+</configure>

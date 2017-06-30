@@ -23,9 +23,9 @@ from pyramid.view import view_defaults
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
-from nti.app.contentlibrary.subscribers import can_be_removed
-from nti.app.contentlibrary.subscribers import removed_registered
-from nti.app.contentlibrary.subscribers import clear_content_package_assets
+from nti.app.contentlibrary.synchronize.subscribers import can_be_removed
+from nti.app.contentlibrary.synchronize.subscribers import removed_registered
+from nti.app.contentlibrary.synchronize.subscribers import clear_content_package_assets
 
 from nti.app.contentlibrary.utils.common import remove_package_inaccessible_assets
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Sync views.
-
 .. $Id$
 """
 
@@ -48,9 +46,9 @@ from nti.app.contentlibrary import MessageFactory as _
 from nti.app.contentlibrary import LOCK_TIMEOUT
 from nti.app.contentlibrary import SYNC_LOCK_NAME
 
-from nti.app.contentlibrary.subscribers import update_indices_when_content_changes
-
 from nti.app.contentlibrary.synchronize import syncContentPackages
+
+from nti.app.contentlibrary.synchronize.subscribers import update_indices_when_content_changes
 
 from nti.app.externalization.error import raise_json_error
 

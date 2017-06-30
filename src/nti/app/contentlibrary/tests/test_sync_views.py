@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -45,8 +45,8 @@ class TestSyncViews(ApplicationLayerTest):
         regs = eventtesting.getEvents(IRegistered)
         assert_that(regs, is_not(empty()))
 
-        syncd = eventtesting.getEvents(
-            IContentPackageLibraryModifiedOnSyncEvent)
+        event = IContentPackageLibraryModifiedOnSyncEvent
+        syncd = eventtesting.getEvents(event)
         assert_that(syncd, is_not(empty()))
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
