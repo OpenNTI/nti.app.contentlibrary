@@ -13,6 +13,7 @@ from zope import component
 from zope import interface
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.dataserver import authorization_acl as nacl
 
@@ -32,4 +33,20 @@ class _ContentResolver(object):
             result = path[-1]
             result = ACLLocationProxy(result, result.__parent__,
                                       result.__name__, nacl.ACL(result))
+        return result
+
+
+@interface.implementer(INTIIDResolver)
+class _BundleResolver(object):
+
+    def resolve(self, key):
+        result = None
+        library = component.queryUtility(IContentPackageBundleLibrary)
+        if library is not None:
+            try:
+                result = library[key]
+                result = ACLLocationProxy(result, result.__parent__,
+                                          result.__name__, nacl.ACL(result))
+            except KeyError:
+                pass
         return result

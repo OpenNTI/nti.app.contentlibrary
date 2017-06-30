@@ -72,7 +72,7 @@ class TestBundleViews(ApplicationLayerTest):
             assert_that(res.json_body, has_entry('OID', is_not(none())))
             assert_that(res.json_body, has_entry('NTIID', is_not(none())))
             assert_that(res.json_body, has_entry('title', is_('Bleach')))
-            ntiid = res.json_body['OID']
+            ntiid = res.json_body['NTIID']
 
             with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
                 bundle = find_object_with_ntiid(ntiid)

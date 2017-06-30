@@ -27,6 +27,7 @@
 	<!-- NTIID Resolvers -->
 	<utility factory=".ntiids._ContentResolver" name="HTML" />
 	<utility factory=".ntiids._ContentResolver" name="Root" />
+	<utility factory=".ntiids._BundleResolver" name="Bundle" />
 
 	<!-- ACL -->
 	<adapter factory=".acl._ContentPackageLibraryACLProvider" />
