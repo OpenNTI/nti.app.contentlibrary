@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: too many ancestors
@@ -36,11 +36,18 @@ from nti.dataserver.contenttypes.forums.interfaces import IGeneralForumComment
 from nti.dataserver.contenttypes.forums.interfaces import IGeneralHeadlinePost
 from nti.dataserver.contenttypes.forums.interfaces import IGeneralHeadlineTopic
 
+from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IShouldHaveTraversablePath
 
 from nti.schema.field import List
 from nti.schema.field import Object
 from nti.schema.field import TextLine as ValidTextLine
+
+
+class IContentBundleCommunity(ICommunity):
+    """
+    A content bundle communiy
+    """
 
 
 class IContentBoard(IDefaultForumBoard,
@@ -49,7 +56,7 @@ class IContentBoard(IDefaultForumBoard,
     """
     A board belonging to a particular piece of content.
     """
-    contains(b'.IContentForum')
+    contains('.IContentForum')
     __setitem__.__doc__ = None
 
 
@@ -59,7 +66,7 @@ class IContentForum(IGeneralForum,
     A forum belonging to a particular piece of content.
     """
     containers(IContentBoard)
-    contains(b'.IContentHeadlineTopic')
+    contains('.IContentHeadlineTopic')
     __parent__.required = False
 
 
@@ -67,17 +74,17 @@ class IContentHeadlinePost(IGeneralHeadlinePost):
     """
     The headline of a content topic
     """
-    containers(b'.IContentHeadlineTopic')
+    containers('.IContentHeadlineTopic')
     __parent__.required = False
 
 
 class IContentHeadlineTopic(IGeneralHeadlineTopic,
                             IPublishableTopic):
     containers(IContentForum)
-    contains(b'.IContentCommentPost')
+    contains('.IContentCommentPost')
     __parent__.required = False
     headline = Object(IContentHeadlinePost,
-                      title="The main, first post of this topic.")
+                      title=u"The main, first post of this topic.")
 
 
 class IContentCommentPost(IGeneralForumComment):
@@ -102,7 +109,7 @@ class IContentUnitPreferences(ILocation,
     # NOTE: This can actually be None in some cases, which makes it
     # impossible to validate this schema.
     sharedWith = List(value_type=Object(IUnicode),
-                      title="List of usernames to share with")
+                      title=u"List of usernames to share with")
 
 
 class IContentPackageRolePermissionManager(IRolePermissionManager):
@@ -126,8 +133,8 @@ class IContentUnitInfo(INTIIDEntry):
     """
 
     contentUnit = Object(IContentUnit,
-                         title="The IContentUnit this object provides info for, if there is one.",
-                         description=""" Typically this will only be provided for one-off requests.
+                         title=u"The IContentUnit this object provides info for, if there is one.",
+                         description=u""" Typically this will only be provided for one-off requests.
                                     Bulk collections/requests will not have it.
                                     """)
 
@@ -136,7 +143,7 @@ class IContentUnitInfo(INTIIDEntry):
 
 class IContentUnitContents(interface.Interface):
 
-    ntiid = ValidTextLine(title='Content unit NTIID')
+    ntiid = ValidTextLine(title=u'Content unit NTIID')
 
     contentType = ValidBytesLine(
         title=u'Content Type',

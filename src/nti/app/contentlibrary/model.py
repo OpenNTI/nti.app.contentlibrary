@@ -12,6 +12,9 @@ logger = __import__('logging').getLogger(__name__)
 from zope import interface
 
 from nti.app.contentlibrary.interfaces import IContentUnitContents
+from nti.app.contentlibrary.interfaces import IContentBundleCommunity
+
+from nti.dataserver.users.communities import Community
 
 from nti.property.property import alias
 
@@ -27,3 +30,8 @@ class ContentUnitContents(SchemaConfigured):
     mime_type = mimeType = 'application/vnd.nextthought.contentunit.contents'
 
     contents = alias('data')
+
+
+@interface.implementer(IContentBundleCommunity)
+class ContentBundleCommunity(Community):
+    mime_type = mimeType = 'application/vnd.nextthought.community'
