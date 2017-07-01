@@ -26,7 +26,11 @@ from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.externalization.error import raise_json_error
 
+from nti.base._compat import text_
+
 from nti.contentlibrary import CONTENT_PACKAGE_BUNDLES
+
+from nti.contentlibrary.filesystem import FilesystemBucket
 
 from nti.contentlibrary.interfaces import IFilesystemBucket
 
@@ -51,7 +55,8 @@ def dc_metadata(bundle):
     doc_root.setAttributeNS(None, "xmlns:dc",
                             "http://purl.org/dc/elements/1.1/")
     # add creators
-    creators = set(bundle.creators or ()) + {getattr(bundle, 'creator', None)}
+    creators = set(bundle.creators or ())
+    creators.union({getattr(bundle, 'creator', None)})
     for name in creators:
         if not name:
             continue
@@ -69,6 +74,7 @@ def dc_metadata(bundle):
 def save_bundle_to_disk(bundle, target, assets=None, name=None):
     name = name or safe_filename(bundle.title)
     tmpdir = os.path.join(tempfile.mkdtemp(), name)
+    os.makedirs(tmpdir)
     # save bundle meta info
     path = os.path.join(tmpdir, "bundle_meta_info.json")
     with open(path, "wb") as fp:
@@ -111,7 +117,12 @@ def save_bundle_to_disk(bundle, target, assets=None, name=None):
 
 def save_bundle(bundle, target, assets=None, name=None):
     if IFilesystemBucket.providedBy(target):
-        return save_bundle_to_disk(bundle, target, assets, name)
+        name = text_(name or safe_filename(bundle.title))
+        path = save_bundle_to_disk(bundle, target, assets, name)
+        bucket = FilesystemBucket(name=name)
+        bucket.absolute_path = path
+        bundle.root = bucket
+        return bucket
     raise_json_error(get_current_request(),
                      hexc.HTTPUnprocessableEntity,
                      {

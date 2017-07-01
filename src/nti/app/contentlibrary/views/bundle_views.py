@@ -221,7 +221,7 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
             # check for transaction retrial
             jid = getattr(self.request, 'jid', None)
             if jid is None:
-                save_bundle(context, library.root, 
+                save_bundle(context, library.enumeration.root, 
                             assets, name=str(doc_id))
                 if hasattr(context, '_presentation_assets'):
                     del context._presentation_assets

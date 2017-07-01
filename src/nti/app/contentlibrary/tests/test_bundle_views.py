@@ -53,7 +53,7 @@ class TestBundleViews(ApplicationLayerTest):
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
     @fudge.patch('nti.app.contentlibrary.views.bundle_views.get_all_sources')
-    def test_create_bundle(self, mock_src):
+    def test_create_and_publish_bundle(self, mock_src):
         tmpdir = tempfile.mkdtemp()
         try:
             path = self.presentation_assets_zip(tmpdir)
@@ -77,6 +77,20 @@ class TestBundleViews(ApplicationLayerTest):
             with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
                 bundle = find_object_with_ntiid(ntiid)
                 assert_that(bundle, 
+                            has_property('root', is_(none())))
+                assert_that(bundle, 
                             has_property('_presentation_assets', is_not(none())))
+                
+            href = '/dataserver2/ContentBundles/%s/@@publish' % ntiid
+            self.testapp.post(href, status=200)
+            with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
+                bundle = find_object_with_ntiid(ntiid)
+                assert_that(bundle, 
+                            has_property('root', is_not(none())))
         finally:
+            bundles = os.path.join(self.layer.library_path,
+                                   'sites',
+                                   'platform.ou.edu',
+                                   'ContentPackageBundles')
+            shutil.rmtree(bundles, ignore_errors=True)
             shutil.rmtree(tmpdir, ignore_errors=True)
