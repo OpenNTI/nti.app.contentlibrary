@@ -111,7 +111,14 @@ def save_bundle_to_disk(bundle, target, assets=None, name=None):
     dest_path = os.path.join(absolute_path, CONTENT_PACKAGE_BUNDLES, name)
     if not os.path.exists(dest_path):
         os.makedirs(dest_path)
-    shutil.move(tmpdir, dest_path)
+    for name in os.listdir(tmpdir):
+        source = os.path.join(tmpdir, name)
+        target = os.path.join(dest_path, name)
+        if os.path.exists(target) and os.path.isdir(target):
+            shutil.rmtree(target)
+        shutil.move(source, target)
+    # clean up
+    shutil.rmtree(tmpdir, ignore_errors=True)
     return dest_path
 
 
