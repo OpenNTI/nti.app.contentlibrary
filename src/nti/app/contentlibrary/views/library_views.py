@@ -6,7 +6,7 @@ Views for exposing the content library to clients.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -245,12 +245,12 @@ class _LibraryTOCRedirectClassView(object):
     link_mt_json = link_mimeType + '+json'
     link_mts = (link_mimeType, link_mt_json)
 
-    json_mimeType = 'application/json'
+    json_mimeType = u'application/json'
     page_info_mimeType = PAGE_INFO_MT
     page_info_mt_json = PAGE_INFO_MT_JSON
     page_mts = (json_mimeType, page_info_mimeType, page_info_mt_json)
 
-    mimeTypes = ('text/html', link_mimeType, link_mt_json,
+    mimeTypes = (u'text/html', link_mimeType, link_mt_json,
                  json_mimeType, page_info_mimeType, page_info_mt_json)
 
     def _as_link(self, href, lastModified, request):
@@ -278,11 +278,11 @@ class _LibraryTOCRedirectClassView(object):
         # admin.
         if      not self._is_published(context) \
             and not has_permission(nauth.ACT_CONTENT_EDIT, context, self.request):
-            raise hexc.HTTPForbidden(
-                _('Do not have access to unpublished object.'))
+            msg = _(u'Do not have access to unpublished object.')
+            raise hexc.HTTPForbidden(msg)
         if      IRenderableContentUnit.providedBy(context) \
             and not IContentRendered.providedBy(context):
-            raise hexc.HTTPNotFound(_('Object not yet rendered.'))
+            raise hexc.HTTPNotFound(_(u'Object not yet rendered.'))
 
     def _get_unit_href(self, unit, default_href):
         mapper = IContentUnitHrefMapper(unit, None)
@@ -316,7 +316,7 @@ class _LibraryTOCRedirectClassView(object):
 
         # If the client asks for a specific type of data,
         # a link, then give it to them. Otherwise...
-        accept_type = 'text/html'
+        accept_type = u'text/html'
         if request.accept:
             accept_type = request.accept.best_match(self.mimeTypes)
 

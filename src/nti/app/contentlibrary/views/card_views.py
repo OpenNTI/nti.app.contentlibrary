@@ -6,7 +6,7 @@ Views related to cards in content.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -41,7 +41,7 @@ PAGE_INFO_MT_JSON = PAGE_INFO_MT_JSON
 # contains traversal helpers to fake it
 class _ContentCard(Contained):
 
-    __slots__ = (b'path', b'ntiid')
+    __slots__ = ('path', 'ntiid')
 
     def __init__(self, path):
         self.path = path
@@ -81,14 +81,14 @@ def pageinfo_from_content_card_view(request):
     return find_page_info_view_helper(request, request.context.path[-1])
 
 
-@view_config(accept=b'application/vnd.nextthought.link+json', **_view_defaults)
+@view_config(accept='application/vnd.nextthought.link+json', **_view_defaults)
 def get_card_view_link(request):
     # Not supported.
     return hexc.HTTPBadRequest()
 
 # explicit empty accept, else we get a ConfigurationConflict and/or
 # no-Accept header goes to the wrong place
-@view_config(accept=b'', **_view_defaults)
+@view_config(accept='', **_view_defaults)
 @view_config(**_view_defaults)
 def get_card_view(request):
     # NOTE: These are not modeled content. What we are returning is arbitrary
@@ -108,7 +108,7 @@ def get_card_view(request):
     # Because of syntax issues, and unicode issues, we have to iterate
     # for the object ourself
 
-    nodes = pq(b'object[data-ntiid]')
+    nodes = pq('object[data-ntiid]')
     object_elm = None
     for node in nodes:
         if      node.tag == 'object' \

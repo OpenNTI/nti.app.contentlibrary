@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -44,13 +44,12 @@ from nti.site.site import get_component_hierarchy_names
 
 from nti.site.utils import unregisterUtility
 
-from nti.traversal.traversal import find_interface
-
+TOTAL = StandardExternalFields.TOTAL
 INTID = StandardExternalFields.INTID
 ITEMS = StandardExternalFields.ITEMS
 NTIID = StandardExternalFields.NTIID
 MIMETYPE = StandardExternalFields.MIMETYPE
-
+ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 
 def _package_assets(package):
     result = []
@@ -69,8 +68,8 @@ def _package_assets(package):
 
 
 def get_package_site(package):
-    folder = find_interface(package, IHostPolicyFolder, strict=False)
-    return folder.__name__
+    site = IHostPolicyFolder(package)
+    return site.__name__
 
 
 def lookup_all_presentation_assets(site_registry):
@@ -178,5 +177,5 @@ def remove_package_inaccessible_assets():
     result['Sites'] = list(sites)
     result['TotalContainedAssets'] = len(master)
     result['TotalRegisteredAssets'] = registered
-    result['Total'] = result['ItemCount'] = len(items)
+    result[TOTAL] = result[ITEM_COUNT] = len(items)
     return result

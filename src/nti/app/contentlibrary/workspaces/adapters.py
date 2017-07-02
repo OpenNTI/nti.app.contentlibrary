@@ -176,6 +176,7 @@ class LibraryCollection(object):
 
     __parent__ = None
     __name__ = 'Main'
+
     name = alias('__name__')
 
     # BWC

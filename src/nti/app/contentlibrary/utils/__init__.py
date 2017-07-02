@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -67,17 +67,17 @@ def find_page_info_view_helper(request, page_ntiid_or_content_unit):
     # don't follow redirects parts of the request should be native strings,
     # which under py2 are bytes. Also make sure we pass any params to
     # subrequest
-    path = b'/dataserver2/Objects/' + _encode(page_ntiid)
+    path = '/dataserver2/Objects/' + _encode(page_ntiid)
     if request.query_string:
         path += '?' + _encode(request.query_string)
 
     # set subrequest
     subrequest = request.blank(path)
-    subrequest.method = b'GET'
+    subrequest.method = 'GET'
     subrequest.possible_site_names = request.possible_site_names
     # prepare environ
-    subrequest.environ[b'REMOTE_USER'] = request.environ['REMOTE_USER']
-    subrequest.environ[b'repoze.who.identity'] = request.environ['repoze.who.identity'].copy()
+    subrequest.environ['REMOTE_USER'] = request.environ['REMOTE_USER']
+    subrequest.environ['repoze.who.identity'] = request.environ['repoze.who.identity'].copy()
     for k in request.environ:
         if k.startswith('paste.') or k.startswith('HTTP_'):
             if k not in subrequest.environ:

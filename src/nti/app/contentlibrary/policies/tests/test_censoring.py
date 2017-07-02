@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -13,7 +13,8 @@ from nti.app.contentlibrary.policies import censoring
 
 from nti.contentfragments.censor import DefaultCensoredContentPolicy
 
-from nti.dataserver import interfaces as nti_interfaces
+from nti.dataserver.interfaces import IUser
+from nti.dataserver.interfaces import ICoppaUser
 
 from nti.appserver.policies.tests.test_application_censoring import CensorTestMixin
 
@@ -31,13 +32,13 @@ class TestApplicationCensoringWithDefaultPolicyForAllUsers(CensorTestMixin, Appl
     def setUp(self):
         super(TestApplicationCensoringWithDefaultPolicyForAllUsers, self).setUp()
         component.provideAdapter(DefaultCensoredContentPolicy,
-                                 adapts=(nti_interfaces.IUser, None))
+                                 adapts=(IUser, None))
         component.provideAdapter(censoring.user_filesystem_censor_policy)
 
     def tearDown(self):
         gsm = component.getGlobalSiteManager()
         gsm.unregisterAdapter(DefaultCensoredContentPolicy,
-                              required=(nti_interfaces.IUser, None))
+                              required=(IUser, None))
         gsm.unregisterAdapter(censoring.user_filesystem_censor_policy)
 
     @WithSharedApplicationMockDS
@@ -50,11 +51,11 @@ class TestApplicationCensoringWithDefaultPolicyForAllUsers(CensorTestMixin, Appl
         # "The ICoppaUser flag trumps the no-censoring flag"
         self._do_test_censor_note("tag:nextthought.com,2011-10:MN-HTML-Uncensored.cosmetology",
                                   censored=True,
-                                  extra_ifaces=(nti_interfaces.ICoppaUser,))
+                                  extra_ifaces=(ICoppaUser,))
 
     @WithSharedApplicationMockDS
     def test_censor_note_not_in_library_enabled_for_kids(self):
         # "If we post a note to a container we don't recognize, we  get censored if we are a kid"
         self._do_test_censor_note('tag:not_in_library',
                                   censored=True,
-                                  extra_ifaces=(nti_interfaces.ICoppaUser,))
+                                  extra_ifaces=(ICoppaUser,))
