@@ -18,6 +18,8 @@ from pyramid.threadlocal import get_current_request
 
 from nti.appserver.pyramid_authorization import has_permission
 
+from nti.contentlibrary import BUNDLE
+
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -37,7 +39,7 @@ from nti.externalization.singleton import SingletonDecorator
 
 from nti.ntiids.ntiids import ROOT
 from nti.ntiids.ntiids import TYPE_OID
-from nti.ntiids.ntiids import is_ntiid_of_type
+from nti.ntiids.ntiids import is_ntiid_of_types
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.publishing.interfaces import IPublishable
@@ -58,7 +60,7 @@ class _DefaultSearchPacakgeResolver(object):
     def resolve(self, unused_user, ntiid=None):
         result = ()
         if ntiid != ROOT:
-            if bool(is_ntiid_of_type(ntiid, TYPE_OID)):
+            if bool(is_ntiid_of_types(ntiid, (TYPE_OID, BUNDLE))):
                 obj = find_object_with_ntiid(ntiid)
                 bundle = IContentPackageBundle(obj, None)
                 if bundle is not None and bundle.ContentPackages:
