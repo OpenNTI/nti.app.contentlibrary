@@ -44,9 +44,7 @@ class _BundleResolver(object):
         library = component.queryUtility(IContentPackageBundleLibrary)
         if library is not None:
             try:
-                result = library[key]
-                result = ACLLocationProxy(result, result.__parent__,
-                                          result.__name__, nacl.ACL(result))
+                return library[key]
             except KeyError:
                 pass
         return result

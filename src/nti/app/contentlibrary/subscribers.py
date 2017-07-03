@@ -14,7 +14,7 @@ from zope import interface
 
 from zope.intid.interfaces import IIntIds
 
-from zope.lifecycleevent.interfaces import IObjectCreatedEvent
+from zope.lifecycleevent.interfaces import IObjectAddedEvent
 
 from zope.securitypolicy.rolepermission import AnnotationRolePermissionManager
 
@@ -90,7 +90,7 @@ def _on_content_pacakge_library_synced(library, unused_event):
 # bundle events
 
 
-@component.adapter(IContentPackageBundle, IObjectCreatedEvent)
+@component.adapter(IContentPackageBundle, IObjectAddedEvent)
 def _on_content_bundle_added(bundle, unused_event):
     # create a bundle community
     try:

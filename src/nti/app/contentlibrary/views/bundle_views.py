@@ -67,6 +67,8 @@ from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
 from nti.externalization.interfaces import StandardExternalFields
 
+from nti.externalization.proxy import removeAllProxies
+
 from nti.site.interfaces import IHostPolicyFolder
 
 MIMETYPE = StandardExternalFields.MIMETYPE
@@ -210,7 +212,7 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
     def _do_provide(self, context):
         super(ContentBundlePublishView, self)._do_provide(context)
         intids = component.getUtility(IIntIds)
-        doc_id = intids.register(context)
+        doc_id = intids.getId(removeAllProxies(context))
         # get any presentation assets
         assets = self.get_source(self.request) \
               or getattr(context, '_presentation_assets', None)
