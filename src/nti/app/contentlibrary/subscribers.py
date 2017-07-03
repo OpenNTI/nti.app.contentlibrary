@@ -14,7 +14,7 @@ from zope import interface
 
 from zope.intid.interfaces import IIntIds
 
-from zope.lifecycleevent.interfaces import IObjectAddedEvent
+from zope.lifecycleevent.interfaces import IObjectCreatedEvent
 
 from zope.securitypolicy.rolepermission import AnnotationRolePermissionManager
 
@@ -35,6 +35,8 @@ from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import ACT_UPDATE
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
 from nti.dataserver.authorization import ROLE_CONTENT_ADMIN
+
+from nti.publishing.interfaces import IObjectPublishedEvent
 
 from nti.site.interfaces import IHostPolicySiteManager
 
@@ -88,8 +90,9 @@ def _on_content_pacakge_library_synced(library, unused_event):
 # bundle events
 
 
-@component.adapter(IContentPackageBundle, IObjectAddedEvent)
+@component.adapter(IContentPackageBundle, IObjectCreatedEvent)
 def _on_content_bundle_added(bundle, unused_event):
+    # create a bundle community
     try:
         intids = component.getUtility(IIntIds)
         doc_id = intids.queryId(bundle)
@@ -100,3 +103,10 @@ def _on_content_bundle_added(bundle, unused_event):
                 ContentBundleCommunity.create_community(username=doc_id)
     except (TypeError, LookupError):  # tests
         pass
+    
+
+@component.adapter(IContentPackageBundle, IObjectPublishedEvent)
+def _on_content_bundle_published(bundle, unused_event):
+    board = IContentBoard(bundle, None)
+    if board is not None:
+        board.createDefaultForum()

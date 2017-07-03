@@ -20,9 +20,13 @@ import tempfile
 
 import fudge
 
+from nti.app.contentlibrary.interfaces import IContentBoard
+
 from nti.cabinet.mixins import SourceFile
 
 from nti.contentlibrary.bundle import PublishableContentPackageBundle
+
+from nti.dataserver.interfaces import ICommunity
 
 from nti.externalization.externalization import to_external_object
 
@@ -81,12 +85,18 @@ class TestBundleViews(ApplicationLayerTest):
                 assert_that(bundle, 
                             has_property('_presentation_assets', is_not(none())))
                 
+                community = ICommunity(bundle, None)
+                assert_that(community, is_not(none()))
+                
             href = '/dataserver2/ContentBundles/%s/@@publish' % ntiid
             self.testapp.post(href, status=200)
             with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
                 bundle = find_object_with_ntiid(ntiid)
                 assert_that(bundle, 
                             has_property('root', is_not(none())))
+                
+                board = IContentBoard(bundle, None)
+                assert_that(board, is_not(none()))
         finally:
             bundles = os.path.join(self.layer.library_path,
                                    'sites',

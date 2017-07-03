@@ -16,6 +16,8 @@ from zope import interface
 
 from zope.deprecation import deprecated
 
+from zope.intid.interfaces import IIntIds
+
 from zope.location.interfaces import IContained
 
 from zope.security.interfaces import IPrincipal
@@ -45,9 +47,14 @@ from nti.dataserver.contenttypes.forums.interfaces import ITopic
 from nti.dataserver.contenttypes.forums.interfaces import IForum
 
 from nti.dataserver.interfaces import IUser
+from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import system_user
 
+from nti.dataserver.users.communities import Community
+
 from nti.dublincore.time_mixins import PersistentCreatedAndModifiedTimeObject
+
+from nti.externalization.proxy import removeAllProxies
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
@@ -59,8 +66,10 @@ from nti.traversal.traversal import find_interface
 
 @interface.implementer(IPrincipal)
 @component.adapter(IContentPackageBundle)
-def bundle_to_principal(library):
-    return system_user
+def bundle_to_principal(bundle):
+    bundle = removeAllProxies(bundle)
+    creator = getattr(bundle, 'creator', None)
+    return IPrincipal(creator) if creator else system_user
 
 
 def _content_unit_to_bundles(unit):
@@ -69,9 +78,20 @@ def _content_unit_to_bundles(unit):
     bundle_catalog = component.queryUtility(IContentPackageBundleLibrary)
     bundles = bundle_catalog.getBundles() if bundle_catalog is not None else ()
     for bundle in bundles or ():
-        if package in bundle.ContentPackages:
+        if package in bundle.ContentPackages or ():
             result.append(bundle)
     return result
+
+
+@interface.implementer(ICommunity)
+@component.adapter(IContentPackageBundle)
+def bundle_to_community(bundle):
+    bundle = removeAllProxies(bundle)
+    intids = component.getUtility(IIntIds)
+    doc_id = intids.queryId(bundle)
+    if doc_id is not None:
+        return Community.get_community(username=str(doc_id))
+    return None
 
 
 @component.adapter(IContentUnit)
@@ -79,6 +99,7 @@ def _content_unit_to_bundles(unit):
 def _content_unit_to_bundle(unit):
     bundles = _content_unit_to_bundles(unit)
     return bundles[0] if bundles else None
+
 
 # Context providers
 

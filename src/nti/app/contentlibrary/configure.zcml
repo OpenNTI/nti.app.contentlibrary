@@ -80,6 +80,10 @@
 			 for="nti.contentlibrary.interfaces.IContentPackageBundle"
 			 provides="zope.security.interfaces.IPrincipal" />
 
+	<adapter factory=".adapters.bundle_to_community"
+			 for="nti.contentlibrary.interfaces.IContentPackageBundle"
+			 provides="nti.dataserver.interfaces.ICommunity" />
+
 	<!-- Externalization -->
 	<!-- Note that we want to use the externalization already present, we just need the
 	correct factories registered -->
@@ -162,7 +166,8 @@
 
 	<!-- Bundles --> 
 	<subscriber handler=".subscribers._on_content_bundle_added" />
-		
+	<subscriber handler=".subscribers._on_content_bundle_published" />
+
 	<!-- Externalization -->
 	<ext:registerAutoPackageIO
 		root_interfaces=".interfaces.IContentUnitContents"

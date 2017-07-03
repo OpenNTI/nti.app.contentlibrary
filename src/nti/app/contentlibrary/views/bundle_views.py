@@ -174,7 +174,7 @@ class ContentBundlePostView(AbstractAuthenticatedView,
         # add to library
         lifecycleevent.created(bundle)
         library = self.get_library(provided=IContentPackageBundleLibrary)
-        library[bundle.ntiid] = bundle
+        library.add(bundle)
         # handle presentation-assets and save
         assets = self.get_source(self.request)
         if assets is not None:
