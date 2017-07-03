@@ -12,12 +12,19 @@ logger = __import__('logging').getLogger(__name__)
 from zope import component
 from zope import interface
 
+from zope.intid.interfaces import IIntIds
+
+from zope.lifecycleevent.interfaces import IObjectAddedEvent
+
 from zope.securitypolicy.rolepermission import AnnotationRolePermissionManager
 
 from nti.app.contentlibrary.interfaces import IContentBoard
 from nti.app.contentlibrary.interfaces import IContentPackageRolePermissionManager
 
+from nti.app.contentlibrary.model import ContentBundleCommunity
+
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageAddedEvent
 from nti.contentlibrary.interfaces import IContentPackageReplacedEvent
@@ -76,3 +83,20 @@ def _on_content_pacakge_library_synced(library, unused_event):
             board = IContentBoard(bundle, None)
             if board is not None:
                 board.createDefaultForum()
+
+
+# bundle events
+
+
+@component.adapter(IContentPackageBundle, IObjectAddedEvent)
+def _on_content_bundle_added(bundle, unused_event):
+    try:
+        intids = component.getUtility(IIntIds)
+        doc_id = intids.queryId(bundle)
+        if doc_id is not None:
+            doc_id = str(doc_id)
+            community = ContentBundleCommunity.get_community(doc_id)
+            if community is None:
+                ContentBundleCommunity.create_community(username=doc_id)
+    except (TypeError, LookupError):  # tests
+        pass

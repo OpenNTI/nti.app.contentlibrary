@@ -23,7 +23,7 @@
 			 provides="zope.generations.interfaces.IInstallableSchemaManager" />
 
 	<!-- Events -->
-	<subscriber handler=".logon._on_openid_user_created" />
+	<subscriber handler=".logon._on_openid_user_created" /> 
 
 	<!-- NTIID Resolvers -->
 	<utility factory=".ntiids._ContentResolver" name="HTML" />
@@ -160,6 +160,9 @@
 	<!-- Resolving metadata, used in the implementation of links -->
 	<adapter factory=".resolvers.ContentMetadataFromContentUnit" />
 
+	<!-- Bundles --> 
+	<subscriber handler=".subscribers._on_content_bundle_added" />
+		
 	<!-- Externalization -->
 	<ext:registerAutoPackageIO
 		root_interfaces=".interfaces.IContentUnitContents"
