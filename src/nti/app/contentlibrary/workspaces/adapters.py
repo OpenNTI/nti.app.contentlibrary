@@ -100,7 +100,7 @@ def _library_for_library(library, request):
 
 
 @interface.implementer(IContentPackageLibrary)
-def _library_for_user(user, request):
+def _library_for_user(unused_user, request):
     global_library = component.queryUtility(IContentPackageLibrary)
     result = component.queryMultiAdapter((global_library, request),
                                          IContentPackageLibrary)
@@ -211,18 +211,21 @@ class BundleLibraryCollection(LibraryCollection):
     def library_items(self):
         return self.library.getBundles()
 
+    def getBundles(self):
+        return self.library_items
+
 
 class BundleLibraryWorkspace(LibraryWorkspace):
     __name__ = 'ContentBundles'
 
 
 @interface.implementer(IContentPackageBundleLibrary)
-def _bundle_for_library(bundle_library, request):
+def _bundle_for_library(bundle_library, unused_request):
     return bundle_library
 
 
 @interface.implementer(IContentPackageBundleLibrary)
-def _bundle_for_user(user, request):
+def _bundle_for_user(unused_user, request):
     bundle_library = component.queryUtility(IContentPackageBundleLibrary)
     return component.queryMultiAdapter((bundle_library, request),
                                        IContentPackageBundleLibrary)

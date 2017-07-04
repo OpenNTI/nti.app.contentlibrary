@@ -18,11 +18,9 @@ from pyramid.threadlocal import get_current_request
 
 from nti.appserver.pyramid_authorization import has_permission
 
-from nti.contentlibrary import BUNDLE
-
 from nti.contentlibrary.interfaces import IContentUnit
-from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.contentsearch.interfaces import ISearchHitPredicate
 from nti.contentsearch.interfaces import IRootPackageResolver
@@ -36,11 +34,6 @@ from nti.dataserver.authorization import ACT_READ
 from nti.externalization.interfaces import StandardExternalFields
 
 from nti.externalization.singleton import SingletonDecorator
-
-from nti.ntiids.ntiids import ROOT
-from nti.ntiids.ntiids import TYPE_OID
-from nti.ntiids.ntiids import is_ntiid_of_types
-from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.publishing.interfaces import IPublishable
 
@@ -57,23 +50,16 @@ class _DefaultSearchPacakgeResolver(object):
     def __init__(self, *args):
         pass
 
-    def resolve(self, unused_user, ntiid=None):
+    def resolve(self, unused_user, unused_ntiid=None):
         result = ()
-        if ntiid != ROOT:
-            if bool(is_ntiid_of_types(ntiid, (TYPE_OID, BUNDLE))):
-                obj = find_object_with_ntiid(ntiid)
-                bundle = IContentPackageBundle(obj, None)
-                if bundle is not None and bundle.ContentPackages:
-                    result = tuple(x.ntiid for x in bundle.ContentPackages)
-            else:
-                result = (ntiid,)
-        else:
-            request = get_current_request()
-            library = component.queryUtility(IContentPackageLibrary)
-            library = component.queryMultiAdapter((library, request),
-                                                  IContentPackageLibrary)
-            if library is not None:
-                result = tuple(x.ntiid for x in library.contentPackages)
+        request = get_current_request()
+        library = component.queryUtility(IContentPackageBundleLibrary)
+        library = component.queryMultiAdapter((library, request),
+                                              IContentPackageBundleLibrary)
+        if library is not None:
+            result = []
+            for bundle in library.getBundles():
+                result.extend(x.ntiid for x in bundle.ContentPackages)
         return result
 
 
