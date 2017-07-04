@@ -147,8 +147,6 @@
 				for="nti.dataserver.interfaces.IUser" />
 
 	<!-- Search pacakge resolvers -->
-	<utility factory=".search._DefaultRootPackageResolver" />
-
 	<subscriber factory=".search._DefaultSearchPacakgeResolver"
 				provides="nti.contentsearch.interfaces.ISearchPackageResolver"
 				for="nti.dataserver.interfaces.IUser" />

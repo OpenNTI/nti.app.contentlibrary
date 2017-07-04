@@ -19,11 +19,9 @@ from pyramid.threadlocal import get_current_request
 from nti.appserver.pyramid_authorization import has_permission
 
 from nti.contentlibrary.interfaces import IContentUnit
-from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.contentsearch.interfaces import ISearchHitPredicate
-from nti.contentsearch.interfaces import IRootPackageResolver
 from nti.contentsearch.interfaces import IContentUnitSearchHit
 from nti.contentsearch.interfaces import ISearchPackageResolver
 
@@ -61,18 +59,6 @@ class _DefaultSearchPacakgeResolver(object):
             for bundle in library.getBundles():
                 result.extend(x.ntiid for x in bundle.ContentPackages)
         return result
-
-
-@interface.implementer(IRootPackageResolver)
-class _DefaultRootPackageResolver(object):
-
-    def __init__(self, *args):
-        pass
-
-    def resolve(self, ntiid):
-        library = component.queryUtility(IContentPackageLibrary)
-        paths = library.pathToNTIID(ntiid) if library is not None else None
-        return paths[0] if paths else None
 
 
 @component.adapter(IContentUnit)
