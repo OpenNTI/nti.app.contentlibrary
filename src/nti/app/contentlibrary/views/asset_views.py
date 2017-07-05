@@ -9,14 +9,9 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from requests.structures import CaseInsensitiveDict
-
 from zope import component
 
 from zope.component.hooks import site as current_site
-
-from zope.security.management import endInteraction
-from zope.security.management import restoreInteraction
 
 from pyramid.view import view_config
 from pyramid.view import view_defaults
@@ -27,11 +22,7 @@ from nti.app.contentlibrary.synchronize.subscribers import can_be_removed
 from nti.app.contentlibrary.synchronize.subscribers import removed_registered
 from nti.app.contentlibrary.synchronize.subscribers import clear_content_package_assets
 
-from nti.app.contentlibrary.utils.common import remove_package_inaccessible_assets
-
 from nti.app.contentlibrary.views.sync_views import _AbstractSyncAllLibrariesView
-
-from nti.app.externalization.internalization import read_body_as_external_object
 
 from nti.common.string import is_true
 
@@ -46,8 +37,6 @@ from nti.contenttypes.presentation import iface_of_asset as iface_of_thing
 
 from nti.dataserver import authorization as nauth
 
-from nti.dataserver.interfaces import IDataserverFolder
-
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
 
@@ -60,25 +49,13 @@ TOTAL = StandardExternalFields.TOTAL
 ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 
 
-def _read_input(request):
-    result = CaseInsensitiveDict()
-    if request:
-        if request.body:
-            values = read_body_as_external_object(request)
-        else:
-            values = request.params
-        result.update(values)
-    return result
-
-
 @view_config(name='assets')
 @view_config(name='GetPresentationAssets')
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
                request_method='GET',
                context=IContentPackage,
-               permission=nauth.ACT_SYNC_LIBRARY,
-               name='GetPresentationAssets')
+               permission=nauth.ACT_SYNC_LIBRARY)
 class GetPackagePresentationAssetsView(AbstractAuthenticatedView):
 
     def _unit_assets(self, package):
@@ -147,20 +124,4 @@ class ResetPackagePresentationAssetsView(_AbstractSyncAllLibrariesView):
                         items.append(item)
                         remove_transaction_history(item)
         result[TOTAL] = result[ITEM_COUNT] = len(items)
-        return result
-
-
-@view_config(context=IDataserverFolder)
-@view_defaults(route_name='objects.generic.traversal',
-               renderer='rest',
-               permission=nauth.ACT_NTI_ADMIN,
-               name='RemovePackageInaccessibleAssets')
-class RemovePackageInaccessibleAssetsView(AbstractAuthenticatedView):
-
-    def __call__(self):
-        endInteraction()
-        try:
-            result = remove_package_inaccessible_assets()
-        finally:
-            restoreInteraction()
         return result
