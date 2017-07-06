@@ -8,7 +8,6 @@ entry_points = {
     'console_scripts': [
         "nti_sync_all_libraries = nti.app.contentlibrary.scripts.nti_sync_all_libraries:main",
         "nti_sync_library_assets = nti.app.contentlibrary.scripts.nti_sync_library_assets:main",
-        "nti_remove_package_inaccessible_assets = nti.app.contentlibrary.scripts.nti_remove_package_inaccessible_assets:main"
     ]
 }
 
