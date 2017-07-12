@@ -21,13 +21,13 @@ from zope import interface
 
 from zope.component.hooks import getSite
 
+from zope.file.file import File
+
 from zope.intid.interfaces import IIntIds
 
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
 
 from ZODB.interfaces import IConnection
-
-from nti.contentfile.model import ContentBlobFile
 
 from nti.contentlibrary.indexed_data import get_site_registry
 from nti.contentlibrary.indexed_data import get_library_catalog
@@ -184,9 +184,10 @@ def parse_embedded_transcript(trx_ext):
     ext = mimetypes.guess_extension(contentType) or '.vtt'
     contents = base64.b64decode(trx_ext['contents'])
     contents = zlib.decompress(contents)
-    return ContentBlobFile(data=contents,
-                           contentType=contentType,
-                           filename="transcript" + ext)
+    result = File(contentType)
+    result.data = contents
+    result.filename = "transcript" + ext
+    return result
 
 
 def parse_embedded_transcripts(internal, ext_obj):
