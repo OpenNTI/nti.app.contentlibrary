@@ -46,7 +46,7 @@ class TestLibraryEntryAclProvider(ApplicationLayerTest):
 		super(TestLibraryEntryAclProvider, cls).setUpClass()
 		cls.temp_dir = tempfile.mkdtemp()
 		cls.library_entry = FilesystemContentPackage()
-		
+
 		@interface.implementer(IFilesystemKey)
 		class Key(object):
 			absolute_path = None
@@ -60,10 +60,10 @@ class TestLibraryEntryAclProvider(ApplicationLayerTest):
 						return f.read()
 				except IOError:
 					return None
-				
+
 		def _make_sibling_key(k):
 			return Key(name=os.path.join(cls.temp_dir, k))
-		
+
 		def _read_contents_of_sibling_entry(k):
 			return _make_sibling_key(k).readContents()
 
@@ -71,7 +71,7 @@ class TestLibraryEntryAclProvider(ApplicationLayerTest):
 		cls.library_entry.children = []
 		cls.library_entry.make_sibling_key = _make_sibling_key
 		cls.library_entry.read_contents_of_sibling_entry = _read_contents_of_sibling_entry
-		
+
 		child = FilesystemContentUnit()
 		child.key = Key(name=os.path.join(cls.temp_dir, 'child.html'))
 		child.make_sibling_key = _make_sibling_key

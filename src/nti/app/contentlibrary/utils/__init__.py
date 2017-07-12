@@ -21,10 +21,13 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 from nti.dataserver import authorization as nauth
 
+from nti.dataserver.authorization import role_for_providers_content
+
 from nti.dataserver.interfaces import IMutableGroupMember
 
 from nti.mimetype.mimetype import nti_mimetype_with_class
 
+from nti.ntiids.ntiids import get_parts
 from nti.ntiids.ntiids import get_provider
 from nti.ntiids.ntiids import get_specific
 from nti.ntiids.ntiids import find_object_with_ntiid
@@ -173,3 +176,15 @@ def update_users_content_roles(user, idurl, content_roles):
 
     member.setGroups(other_provider_roles + roles_to_add)
 _update_users_content_roles = update_users_content_roles # BWC
+
+
+def get_package_role(package):
+    """
+    For an IContentPackage, return an IRole.
+    """
+    ntiid = package.ntiid
+    ntiid = get_parts(ntiid)
+    provider = ntiid.provider
+    specific = ntiid.specific
+    role = role_for_providers_content(provider, specific)
+    return role

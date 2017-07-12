@@ -15,6 +15,8 @@ from zope.cachedescriptors.property import Lazy
 
 from zope.interface.interfaces import ComponentLookupError
 
+from nti.app.contentlibrary.utils import get_package_role
+
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -102,7 +104,7 @@ class _AbstractDelimitedHierarchyEntryACLProvider(object):
         if acl_string is not None:
             try:
                 __acl__ = self._acl_from_string(self.context,
-                                                acl_string, 
+                                                acl_string,
                                                 provenance)
                 # Empty files (those that do exist but feature no valid ACL lines)
                 # are considered a mistake, an overlooked accident. In the interest of trying
@@ -131,21 +133,23 @@ class _AbstractDelimitedHierarchyEntryACLProvider(object):
 
 def _supplement_acl_with_content_role(self, context, acl):
     """
-    Add read-access to a pseudo-group
-    based on the (lowercased) NTIID of the closest containing content package.
+    Add read-access to a pseudo-group based on the (lowercased) NTIID of the
+    closest containing content package.
 
-    It is important to do this both for the root and sublevels of the tree that allow
-    ACLs to be specified in files, because we may be putting a default Deny entry
-    there. (The default deny at the sub files is needed to be sure
+    It is important to do this both for the root and sublevels of the tree that
+    allow ACLs to be specified in files, because we may be putting a default
+    Deny entry there. (The default deny at the sub files is needed to be sure
     that we can properly mix granting and denying access and forces acl files
     to be very specific.)
     """
 
     package = traversal.find_interface(context, IContentPackage, strict=False)
+    # Some tests need this safety
     if package is not None and package.ntiid:
         parts = ntiids.get_parts(package.ntiid)
         if parts and parts.provider and parts.specific:
-            acl = acl + ace_allowing(authorization.role_for_providers_content(parts.provider, parts.specific),
+            package_role = get_package_role(package)
+            acl = acl + ace_allowing(package_role,
                                      authorization.ACT_READ,
                                      self)
     return acl
@@ -178,8 +182,8 @@ class _DelimitedHierarchyContentPackageACLProvider(_AbstractDelimitedHierarchyEn
         return acl
 
     def _acl_from_string(self, context, acl_string, provenance=None):
-        acl = super(_DelimitedHierarchyContentPackageACLProvider, self)._acl_from_string(context, 
-                                                                                         acl_string, 
+        acl = super(_DelimitedHierarchyContentPackageACLProvider, self)._acl_from_string(context,
+                                                                                         acl_string,
                                                                                          provenance=provenance)
         acl = _supplement_acl_with_content_role(self, context, acl)
         return acl
@@ -216,8 +220,8 @@ class _DelimitedHierarchyContentUnitACLProvider(_AbstractDelimitedHierarchyEntry
         ordinals = []
         ordinals.append(context.ordinal)
         parent = context.__parent__
-        while (    parent is not None 
-               and IContentUnit.providedBy(parent) 
+        while (    parent is not None
+               and IContentUnit.providedBy(parent)
                and not IContentPackage.providedBy(parent)):
             ordinals.append(parent.ordinal)
             parent = parent.__parent__
@@ -236,7 +240,7 @@ class _DelimitedHierarchyContentUnitACLProvider(_AbstractDelimitedHierarchyEntry
 
     def _acl_from_string(self, context, acl_string, provenance=None):
         acl = super(_DelimitedHierarchyContentUnitACLProvider, self)._acl_from_string(context,
-                                                                                      acl_string, 
+                                                                                      acl_string,
                                                                                       provenance=provenance)
         if self._acl_sibling_fallback_name:
             return _supplement_acl_with_content_role(self, context, acl)

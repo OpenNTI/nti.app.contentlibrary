@@ -33,6 +33,11 @@ from nti.app.base.abstract_views import AbstractAuthenticatedView
 
 from nti.app.contentlibrary import MessageFactory as _
 
+from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
+from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
+
+from nti.app.contentlibrary.utils import get_package_role
+
 from nti.app.contentlibrary.utils.bundle import save_bundle
 
 from nti.app.contentlibrary.views import ContentBundlesPathAdapter
@@ -63,7 +68,13 @@ from nti.contentlibrary.utils import make_content_package_bundle_ntiid
 from nti.contentlibrary.utils import is_valid_presentation_assets_source
 
 from nti.dataserver.authorization import ACT_READ
+from nti.dataserver.authorization import ACT_NTI_ADMIN
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
+from nti.dataserver.authorization import CONTENT_ROLE_PREFIX
+
+from nti.dataserver.interfaces import IMutableGroupMember
+
+from nti.dataserver.users.communities import Community
 
 from nti.externalization.interfaces import StandardExternalFields
 
@@ -223,10 +234,95 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
             # check for transaction retrial
             jid = getattr(self.request, 'jid', None)
             if jid is None:
-                save_bundle(context, library.enumeration.root, 
+                save_bundle(context, library.enumeration.root,
                             assets, name=str(doc_id))
                 if hasattr(context, '_presentation_assets'):
                     del context._presentation_assets
         # save trx id
         self.request.jid = doc_id
         return context
+
+
+class AbstractBundleUpdateAccessView(AbstractAuthenticatedView):
+    """
+    Base class for granting/removing a site community's access to
+    a content package bundle (e.g. the packages within our context
+    bundle). We do so by adding/removing the content role from the
+    site community's IGroupMember list. If a package is added/removed
+    from a bundle, this may have to be called again.
+
+    TODO: Event, username params, decorators, bundle perm
+    """
+
+    @Lazy
+    def _site_community(self):
+        site_policy = component.queryUtility(ISitePolicyUserEventListener)
+        community_username = getattr(site_policy, 'COM_USERNAME', '')
+        result = None
+        if community_username:
+            result = Community.get_community(community_username)
+        return result
+
+    @Lazy
+    def _entities(self):
+        result = ()
+        if self._site_community is not None:
+            result = (self._site_community,)
+        return result
+
+    @Lazy
+    def _context_roles(self):
+        result = set()
+        for package in self.context.ContentPackages or ():
+            package_role = get_package_role(package)
+            result.add(package_role)
+        return result
+
+    def _update_access(self):
+        for entity in self._entities:
+            logger.info("Updating access to bundle (%s) (%s) (type=%s)",
+                        self.context.ntiid, entity, self.type)
+            membership = component.getAdapter(entity, IMutableGroupMember,
+                                              CONTENT_ROLE_PREFIX)
+            orig_groups = set(membership.groups)
+            new_groups = self._get_new_groups(orig_groups, self._context_roles)
+            if new_groups != orig_groups:
+                # be idempotent
+                membership.setGroups(new_groups)
+
+    def __call__(self):
+        self._update_access()
+        return hexc.HTTPNoContent()
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             request_method='POST',
+             name=VIEW_BUNDLE_GRANT_ACCESS,
+             permission=ACT_NTI_ADMIN,
+             context=IContentPackageBundle)
+class BundleGrantAccessView(AbstractBundleUpdateAccessView):
+
+    type = "GRANT"
+
+    def _get_new_groups(self, original_groups, context_roles):
+        return original_groups | context_roles
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             request_method='POST',
+             name=VIEW_BUNDLE_REMOVE_ACCESS,
+             permission=ACT_NTI_ADMIN,
+             context=IContentPackageBundle)
+class BundleRemoveAccessView(AbstractBundleUpdateAccessView):
+    """
+    FIXME: User has access to package from multiple bundles, how do
+    handle that correctly? Do we iterate through bundle library
+    checking bundle access?
+    """
+
+    type = "REMOVE"
+
+    def _get_new_groups(self, original_groups, context_roles):
+        return original_groups - context_roles

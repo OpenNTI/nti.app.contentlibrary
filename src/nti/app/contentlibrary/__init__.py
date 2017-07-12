@@ -24,6 +24,12 @@ VIEW_PUBLISH_CONTENTS = 'PublishContents'
 #: A view to fetch the published contentx
 VIEW_PACKAGE_WITH_CONTENTS = 'PackageWithContents'
 
+#: A view to grant access to a bundle.
+VIEW_BUNDLE_GRANT_ACCESS = 'GrantBundleAccess'
+
+#: A view to remove access to a bundle.
+VIEW_BUNDLE_REMOVE_ACCESS = 'RemoveBundleAccess'
+
 #: Library path adapter
 LIBRARY_ADAPTER = 'Library'
 

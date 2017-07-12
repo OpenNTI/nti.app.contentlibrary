@@ -146,7 +146,7 @@ def _create_page_info(request, href, ntiid, last_modified=0, jsonp_href=None):
     package = find_interface(info.contentUnit, IContentPackage, strict=False)
     if package is not None:
         link = Link(package, rel='package')
-        info.extra_links = info.extra_links + (link,) 
+        info.extra_links = info.extra_links + (link,)
     if last_modified:
         # FIXME: Need to take into account the assessment item times as well
         # This is probably not huge, because right now they both change at the
@@ -762,8 +762,7 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
             raise hexc.HTTPUnprocessableEntity("Invalid ObjectId.")
 
         obj = find_object_with_ntiid(obj_ntiid)
-        # If we get a contained object, we need the path
-        # to the container.
+        # If we get a contained object, we need the path to the container.
         if IHighlight.providedBy(obj):
             obj_ntiid = obj.containerId
             obj = find_object_with_ntiid(obj_ntiid)
