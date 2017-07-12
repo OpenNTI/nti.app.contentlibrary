@@ -9,6 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import six
 import urlparse
 import collections
 
@@ -19,8 +20,7 @@ from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
-from nti.dataserver import authorization as nauth
-
+from nti.dataserver.authorization import CONTENT_ROLE_PREFIX
 from nti.dataserver.authorization import role_for_providers_content
 
 from nti.dataserver.interfaces import IMutableGroupMember
@@ -37,7 +37,7 @@ PAGE_INFO_MT_JSON = PAGE_INFO_MT + '+json'
 
 
 def _encode(s):
-    return s.encode('utf-8') if isinstance(s, unicode) else s
+    return s.encode('utf-8') if isinstance(s, six.text_type) else s
 
 
 def find_page_info_view_helper(request, page_ntiid_or_content_unit):
@@ -130,7 +130,7 @@ def update_users_content_roles(user, idurl, content_roles):
     """
     member = component.getAdapter(user,
                                   IMutableGroupMember,
-                                  nauth.CONTENT_ROLE_PREFIX)
+                                  CONTENT_ROLE_PREFIX)
     if not content_roles and not member.hasGroups():
         return  # No-op
 
@@ -138,7 +138,7 @@ def update_users_content_roles(user, idurl, content_roles):
     provider = urlparse.urlparse(idurl).netloc.split('.')[-2]
     provider = provider.lower()
 
-    empty_role = nauth.role_for_providers_content(provider, '')
+    empty_role = role_for_providers_content(provider, '')
 
     # Delete all of our provider's roles, leaving everything else intact
     other_provider_roles = [
@@ -165,17 +165,15 @@ def update_users_content_roles(user, idurl, content_roles):
         if local_role in provider_packages:
             for specific in provider_packages[local_role]:
                 roles_to_add.append(
-                    nauth.role_for_providers_content(
-                        provider,
-                        specific))
+                    role_for_providers_content(provider, specific)
+                )
         else:
             roles_to_add.append(
-                nauth.role_for_providers_content(
-                    provider,
-                    local_role))
-
+                role_for_providers_content(provider, local_role)
+            )
+    # set groups
     member.setGroups(other_provider_roles + roles_to_add)
-_update_users_content_roles = update_users_content_roles # BWC
+_update_users_content_roles = update_users_content_roles  # BWC
 
 
 def get_package_role(package):
