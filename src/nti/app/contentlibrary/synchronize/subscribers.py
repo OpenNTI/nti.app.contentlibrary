@@ -690,15 +690,11 @@ def _on_content_package_rendered(content_package, unused_event):
 # clear events
 
 
-def _clear_when_removed(content_package, force=True, process_global=False):
+def clear_content_package_assets(content_package, force=True, process_global=False):
     """
     Because we don't know where the data is stored, when a
     content package is removed we need to clear its data.
     """
-    # XXX: Probably want content package assets to be cleaned up,
-    # but for now, let's leave them.
-    if IEditableContentPackage.providedBy(content_package):
-        return
     result = []
     catalog = get_library_catalog()
     _clear_assets(content_package, force)
@@ -735,14 +731,17 @@ def _clear_when_removed(content_package, force=True, process_global=False):
     logger.info('Removed indexes for content package %s (removed=%s)',
                 content_package, len(result))
     return result
-clear_content_package_assets = _clear_when_removed
+_clear_when_removed = clear_content_package_assets
 
 
 @component.adapter(IContentPackage, IObjectRemovedEvent)
 def _clear_index_when_content_removed(content_package, unused_event):
-    return _clear_when_removed(content_package)
+    # XXX: Probably want content package assets to be cleaned up,
+    # but for now, let's leave them.
+    if not IEditableContentPackage.providedBy(content_package):
+        clear_content_package_assets(content_package)
 
 
 @component.adapter(IContentPackage, IObjectUnpublishedEvent)
 def _clear_index_when_content_unpublished(content_package, unused_event):
-    return _clear_when_removed(content_package, force=True)
+    return clear_content_package_assets(content_package, force=True)
