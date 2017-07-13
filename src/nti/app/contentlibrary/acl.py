@@ -3,7 +3,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -70,6 +70,7 @@ class _TestingLibraryTOCEntryACLProvider(object):
                              ALL_PERMISSIONS,
                              _TestingLibraryTOCEntryACLProvider),)
 
+
 # TODO: This could be (and was) registered for a simple IDelimitedHierarchyEntry.
 # There is none of that separate from the contentpackage/unit though, so it shouldn't
 # be needed in that capacity.
@@ -77,8 +78,8 @@ class _TestingLibraryTOCEntryACLProvider(object):
 
 class _AbstractDelimitedHierarchyEntryACLProvider(object):
     """
-    Checks a hierarchy entry for the existence of a file (typically .'.nti_acl'), and if present,
-    reads an ACL from it.
+    Checks a hierarchy entry for the existence of a file (typically .'.nti_acl'), 
+    and if present, reads an ACL from it.
 
     Otherwise, the ACL allows all authenticated users access.
     """
@@ -91,6 +92,7 @@ class _AbstractDelimitedHierarchyEntryACLProvider(object):
     #: If defined by a subclass, this will be checked
     #: when `_acl_sibling_entry_name` does not exist.
     _acl_sibling_fallback_name = None
+
     _default_allow = True
     _add_default_deny_to_acl_from_file = False
 
@@ -126,7 +128,6 @@ class _AbstractDelimitedHierarchyEntryACLProvider(object):
                                          _AbstractDelimitedHierarchyEntryACLProvider),))
         else:
             __acl__ = ()  # Inherit from parent
-
         return __acl__
 
     def _acl_from_string(self, context, acl_string, provenance=None):
@@ -229,7 +230,7 @@ class _DelimitedHierarchyContentUnitACLProvider(_AbstractDelimitedHierarchyEntry
             parent = parent.__parent__
 
         ordinals.reverse()
-        path = '.'.join([str(i) for i in ordinals])
+        path = u'.'.join(str(i) for i in ordinals)
         self._acl_sibling_entry_name = \
             _AbstractDelimitedHierarchyEntryACLProvider._acl_sibling_entry_name + '.' + path
 
@@ -339,13 +340,13 @@ class _ContentPackageBundleACLProvider(object):
                      getattr(self.context, 'creator', None)):
             if prin is None:
                 continue
-            admin_ace = ace_allowing(prin, ALL_PERMISSIONS, self)
+            admin_ace = ace_allowing(prin, ALL_PERMISSIONS, type(self))
             aces.append(admin_ace)
         # Now our bundle role
         bundle_role = role_for_content_bundle(self.context)
-        aces.append( ace_allowing(bundle_role,
-                                  authorization.ACT_READ,
-                                  self))
+        aces.append(ace_allowing(bundle_role,
+                                 authorization.ACT_READ,
+                                 type(self)))
         # Restrict, if necessary.
         if self.context.RestrictedAccess:
             aces.append(ACE_DENY_ALL)
