@@ -1,6 +1,6 @@
 {
         "title": "Visible Bundle",
         "ntiid": "tag:nextthought.com,2011-10:NTI-Bundle-VisibleBundle",
-        "ContentPackages": ["tag:nextthought.com,2011-10:NextThought-HTML-PackageA",
-                            "tag:nextthought.com,2011-10:NextThought-HTML-PackageB"]
+        "ContentPackages": ["tag:nextthought.com,2011-10:NTI-HTML-PackageA",
+                            "tag:nextthought.com,2011-10:NTI-HTML-PackageB"]
 }

@@ -36,6 +36,8 @@ from nti.app.contentlibrary import MessageFactory as _
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 
+from nti.app.contentlibrary.acl import role_for_content_bundle
+
 from nti.app.contentlibrary.utils import get_package_role
 
 from nti.app.contentlibrary.utils.bundle import save_bundle
@@ -147,10 +149,10 @@ class ContentPackageBundleMixin(object):
         return library
 
     @classmethod
-    def make_bundle_ntiid(cls, provider=None, base=None, extra=None):
+    def make_bundle_ntiid(cls, bundle, provider=None, base=None, extra=None):
         policy = component.queryUtility(ISitePolicyUserEventListener)
         provider = provider or getattr(policy, 'PROVIDER', None) or NTI
-        return make_content_package_bundle_ntiid(provider, base, extra)
+        return make_content_package_bundle_ntiid(bundle, provider, base, extra)
 
 
 @view_config(route_name='objects.generic.traversal',
@@ -245,13 +247,13 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
 
 class AbstractBundleUpdateAccessView(AbstractAuthenticatedView):
     """
-    Base class for granting/removing a site community's access to
-    a content package bundle (e.g. the packages within our context
-    bundle). We do so by adding/removing the content role from the
-    site community's IGroupMember list. If a package is added/removed
-    from a bundle, this may have to be called again.
+    Base class for granting/removing a site community's access to an
+    :class:`IContentPackageBundle` (e.g. the packages within our context
+    bundle). We do so by adding/removing the content role(s) from the site
+    community's IGroupMember list, including the content bundle role. If a
+    package is added/removed from a bundle, this may have to be called again.
 
-    TODO: Event, username params, decorators, bundle perm
+    TODO: Event, username params, decorators
     """
 
     @Lazy
@@ -273,6 +275,8 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView):
     @Lazy
     def _context_roles(self):
         result = set()
+        bundle_role = role_for_content_bundle(self.context)
+        result.add(bundle_role)
         for package in self.context.ContentPackages or ():
             package_role = get_package_role(package)
             result.add(package_role)

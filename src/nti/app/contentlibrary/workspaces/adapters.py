@@ -66,7 +66,7 @@ class _PermissionedContentPackageLibrary(ProxyBase):
         request = request or self._v_request
         result = is_readable(content_package, request)
         if not result:
-            # Nope. What about a top-level child? 
+            # Nope. What about a top-level child?
             # TODO: Why we check children?
             result = any(is_readable(x, request)
                          for x in content_package.children or ())
@@ -209,7 +209,9 @@ class BundleLibraryCollection(LibraryCollection):
 
     @property
     def library_items(self):
-        return self.library.getBundles()
+        for bundle in self.library.getBundles() or ():
+            if is_readable(bundle):
+                yield bundle
 
     def getBundles(self):
         return self.library_items

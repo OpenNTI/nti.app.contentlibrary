@@ -23,7 +23,7 @@
 			 provides="zope.generations.interfaces.IInstallableSchemaManager" />
 
 	<!-- Events -->
-	<subscriber handler=".logon._on_openid_user_created" /> 
+	<subscriber handler=".logon._on_openid_user_created" />
 
 	<!-- NTIID Resolvers -->
 	<utility factory=".ntiids._ContentResolver" name="HTML" />
@@ -31,6 +31,7 @@
 	<utility factory=".ntiids._BundleResolver" name="Bundle" />
 
 	<!-- ACL -->
+	<adapter factory=".acl._ContentPackageBundleACLProvider" />
 	<adapter factory=".acl._ContentPackageLibraryACLProvider" />
 	<adapter factory=".acl._RenderableContentPackageACLProvider" />
 	<adapter factory=".acl._ContentPackageBundleLibraryACLProvider" />
@@ -162,7 +163,7 @@
 	<!-- Resolving metadata, used in the implementation of links -->
 	<adapter factory=".resolvers.ContentMetadataFromContentUnit" />
 
-	<!-- Bundles --> 
+	<!-- Bundles -->
 	<subscriber handler=".subscribers._on_content_bundle_added" />
 	<subscriber handler=".subscribers._on_content_bundle_published" />
 

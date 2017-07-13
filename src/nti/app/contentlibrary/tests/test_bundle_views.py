@@ -12,10 +12,12 @@ from hamcrest import none
 from hamcrest import is_not
 from hamcrest import not_none
 from hamcrest import has_item
+from hamcrest import contains
 from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_property
+from hamcrest import contains_inanyorder
 does_not = is_not
 
 import os
@@ -89,24 +91,85 @@ class TestBundleViews(ApplicationLayerTest):
             result.update(adapter.groups)
         return result
 
+    def _get_bundle_ntiids(self, username, environ):
+        bundle_href = '/dataserver2/users/%s/ContentBundles/VisibleContentBundles' % username
+        admin_bundles = self.testapp.get(bundle_href, extra_environ=environ)
+        return [x['ntiid'] for x in admin_bundles.json_body['titles']]
+
     @WithSharedApplicationMockDS(users=True, testapp=True)
-    def test_base_library_state(self):
+    def test_library_restricted(self):
         """
         Validate our post-sync state, including access.
         """
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
+            Community.create_community(dataserver=self.ds,
+                                       username='ou.nextthought.com')
+        # Create a regular user and add him to the site community.
+        basic_username = 'GeorgeBluth'
+        admin_username = 'sjohnson@nextthought.com'
+        with mock_dataserver.mock_db_trans(self.ds):
+            user = self._create_user(basic_username)
+            community = Community.get_community(username='ou.nextthought.com')
+            user.record_dynamic_membership(community)
+        user_environ = self._make_extra_environ(basic_username)
+
+        visible_ntiid = "tag:nextthought.com,2011-10:NTI-Bundle-VisibleBundle"
+        restricted_ntiid = "tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle"
+
+        with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             library = component.getUtility(IContentPackageBundleLibrary)
             bundles = tuple(library.getBundles())
             assert_that(bundles, has_length(2))
+
+        # Admin can see all
+        admin_bundle_ntiids = self._get_bundle_ntiids(admin_username, None)
+        assert_that(admin_bundle_ntiids, contains_inanyorder(visible_ntiid,
+                                                             restricted_ntiid))
+
+        # Regular user cannot view restricted bundles
+        user_bundle_ntiids = self._get_bundle_ntiids(basic_username, user_environ)
+        assert_that(user_bundle_ntiids, contains(visible_ntiid))
+
+        # Now grant access for both
+        for bundle_ntiid in (restricted_ntiid, visible_ntiid):
+            grant_href = '/dataserver2/ContentBundles/%s/@@%s' \
+                        % (bundle_ntiid, VIEW_BUNDLE_GRANT_ACCESS)
+            self.testapp.post(grant_href)
+
+        for username, environ in ((admin_username, None),
+                                  (basic_username, user_environ)):
+            bundle_ntiids = self._get_bundle_ntiids(username, environ)
+            assert_that(bundle_ntiids,
+                        contains_inanyorder(visible_ntiid,
+                                            restricted_ntiid),
+                        username)
+
+        # Now restrict access to both
+        # XXX: Note the visible package status does not change
+        # Is that what we want?
+        for bundle_ntiid in (restricted_ntiid, visible_ntiid):
+            grant_href = '/dataserver2/ContentBundles/%s/@@%s' \
+                        % (bundle_ntiid, VIEW_BUNDLE_REMOVE_ACCESS)
+            self.testapp.post(grant_href)
+
+        admin_bundle_ntiids = self._get_bundle_ntiids(admin_username, None)
+        assert_that(admin_bundle_ntiids, contains_inanyorder(visible_ntiid,
+                                                             restricted_ntiid))
+
+        # Regular user cannot view restricted bundles
+        user_bundle_ntiids = self._get_bundle_ntiids(basic_username, user_environ)
+        assert_that(user_bundle_ntiids, contains(visible_ntiid))
+
 
     def _test_access(self, ntiid):
         """
         Validate granting/removing access to bundle. Multiple calls work
         correctly.
         """
-        # Grant community access
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
-            Community.create_community(dataserver=self.ds, username='ou.nextthought.com')
+            Community.create_community(dataserver=self.ds,
+                                       username='ou.nextthought.com')
+        # Grant community access
         grant_href = '/dataserver2/ContentBundles/%s/@@%s' \
                      % (ntiid, VIEW_BUNDLE_GRANT_ACCESS)
         self.testapp.post(grant_href)
@@ -134,6 +197,7 @@ class TestBundleViews(ApplicationLayerTest):
     @fudge.patch('nti.app.contentlibrary.views.bundle_views.get_all_sources')
     def test_create_and_publish_bundle(self, mock_src):
         tmpdir = tempfile.mkdtemp()
+        bundle_path_part = None
         try:
             path = self.presentation_assets_zip(tmpdir)
             with open(path, "rb") as fp:
@@ -180,11 +244,12 @@ class TestBundleViews(ApplicationLayerTest):
 
             self._test_access(ntiid)
         finally:
-            new_bundle = os.path.join(self.layer.library_path,
-                                      'sites',
-                                      'platform.ou.edu',
-                                      'ContentPackageBundles',
-                                      bundle_path_part)
-            shutil.rmtree(new_bundle, ignore_errors=True)
+            if bundle_path_part:
+                new_bundle = os.path.join(self.layer.library_path,
+                                          'sites',
+                                          'platform.ou.edu',
+                                          'ContentPackageBundles',
+                                          bundle_path_part)
+                shutil.rmtree(new_bundle, ignore_errors=True)
             shutil.rmtree(tmpdir, ignore_errors=True)
 

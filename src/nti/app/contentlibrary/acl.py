@@ -19,6 +19,7 @@ from nti.app.contentlibrary.utils import get_package_role
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
@@ -37,10 +38,12 @@ from nti.dataserver.interfaces import ACE_DENY_ALL
 from nti.dataserver.interfaces import ALL_PERMISSIONS
 from nti.dataserver.interfaces import AUTHENTICATED_GROUP_NAME
 
+from nti.dataserver.interfaces import IRole
 from nti.dataserver.interfaces import IACLProvider
 from nti.dataserver.interfaces import ISupplementalACLProvider
 
 from nti.ntiids import ntiids
+from nti.ntiids.ntiids import get_parts
 
 from nti.property.property import LazyOnClass as _LazyOnClass
 
@@ -314,3 +317,56 @@ class _ContentPackageBundleLibraryACLProvider(object):
         return _ACL((ace_allowing(AUTHENTICATED_GROUP_NAME,
                                   authorization.ACT_READ,
                                   _ContentPackageLibraryACLProvider),))
+
+
+CONTENT_BUNDLE_ROLE_PREFIX = 'content-bundle-role:'
+
+
+def role_for_content_bundle(bundle):
+    """
+    Create an IRole for access to this :class:`IContentPackageBundle
+    provided by the given ``provider`` and having the local (specific)
+    part of an NTIID matching ``local_part``.
+    """
+    ntiid = bundle.ntiid
+    ntiid = get_parts(ntiid)
+    provider = ntiid.provider
+    specific = ntiid.specific
+    val = '%s%s:%s' % (CONTENT_BUNDLE_ROLE_PREFIX,
+                       provider.lower(), specific.lower())
+    return IRole(val)
+
+
+@interface.implementer(IACLProvider)
+@component.adapter(IContentPackageBundle)
+class _ContentPackageBundleACLProvider(object):
+    """
+    Historically, IContentPackageBundles have been always available. Now we
+    preserve that behavior by default and allow access to be restricted (and
+    granted via an API).
+    """
+
+    def __init__(self, context):
+        self.context = context
+
+    @Lazy
+    def __acl__(self):
+        aces = []
+        # By default, all admins and the creator have all-access.
+        for prin in (authorization.ROLE_CONTENT_ADMIN,
+                     authorization.ROLE_ADMIN,
+                     getattr(self.context, 'creator', None)):
+            if prin is None:
+                continue
+            admin_ace = ace_allowing(prin, ALL_PERMISSIONS, self)
+            aces.append(admin_ace)
+        # Now our bundle role
+        bundle_role = role_for_content_bundle(self.context)
+        aces.append( ace_allowing(bundle_role,
+                                  authorization.ACT_READ,
+                                  self))
+        # Restrict, if necessary.
+        if self.context.RestrictedAccess:
+            aces.append(ACE_DENY_ALL)
+        acl = acl_from_aces(aces)
+        return acl
