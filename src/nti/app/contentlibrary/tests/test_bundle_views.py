@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
+from hamcrest import not_none
 from hamcrest import has_item
 from hamcrest import has_entry
 from hamcrest import assert_that
@@ -23,6 +24,8 @@ import tempfile
 import fudge
 
 from zope import component
+
+from zope.intid.interfaces import IIntIds
 
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
@@ -41,6 +44,8 @@ from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IGroupMember
 
 from nti.externalization.externalization import to_external_object
+
+from nti.externalization.proxy import removeAllProxies
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
@@ -146,6 +151,11 @@ class TestBundleViews(ApplicationLayerTest):
 
                 board = IContentBoard(bundle, None)
                 assert_that(board, is_not(none()))
+                # Disk folder
+                intids = component.getUtility(IIntIds)
+                bundle_path_part = intids.getId(removeAllProxies(bundle))
+                assert_that(bundle_path_part, not_none())
+                bundle_path_part = str(bundle_path_part)
 
             self._test_access(ntiid)
         finally:
@@ -153,7 +163,7 @@ class TestBundleViews(ApplicationLayerTest):
                                       'sites',
                                       'platform.ou.edu',
                                       'ContentPackageBundles',
-                                      ntiid)
+                                      bundle_path_part)
             shutil.rmtree(new_bundle, ignore_errors=True)
             shutil.rmtree(tmpdir, ignore_errors=True)
 
