@@ -23,6 +23,7 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.dataserver.authorization import CONTENT_ROLE_PREFIX
 from nti.dataserver.authorization import role_for_providers_content
 
+from nti.dataserver.interfaces import IRole
 from nti.dataserver.interfaces import IMutableGroupMember
 
 from nti.mimetype.mimetype import nti_mimetype_with_class
@@ -35,6 +36,7 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 PAGE_INFO_MT = nti_mimetype_with_class('pageinfo')
 PAGE_INFO_MT_JSON = PAGE_INFO_MT + '+json'
 
+CONTENT_BUNDLE_ROLE_PREFIX = 'content-bundle-role:'
 
 def _encode(s):
     return s.encode('utf-8') if isinstance(s, six.text_type) else s
@@ -184,6 +186,20 @@ def role_for_content_package(package):
     ntiid = get_parts(ntiid)
     provider = ntiid.provider
     specific = ntiid.specific
-    role = role_for_providers_content(provider, specific)
-    return role
+    return role_for_providers_content(provider, specific)
 get_package_role = role_for_content_package # BWC
+
+
+def role_for_content_bundle(bundle):
+    """
+    Create an IRole for access to this :class:`IContentPackageBundle
+    provided by the given ``provider`` and having the local (specific)
+    part of an NTIID matching ``local_part``.
+    """
+    ntiid = bundle.ntiid
+    ntiid = get_parts(ntiid)
+    provider = ntiid.provider
+    specific = ntiid.specific
+    val = '%s%s:%s' % (CONTENT_BUNDLE_ROLE_PREFIX,
+                       provider.lower(), specific.lower())
+    return IRole(val)

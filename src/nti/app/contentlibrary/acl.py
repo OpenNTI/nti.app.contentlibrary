@@ -15,6 +15,7 @@ from zope.cachedescriptors.property import Lazy
 
 from zope.interface.interfaces import ComponentLookupError
 
+from nti.app.contentlibrary.utils import role_for_content_bundle
 from nti.app.contentlibrary.utils import role_for_content_package
 
 from nti.contentlibrary.interfaces import IContentUnit
@@ -38,12 +39,10 @@ from nti.dataserver.interfaces import ACE_DENY_ALL
 from nti.dataserver.interfaces import ALL_PERMISSIONS
 from nti.dataserver.interfaces import AUTHENTICATED_GROUP_NAME
 
-from nti.dataserver.interfaces import IRole
 from nti.dataserver.interfaces import IACLProvider
 from nti.dataserver.interfaces import ISupplementalACLProvider
 
 from nti.ntiids import ntiids
-from nti.ntiids.ntiids import get_parts
 
 from nti.property.property import LazyOnClass as _LazyOnClass
 
@@ -317,24 +316,6 @@ class _ContentPackageBundleLibraryACLProvider(object):
         return _ACL((ace_allowing(AUTHENTICATED_GROUP_NAME,
                                   authorization.ACT_READ,
                                   _ContentPackageLibraryACLProvider),))
-
-
-CONTENT_BUNDLE_ROLE_PREFIX = 'content-bundle-role:'
-
-
-def role_for_content_bundle(bundle):
-    """
-    Create an IRole for access to this :class:`IContentPackageBundle
-    provided by the given ``provider`` and having the local (specific)
-    part of an NTIID matching ``local_part``.
-    """
-    ntiid = bundle.ntiid
-    ntiid = get_parts(ntiid)
-    provider = ntiid.provider
-    specific = ntiid.specific
-    val = '%s%s:%s' % (CONTENT_BUNDLE_ROLE_PREFIX,
-                       provider.lower(), specific.lower())
-    return IRole(val)
 
 
 @interface.implementer(IACLProvider)
