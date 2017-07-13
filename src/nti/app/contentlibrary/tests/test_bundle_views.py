@@ -13,6 +13,7 @@ from hamcrest import is_not
 from hamcrest import not_none
 from hamcrest import has_item
 from hamcrest import has_entry
+from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_property
 does_not = is_not
@@ -37,6 +38,11 @@ from nti.app.contentlibrary.utils import get_package_role
 from nti.cabinet.mixins import SourceFile
 
 from nti.contentlibrary.bundle import PublishableContentPackageBundle
+
+from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
+
+from nti.contentlibrary.subscribers import sync_bundles_when_library_synched
 
 from nti.dataserver.users.communities import Community
 
@@ -72,11 +78,26 @@ class TestBundleViews(ApplicationLayerTest):
                             "presentation-assets")
         return shutil.make_archive(outfile, "zip", path)
 
+    def _sync(self):
+        with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
+            library = component.getUtility(IContentPackageLibrary)
+            sync_bundles_when_library_synched(library, None)
+
     def _get_entity_groups(self, entity):
         result = set()
         for _, adapter in component.getAdapters((entity,), IGroupMember):
             result.update(adapter.groups)
         return result
+
+    @WithSharedApplicationMockDS(users=True, testapp=True)
+    def test_base_library_state(self):
+        """
+        Validate our post-sync state, including access.
+        """
+        with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
+            library = component.getUtility(IContentPackageBundleLibrary)
+            bundles = tuple(library.getBundles())
+            assert_that(bundles, has_length(2))
 
     def _test_access(self, ntiid):
         """

@@ -47,11 +47,11 @@ from nti.dataserver.tests import mock_dataserver
 class ContentUnit(object):
 
     __parent__ = None
-    
+
     ntiid = None
     lastModified = 0
     href = 'prealgebra'
-    
+
     def does_sibling_entry_exist(self, sib_name):
         return None
 
@@ -72,7 +72,7 @@ class NIDMapper(object):
         if not href.startswith('/'):
             href = '/' + href
         self.href = href
-        
+
 
 class TestApplication(ApplicationLayerTest):
 
@@ -91,7 +91,7 @@ class TestApplication(ApplicationLayerTest):
 
         res = self.testapp.get(href)
         assert_that(res.cache_control, has_property('max_age', 0))
-        assert_that(res.json_body, 
+        assert_that(res.json_body,
                     has_entries('href', href,
                                 'titles', is_([])))
 
@@ -126,7 +126,7 @@ class TestApplicationContent(ApplicationLayerTest):
                                headers={"Accept": 'application/json'})
 
         href = self.require_link_href_with_rel(res.json_body, 'content')
-        assert_that(href, 
+        assert_that(href,
                     is_('/TestFilesystem/tag_nextthought_com_2011-10_USSC-HTML-Cohen_18.html#22'))
 
         self.require_link_href_with_rel(res.json_body, 'package')
@@ -156,12 +156,13 @@ class TestApplicationBundles(ApplicationLayerTest):
 
         res = self.testapp.get(href)
         assert_that(res.cache_control, has_property('max_age', 0))
-        assert_that(res.json_body, 
+        assert_that(res.json_body,
                     has_entries('href', href,
-                                'titles', has_length(1)))
+                                'titles', has_length(2)))
 
-        package = res.json_body['titles'][0]
-        assert_that(package, 
+        titles = res.json_body['titles']
+        package = next(x for x in titles if x['ntiid'] == u'tag:nextthought.com,2011-10:NTI-Bundle-ABundle')
+        assert_that(package,
                     has_entry('ContentPackages',
                               contains(has_entry('Class', 'ContentPackage'))))
 
