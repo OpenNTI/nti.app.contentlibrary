@@ -149,10 +149,11 @@ class TestBundleViews(ApplicationLayerTest):
 
             self._test_access(ntiid)
         finally:
-            bundles = os.path.join(self.layer.library_path,
-                                   'sites',
-                                   'platform.ou.edu',
-                                   'ContentPackageBundles')
-            shutil.rmtree(bundles, ignore_errors=True)
+            new_bundle = os.path.join(self.layer.library_path,
+                                      'sites',
+                                      'platform.ou.edu',
+                                      'ContentPackageBundles',
+                                      ntiid)
+            shutil.rmtree(new_bundle, ignore_errors=True)
             shutil.rmtree(tmpdir, ignore_errors=True)
 
