@@ -107,9 +107,9 @@ class AllContentPackagesView(AbstractAuthenticatedView,
         library = component.queryUtility(IContentPackageLibrary)
         if library is not None:
             packages = list(library.contentPackages)
+            packages.sort(key=lambda p: p.ntiid)
         else:
             packages = ()
-        packages.sort(key=lambda p: p.ntiid)
         result['TotalItemCount'] = len(packages)
         self._batch_items_iterable(result, packages)
         result[ITEM_COUNT] = len(result[ITEMS])
@@ -135,9 +135,9 @@ class AllContentPackageBundlesView(AbstractAuthenticatedView,
         library = component.queryUtility(IContentPackageBundleLibrary)
         if library is not None:
             bundles = list(library.getBundles())
+            bundles.sort(key=lambda p: p.ntiid)
         else:
             bundles = ()
-        bundles.sort(key=lambda p: p.ntiid)
         result['TotalItemCount'] = len(bundles)
         self._batch_items_iterable(result, bundles)
         result[ITEM_COUNT] = len(result[ITEMS])
