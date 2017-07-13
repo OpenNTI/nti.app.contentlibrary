@@ -38,7 +38,7 @@ from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 
 from nti.app.contentlibrary.acl import role_for_content_bundle
 
-from nti.app.contentlibrary.utils import get_package_role
+from nti.app.contentlibrary.utils import role_for_content_package
 
 from nti.app.contentlibrary.utils.bundle import save_bundle
 
@@ -278,7 +278,7 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView):
         bundle_role = role_for_content_bundle(self.context)
         result.add(bundle_role)
         for package in self.context.ContentPackages or ():
-            package_role = get_package_role(package)
+            package_role = role_for_content_package(package)
             result.add(package_role)
         return result
 

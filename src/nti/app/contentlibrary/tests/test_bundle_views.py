@@ -35,7 +35,7 @@ from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 
 from nti.app.contentlibrary.interfaces import IContentBoard
 
-from nti.app.contentlibrary.utils import get_package_role
+from nti.app.contentlibrary.utils import role_for_content_package
 
 from nti.cabinet.mixins import SourceFile
 
@@ -176,7 +176,7 @@ class TestBundleViews(ApplicationLayerTest):
         self.testapp.post(grant_href)
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             package = find_object_with_ntiid(self.pkg_ntiid)
-            package_role = get_package_role(package)
+            package_role = role_for_content_package(package)
             community = Community.get_community('ou.nextthought.com')
             groups = self._get_entity_groups(community)
             assert_that(groups, has_item(package_role))
@@ -188,7 +188,7 @@ class TestBundleViews(ApplicationLayerTest):
         self.testapp.post(remove_href)
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             package = find_object_with_ntiid(self.pkg_ntiid)
-            package_role = get_package_role(package)
+            package_role = role_for_content_package(package)
             community = Community.get_community('ou.nextthought.com')
             groups = self._get_entity_groups(community)
             assert_that(groups, does_not(has_item(package_role)))

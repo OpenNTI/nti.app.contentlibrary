@@ -176,7 +176,7 @@ def update_users_content_roles(user, idurl, content_roles):
 _update_users_content_roles = update_users_content_roles  # BWC
 
 
-def get_package_role(package):
+def role_for_content_package(package):
     """
     For an IContentPackage, return an IRole.
     """
@@ -186,3 +186,4 @@ def get_package_role(package):
     specific = ntiid.specific
     role = role_for_providers_content(provider, specific)
     return role
+get_package_role = role_for_content_package # BWC

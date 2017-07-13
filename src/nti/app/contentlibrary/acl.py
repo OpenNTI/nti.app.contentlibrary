@@ -15,7 +15,7 @@ from zope.cachedescriptors.property import Lazy
 
 from zope.interface.interfaces import ComponentLookupError
 
-from nti.app.contentlibrary.utils import get_package_role
+from nti.app.contentlibrary.utils import role_for_content_package
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
@@ -151,7 +151,7 @@ def _supplement_acl_with_content_role(self, context, acl):
     if package is not None and package.ntiid:
         parts = ntiids.get_parts(package.ntiid)
         if parts and parts.provider and parts.specific:
-            package_role = get_package_role(package)
+            package_role = role_for_content_package(package)
             acl = acl + ace_allowing(package_role,
                                      authorization.ACT_READ,
                                      self)
