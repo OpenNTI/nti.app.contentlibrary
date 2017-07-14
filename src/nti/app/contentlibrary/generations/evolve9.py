@@ -67,6 +67,7 @@ def do_evolve(context, generation=generation):
             index = ContentBundleRestrictedAccessIndex(family=intids.family)
             locate(index, catalog, IX_RESTRICTED_ACCESS)
             catalog[IX_RESTRICTED_ACCESS] = index
+            intids.register(index)
         evolve8.process_sites(catalog, intids)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
