@@ -18,14 +18,14 @@ from zope.interface.interfaces import ComponentLookupError
 from nti.app.contentlibrary.utils import role_for_content_bundle
 from nti.app.contentlibrary.utils import role_for_content_package
 
-from nti.contentlibrary.interfaces import IContentUnit,\
-    IPublishableContentPackageBundle
+from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentUnit
+from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackage
 
 from nti.dataserver import authorization
