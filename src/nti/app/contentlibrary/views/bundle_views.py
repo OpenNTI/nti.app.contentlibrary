@@ -28,6 +28,8 @@ from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 
+from nti.app.authentication import get_remote_user
+
 from nti.app.base.abstract_views import get_all_sources
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
@@ -244,7 +246,7 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
                     del context._presentation_assets
         # save trx id
         self.request.jid = doc_id
-        context.publisher = self.remoteUser.username
+        context.publisher = get_remote_user().username
         return context
 
 

@@ -23,8 +23,13 @@
 	<subscriber factory=".userdata._UGDLibraryPathLinkDecorator"
 				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
 
-	<subscriber factory=".contentunit._ContentBundlePagesLinkDecorator"
+	<subscriber factory=".bundle._ContentBundlePagesLinkDecorator"
 				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
+
+	<subscriber factory=".bundle._PublishableContentPackageBundleDecorator"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+                for="nti.contentlibrary.interfaces.IPublishableContentPackageBundle
+                     pyramid.interfaces.IRequest"/>
 
     <subscriber factory=".contentunit.EditablePackageDecorator"
                 provides="nti.externalization.interfaces.IExternalObjectDecorator"
