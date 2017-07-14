@@ -58,6 +58,8 @@ from nti.app.publishing.views import UnpublishView
 
 from nti.appserver.policies.interfaces import ISitePolicyUserEventListener
 
+from nti.appserver.pyramid_authorization import is_readable
+
 from nti.appserver.ugd_edit_views import ContainerContextUGDPostView
 
 from nti.contentlibrary.bundle import DEFAULT_BUNDLE_MIME_TYPE
@@ -288,11 +290,15 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView):
         return result
 
     @Lazy
+    def _packages(self):
+        return tuple(self.context.ContentPackages or ())
+
+    @Lazy
     def _context_roles(self):
         result = set()
         bundle_role = role_for_content_bundle(self.context)
         result.add(bundle_role)
-        for package in self.context.ContentPackages or ():
+        for package in self._packages:
             package_role = role_for_content_package(package)
             result.add(package_role)
         return result
@@ -336,12 +342,43 @@ class BundleGrantAccessView(AbstractBundleUpdateAccessView):
              context=IContentPackageBundle)
 class BundleRemoveAccessView(AbstractBundleUpdateAccessView):
     """
-    FIXME: User has access to package from multiple bundles, how do
-    handle that correctly? Do we iterate through bundle library
-    checking bundle access?
+    Remove access to a particular bundle, making sure we handle permissioning
+    appropriately.
+
+    TODO: removing entity from access but site still has access...
     """
 
     type = "REMOVE"
 
+    def _has_access(self, bundle):
+        # Make sure we do not include our context
+        # This is tricky; normally bundles that are completely visible only
+        # point to packages that are also completely visible. We should not
+        # interfere in that relationship (e.g. unrestricted bundles that point
+        # to restricted packages is an undefined relationship).
+        return  bundle != self.context \
+            and bundle.RestrictedAccess \
+            and is_readable(bundle, request=self.request)
+
+    def _get_accessible_packages(self):
+        """
+        We're losing access to a set of packages, but take care to make sure
+        we do not have access via an alternate bundle.
+        """
+        # This might be expensive once we get a lot of bundles; should be fine
+        # for now though.
+        result = set()
+        bundle_library = component.getUtility(IContentPackageBundleLibrary)
+        for bundle in bundle_library.getBundles() or ():
+            if self._has_access(bundle):
+                result.update(bundle.ContentPackages)
+        return result
+
+    def _get_context_roles_to_remove(self, roles_to_remove):
+        accessible_packages = set(self._packages) & self._get_accessible_packages()
+        accessible_roles = set(role_for_content_package(x) for x in accessible_packages)
+        return roles_to_remove - accessible_roles
+
     def _get_new_groups(self, original_groups, context_roles):
+        context_roles = self._get_context_roles_to_remove( context_roles )
         return original_groups - context_roles

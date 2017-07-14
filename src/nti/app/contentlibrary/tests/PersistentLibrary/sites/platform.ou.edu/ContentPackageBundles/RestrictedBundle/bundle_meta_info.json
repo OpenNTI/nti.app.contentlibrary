@@ -2,5 +2,6 @@
         "title": "Restricted Bundle",
         "ntiid": "tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle",
         "RestrictedAccess": true,
-        "ContentPackages": ["tag:nextthought.com,2011-10:NTI-HTML-PackageC"]
+        "ContentPackages": ["tag:nextthought.com,2011-10:NTI-HTML-PackageB",
+                            "tag:nextthought.com,2011-10:NTI-HTML-PackageC"]
 }

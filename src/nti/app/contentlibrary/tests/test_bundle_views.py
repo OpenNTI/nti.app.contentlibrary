@@ -97,9 +97,13 @@ class TestBundleViews(ApplicationLayerTest):
         return [x['ntiid'] for x in admin_bundles.json_body['titles']]
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
-    def test_library_restricted(self):
+    def test_restricted_bundles(self):
         """
-        Validate our post-sync state, including access.
+        Validate our post-sync state, including access. This includes pointing
+        to two restricted bundles (RestrictedBundle and RestrictedBundle2) and
+        one unrestricted bundle (VisibleBundle). These point to three packages:
+        two of which are restricted by acls (PackageB and PackageC) and one
+        which is unrestricted (PackageA).
         """
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             Community.create_community(dataserver=self.ds,
@@ -113,40 +117,62 @@ class TestBundleViews(ApplicationLayerTest):
             user.record_dynamic_membership(community)
         user_environ = self._make_extra_environ(basic_username)
 
+        # A,B in Visible; B,C in Restricted, C in Restricted2
         visible_ntiid = "tag:nextthought.com,2011-10:NTI-Bundle-VisibleBundle"
         restricted_ntiid = "tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle"
+        restricted2_ntiid = "tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle2"
+        package_a_ntiid = "tag:nextthought.com,2011-10:NTI-HTML-PackageA"
+        package_b_ntiid = "tag:nextthought.com,2011-10:NTI-HTML-PackageB"
+        package_c_ntiid = "tag:nextthought.com,2011-10:NTI-HTML-PackageC"
+        all_packages = (package_a_ntiid, package_b_ntiid, package_c_ntiid)
 
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             library = component.getUtility(IContentPackageBundleLibrary)
             bundles = tuple(library.getBundles())
-            assert_that(bundles, has_length(2))
+            assert_that(bundles, has_length(3))
 
         # Admin can see all
         admin_bundle_ntiids = self._get_bundle_ntiids(admin_username, None)
         assert_that(admin_bundle_ntiids, contains_inanyorder(visible_ntiid,
-                                                             restricted_ntiid))
+                                                             restricted_ntiid,
+                                                             restricted2_ntiid))
+        for package in all_packages:
+            self.testapp.get('/dataserver2/Objects/%s' % package)
 
         # Regular user cannot view restricted bundles
+        # Note they can not view packageB even though it is in a visible ContentBundle;
+        # this implies nothing about underlying package access.
         user_bundle_ntiids = self._get_bundle_ntiids(basic_username, user_environ)
         assert_that(user_bundle_ntiids, contains(visible_ntiid))
+        self.testapp.get('/dataserver2/Objects/%s' % package_a_ntiid,
+                         extra_environ=user_environ)
+        for package in (package_b_ntiid, package_c_ntiid):
+            self.testapp.get('/dataserver2/Objects/%s' % package,
+                             extra_environ=user_environ,
+                             status=403)
 
-        # Now grant access for both
-        for bundle_ntiid in (restricted_ntiid, visible_ntiid):
+        # Now grant access for all
+        for bundle_ntiid in (restricted_ntiid, restricted2_ntiid, visible_ntiid):
             grant_href = '/dataserver2/ContentBundles/%s/@@%s' \
                         % (bundle_ntiid, VIEW_BUNDLE_GRANT_ACCESS)
             self.testapp.post(grant_href)
 
+        # Both users can see bundles as well as all packages
         for username, environ in ((admin_username, None),
                                   (basic_username, user_environ)):
             bundle_ntiids = self._get_bundle_ntiids(username, environ)
             assert_that(bundle_ntiids,
                         contains_inanyorder(visible_ntiid,
-                                            restricted_ntiid),
+                                            restricted_ntiid,
+                                            restricted2_ntiid),
                         username)
+            for package in all_packages:
+                self.testapp.get('/dataserver2/Objects/%s' % package,
+                                 extra_environ=environ)
 
-        # Now restrict access to both
-        # XXX: Note the visible package status does not change
-        # Is that what we want?
+        # Now restrict access to all except restricted2
+        # XXX: Note the visible package status does not change; is that
+        # what we want?
         for bundle_ntiid in (restricted_ntiid, visible_ntiid):
             grant_href = '/dataserver2/ContentBundles/%s/@@%s' \
                         % (bundle_ntiid, VIEW_BUNDLE_REMOVE_ACCESS)
@@ -154,11 +180,23 @@ class TestBundleViews(ApplicationLayerTest):
 
         admin_bundle_ntiids = self._get_bundle_ntiids(admin_username, None)
         assert_that(admin_bundle_ntiids, contains_inanyorder(visible_ntiid,
-                                                             restricted_ntiid))
+                                                             restricted_ntiid,
+                                                             restricted2_ntiid))
+        for package in all_packages:
+            self.testapp.get('/dataserver2/Objects/%s' % package)
 
-        # Regular user cannot view restricted bundles
+        # Regular user cannot view restricted bundle, but can still
+        # view packageC, via the still visible restricted2 bundle.
         user_bundle_ntiids = self._get_bundle_ntiids(basic_username, user_environ)
-        assert_that(user_bundle_ntiids, contains(visible_ntiid))
+        assert_that(user_bundle_ntiids, contains_inanyorder(visible_ntiid,
+                                                            restricted2_ntiid))
+
+        for package in (package_a_ntiid, package_c_ntiid):
+            self.testapp.get('/dataserver2/Objects/%s' % package,
+                             extra_environ=user_environ)
+        self.testapp.get('/dataserver2/Objects/%s' % package_b_ntiid,
+                         extra_environ=user_environ,
+                         status=403)
 
 
     def _test_access(self, ntiid):
