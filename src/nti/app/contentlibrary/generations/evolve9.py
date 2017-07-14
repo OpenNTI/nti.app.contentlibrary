@@ -75,10 +75,11 @@ def do_evolve(context, generation=generation):
             catalog[IX_RESTRICTED_ACCESS] = index
             intids.register(index)
         # index sites
-        evolve8.process_sites(catalog, intids)
+        seen = evolve8.process_sites(catalog, intids)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
-    logger.info('Content library evolution %s done.', generation)
+    logger.info('Content library evolution %s done. %s bundle(s) indexed', 
+                generation, len(seen))
 
 
 def evolve(context):
