@@ -41,12 +41,12 @@ class MockDataserver(object):
 def index_site(current_site, catalog, intids,  seen):
     with site(current_site):
         library = component.queryUtility(IContentPackageBundleLibrary)
-        if library is None:
-            return
-        for bundle in library.getBundles() or ():
-            doc_id = intids.queryId(intids)
+        bundles = library.getBundles() if library else ()
+        for bundle in bundles:
+            doc_id = intids.queryId(bundle)
             if doc_id is None or doc_id in seen:
                 continue
+            seen.add(doc_id)
             catalog.index_doc(doc_id, bundle)
 
 
