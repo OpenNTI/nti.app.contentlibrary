@@ -168,7 +168,6 @@ class RebuildContentPackageCatalogView(AbstractAuthenticatedView):
         # reindex
         seen = set()
         for host_site in get_all_host_sites():  # check all sites
-            logger.info("Processing site %s", host_site.__name__)
             with current_site(host_site):
                 library = component.queryUtility(IContentPackageLibrary)
                 packages = library.contentPackages if library else ()
@@ -208,7 +207,6 @@ class RebuildContentBundleCatalogView(AbstractAuthenticatedView):
         # reindex
         seen = set()
         for host_site in get_all_host_sites():  # check all sites
-            logger.info("Processing site %s", host_site.__name__)
             with current_site(host_site):
                 library = component.queryUtility(IContentPackageBundleLibrary)
                 bundles = library.getBundles() if library else ()
