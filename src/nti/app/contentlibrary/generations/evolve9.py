@@ -27,6 +27,8 @@ from nti.contentlibrary.index import IX_RESTRICTED_ACCESS
 from nti.contentlibrary.index import install_contentbundle_catalog
 from nti.contentlibrary.index import ContentBundleRestrictedAccessIndex
 
+from nti.contentlibrary.interfaces import IContentPackageLibrary
+
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IOIDResolver
 
@@ -61,6 +63,10 @@ def do_evolve(context, generation=generation):
 
         lsm = ds_folder.getSiteManager()
         intids = lsm.getUtility(IIntIds)
+        
+        library = component.queryUtility(IContentPackageLibrary)
+        if library is not None:
+            library.syncContentPackages()
 
         catalog = install_contentbundle_catalog(ds_folder, intids)
         if IX_RESTRICTED_ACCESS not in catalog:
@@ -68,6 +74,7 @@ def do_evolve(context, generation=generation):
             locate(index, catalog, IX_RESTRICTED_ACCESS)
             catalog[IX_RESTRICTED_ACCESS] = index
             intids.register(index)
+        # index sites
         evolve8.process_sites(catalog, intids)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)

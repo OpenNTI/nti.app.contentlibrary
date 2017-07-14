@@ -54,7 +54,7 @@ def process_sites(catalog, intids):
     seen = set()
     for current_site in get_all_host_sites():
         index_site(current_site, catalog, intids, seen)
-
+    return seen
 
 def evolve(context):
     pass
