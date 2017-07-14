@@ -79,7 +79,7 @@ class _TestingLibraryTOCEntryACLProvider(object):
 
 class _AbstractDelimitedHierarchyEntryACLProvider(object):
     """
-    Checks a hierarchy entry for the existence of a file (typically .'.nti_acl'), 
+    Checks a hierarchy entry for the existence of a file (typically .'.nti_acl'),
     and if present, reads an ACL from it.
 
     Otherwise, the ACL allows all authenticated users access.
@@ -335,8 +335,8 @@ class _ContentPackageBundleACLProvider(object):
     def _bundle_ace(self, aces):
         bundle_role = role_for_content_bundle(self.context)
         aces.append(ace_allowing(bundle_role,
-                                  authorization.ACT_READ,
-                                  type(self)))
+                                 authorization.ACT_READ,
+                                 type(self)))
 
     @Lazy
     def __acl__(self):
@@ -349,7 +349,6 @@ class _ContentPackageBundleACLProvider(object):
                 continue
             admin_ace = ace_allowing(prin, ALL_PERMISSIONS, type(self))
             aces.append(admin_ace)
-        # Now our bundle role
         self._bundle_ace(aces)
         # Restrict, if necessary.
         if self.context.RestrictedAccess:

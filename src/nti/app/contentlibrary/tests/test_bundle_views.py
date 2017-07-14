@@ -105,15 +105,16 @@ class TestBundleViews(ApplicationLayerTest):
         two of which are restricted by acls (PackageB and PackageC) and one
         which is unrestricted (PackageA).
         """
+        community_name = 'BundleCommunityTest'
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             Community.create_community(dataserver=self.ds,
-                                       username='ou.nextthought.com')
+                                       username=community_name)
         # Create a regular user and add him to the site community.
         basic_username = 'GeorgeBluth'
         admin_username = 'sjohnson@nextthought.com'
         with mock_dataserver.mock_db_trans(self.ds):
             user = self._create_user(basic_username)
-            community = Community.get_community(username='ou.nextthought.com')
+            community = Community.get_community(username=community_name)
             user.record_dynamic_membership(community)
         user_environ = self._make_extra_environ(basic_username)
 
@@ -151,10 +152,12 @@ class TestBundleViews(ApplicationLayerTest):
                              extra_environ=user_environ,
                              status=403)
 
-        # Now grant access for all
+        # Now grant access to the community for all
         for bundle_ntiid in (restricted_ntiid, restricted2_ntiid, visible_ntiid):
-            grant_href = '/dataserver2/ContentBundles/%s/@@%s' \
-                        % (bundle_ntiid, VIEW_BUNDLE_GRANT_ACCESS)
+            grant_href = '/dataserver2/ContentBundles/%s/@@%s?user=%s' \
+                        % (bundle_ntiid,
+                           VIEW_BUNDLE_GRANT_ACCESS,
+                           community_name)
             self.testapp.post(grant_href)
 
         # Both users can see bundles as well as all packages
@@ -171,12 +174,14 @@ class TestBundleViews(ApplicationLayerTest):
                                  extra_environ=environ)
 
         # Now restrict access to all except restricted2
-        # XXX: Note the visible package status does not change; is that
-        # what we want?
+        # XXX: Note the visible package status does not change even if
+        # remove access; is that what we want?
         for bundle_ntiid in (restricted_ntiid, visible_ntiid):
-            grant_href = '/dataserver2/ContentBundles/%s/@@%s' \
-                        % (bundle_ntiid, VIEW_BUNDLE_REMOVE_ACCESS)
-            self.testapp.post(grant_href)
+            remove_href = '/dataserver2/ContentBundles/%s/@@%s?user=%s' \
+                        % (bundle_ntiid,
+                           VIEW_BUNDLE_REMOVE_ACCESS,
+                           community_name)
+            self.testapp.post(remove_href)
 
         admin_bundle_ntiids = self._get_bundle_ntiids(admin_username, None)
         assert_that(admin_bundle_ntiids, contains_inanyorder(visible_ntiid,
@@ -187,6 +192,44 @@ class TestBundleViews(ApplicationLayerTest):
 
         # Regular user cannot view restricted bundle, but can still
         # view packageC, via the still visible restricted2 bundle.
+        user_bundle_ntiids = self._get_bundle_ntiids(basic_username, user_environ)
+        assert_that(user_bundle_ntiids, contains_inanyorder(visible_ntiid,
+                                                            restricted2_ntiid))
+
+        for package in (package_a_ntiid, package_c_ntiid):
+            self.testapp.get('/dataserver2/Objects/%s' % package,
+                             extra_environ=user_environ)
+        self.testapp.get('/dataserver2/Objects/%s' % package_b_ntiid,
+                         extra_environ=user_environ,
+                         status=403)
+
+        # Now grant access to user to all
+        for bundle_ntiid in (restricted_ntiid, restricted2_ntiid, visible_ntiid):
+            grant_href = '/dataserver2/ContentBundles/%s/@@%s?user=%s' \
+                        % (bundle_ntiid,
+                           VIEW_BUNDLE_GRANT_ACCESS,
+                           basic_username)
+            self.testapp.post(grant_href)
+
+        # User has access to all again
+        bundle_ntiids = self._get_bundle_ntiids(basic_username, user_environ)
+        assert_that(bundle_ntiids,
+                    contains_inanyorder(visible_ntiid,
+                                        restricted_ntiid,
+                                        restricted2_ntiid))
+        for package in all_packages:
+            self.testapp.get('/dataserver2/Objects/%s' % package,
+                             extra_environ=user_environ)
+
+        # Now restrict access for user from all
+        for bundle_ntiid in (restricted_ntiid, visible_ntiid, restricted2_ntiid):
+            remove_href = '/dataserver2/ContentBundles/%s/@@%s?user=%s' \
+                        % (bundle_ntiid,
+                           VIEW_BUNDLE_REMOVE_ACCESS,
+                           basic_username)
+            self.testapp.post(remove_href)
+
+        # Still has access to RestrictedBundle2 and PackageC via community
         user_bundle_ntiids = self._get_bundle_ntiids(basic_username, user_environ)
         assert_that(user_bundle_ntiids, contains_inanyorder(visible_ntiid,
                                                             restricted2_ntiid))
@@ -243,7 +286,8 @@ class TestBundleViews(ApplicationLayerTest):
             mock_src.is_callable().with_args().returns({"assets.zip":source})
             href = '/dataserver2/ContentBundles'
             bundle = PublishableContentPackageBundle(title=u'Bleach',
-                                                     description=u'Manga bleach')
+                                                     description=u'Manga bleach',
+                                                     RestrictedAccess=True)
             ext_obj = to_external_object(bundle)
             ext_obj.pop('NTIID', None)
             ext_obj.pop('ntiid', None)
