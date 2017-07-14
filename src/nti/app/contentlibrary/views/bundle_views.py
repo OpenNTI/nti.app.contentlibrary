@@ -242,6 +242,7 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
                     del context._presentation_assets
         # save trx id
         self.request.jid = doc_id
+        context.publisher = self.remoteUser.username
         return context
 
 
