@@ -9,7 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-generation = 6
+generation = 9
 
 from zope import component
 from zope import interface
@@ -19,13 +19,17 @@ from zope.component.hooks import setHooks
 
 from zope.intid.interfaces import IIntIds
 
-from nti.contentlibrary.index import install_library_catalog
+from zope.location import locate
+
+from nti.app.contentlibrary.generations import evolve8
+
+from nti.contentlibrary.index import IX_RESTRICTED_ACCESS
+from nti.contentlibrary.index import install_contentbundle_catalog
+from nti.contentlibrary.index import ContentBundleRestrictedAccessIndex
 
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IOIDResolver
 
-IX_CREATEDTIME = 'createdTime'
-IX_LASTMODIFIED = 'lastModified'
 
 @interface.implementer(IDataserver)
 class MockDataserver(object):
@@ -52,20 +56,18 @@ def do_evolve(context, generation=generation):
     component.provideUtility(mock_ds, IDataserver)
 
     with site(ds_folder):
-        assert  component.getSiteManager() == ds_folder.getSiteManager(), \
-                "Hooks not installed?"
+        assert component.getSiteManager() == ds_folder.getSiteManager(), \
+               "Hooks not installed?"
 
         lsm = ds_folder.getSiteManager()
         intids = lsm.getUtility(IIntIds)
 
-        catalog = install_library_catalog(ds_folder, intids)
-        for name in (IX_CREATEDTIME, IX_LASTMODIFIED):
-            if name in catalog:
-                index = catalog[name]
-                index.index.clear()
-                intids.unregister(index)
-                del catalog[name]
-                index.__parent__ = None
+        catalog = install_contentbundle_catalog(ds_folder, intids)
+        if IX_RESTRICTED_ACCESS not in catalog:
+            index = ContentBundleRestrictedAccessIndex(family=intids.family)
+            locate(index, catalog, IX_RESTRICTED_ACCESS)
+            catalog[IX_RESTRICTED_ACCESS] = index
+        evolve8.process_sites(catalog, intids)
 
     component.getGlobalSiteManager().unregisterUtility(mock_ds, IDataserver)
     logger.info('Content library evolution %s done.', generation)
@@ -73,6 +75,6 @@ def do_evolve(context, generation=generation):
 
 def evolve(context):
     """
-    Evolve to gen 6 by removing lastMod, createdTime indexes from library catalog
+    Evolve to gen 9 by adding the restricted access index
     """
     do_evolve(context)
