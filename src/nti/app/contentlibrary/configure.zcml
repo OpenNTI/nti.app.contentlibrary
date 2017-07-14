@@ -36,6 +36,7 @@
 	<adapter factory=".acl._RenderableContentPackageACLProvider" />
 	<adapter factory=".acl._ContentPackageBundleLibraryACLProvider" />
 	<adapter factory=".acl._DelimitedHierarchyContentUnitACLProvider" />
+	<adapter factory=".acl._PublishableContentPackageBundleACLProvider" />
 	<adapter factory=".acl._DelimitedHierarchyContentPackageACLProvider" />
 
 	<adapter factory=".acl._TestingLibraryTOCEntryACLProvider"

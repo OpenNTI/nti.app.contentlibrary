@@ -18,7 +18,8 @@ from zope.interface.interfaces import ComponentLookupError
 from nti.app.contentlibrary.utils import role_for_content_bundle
 from nti.app.contentlibrary.utils import role_for_content_package
 
-from nti.contentlibrary.interfaces import IContentUnit
+from nti.contentlibrary.interfaces import IContentUnit,\
+    IPublishableContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -331,6 +332,12 @@ class _ContentPackageBundleACLProvider(object):
     def __init__(self, context):
         self.context = context
 
+    def _bundle_ace(self, aces):
+        bundle_role = role_for_content_bundle(self.context)
+        aces.append(ace_allowing(bundle_role,
+                                  authorization.ACT_READ,
+                                  type(self)))
+
     @Lazy
     def __acl__(self):
         aces = []
@@ -343,12 +350,18 @@ class _ContentPackageBundleACLProvider(object):
             admin_ace = ace_allowing(prin, ALL_PERMISSIONS, type(self))
             aces.append(admin_ace)
         # Now our bundle role
-        bundle_role = role_for_content_bundle(self.context)
-        aces.append(ace_allowing(bundle_role,
-                                 authorization.ACT_READ,
-                                 type(self)))
+        self._bundle_ace(aces)
         # Restrict, if necessary.
         if self.context.RestrictedAccess:
             aces.append(ACE_DENY_ALL)
         acl = acl_from_aces(aces)
         return acl
+
+
+@interface.implementer(IACLProvider)
+@component.adapter(IPublishableContentPackageBundle)
+class _PublishableContentPackageBundleACLProvider(_ContentPackageBundleACLProvider):
+
+    def _bundle_ace(self, aces):
+        if self.context.is_published():
+            super(_PublishableContentPackageBundleACLProvider, self)._bundle_ace(aces)
