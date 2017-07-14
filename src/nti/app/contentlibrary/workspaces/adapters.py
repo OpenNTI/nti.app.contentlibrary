@@ -262,4 +262,3 @@ def _bundle_workspace(user_service):
     if ws is not None:
         ws.__parent__ = user
         return ws
-

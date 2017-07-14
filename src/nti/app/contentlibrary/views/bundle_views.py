@@ -49,8 +49,10 @@ from nti.app.externalization.error import raise_json_error
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
 from nti.app.publishing import VIEW_PUBLISH
+from nti.app.publishing import VIEW_UNPUBLISH
 
 from nti.app.publishing.views import PublishView
+from nti.app.publishing.views import UnpublishView
 
 from nti.appserver.policies.interfaces import ISitePolicyUserEventListener
 
@@ -107,7 +109,7 @@ class ContentPackageBundleMixin(object):
 
     @Lazy
     def extra(self):
-        return str(uuid.uuid4()).split('-')[0].upper()
+        return str(uuid.uuid4().get_time_low())
 
     def get_source(self, request=None):
         request = self.request if not request else request
@@ -244,6 +246,16 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
         self.request.jid = doc_id
         context.publisher = self.remoteUser.username
         return context
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             request_method='POST',
+             name=VIEW_UNPUBLISH,
+             permission=ACT_CONTENT_EDIT,
+             context=IPublishableContentPackageBundle)
+class ContentBundleUnpublishView(UnpublishView):
+    pass
 
 
 class AbstractBundleUpdateAccessView(AbstractAuthenticatedView):
