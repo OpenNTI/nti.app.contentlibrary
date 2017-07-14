@@ -34,4 +34,6 @@ class ContentUnitContents(SchemaConfigured):
 
 @interface.implementer(IContentBundleCommunity)
 class ContentBundleCommunity(Community):
-    mime_type = mimeType = 'application/vnd.nextthought.community'
+    __external_can_create__ = False
+    __external_class_name__ = 'Community'
+    mime_type = mimeType = 'application/vnd.nextthought.contentbundlecommunity'
