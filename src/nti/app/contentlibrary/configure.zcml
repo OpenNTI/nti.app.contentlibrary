@@ -179,5 +179,11 @@
 
 	<subscriber	factory=".predicates._UserContentPackages"
 				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
+				
+	<subscriber	factory=".predicates._SystemContentPackageBundles"
+				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
+
+	<subscriber	factory=".predicates._UserContentPackageBundles"
+				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
 
 </configure>
