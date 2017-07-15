@@ -31,6 +31,11 @@
                 for="nti.contentlibrary.interfaces.IPublishableContentPackageBundle
                      pyramid.interfaces.IRequest"/>
 
+    <subscriber factory=".bundle._ContentBundleDecorator"
+                provides="nti.externalization.interfaces.IExternalObjectDecorator"
+                for="nti.contentlibrary.interfaces.IContentPackageBundle
+                     pyramid.interfaces.IRequest"/>
+
     <subscriber factory=".contentunit.EditablePackageDecorator"
                 provides="nti.externalization.interfaces.IExternalObjectDecorator"
                 for="nti.contentlibrary.interfaces.IEditableContentPackage
@@ -50,5 +55,5 @@
 				provides="nti.externalization.interfaces.IExternalMappingDecorator"
 				for="..interfaces.IContentUnitInfo
 					 pyramid.interfaces.IRequest" />
-					 
+
 </configure>

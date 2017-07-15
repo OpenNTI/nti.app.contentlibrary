@@ -277,7 +277,7 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView,
 
     :params user The comma-separated usernames of the entities to grant/deny access.
 
-    TODO: Event, decorators
+    TODO: Event
     """
 
     def readInput(self, value=None):

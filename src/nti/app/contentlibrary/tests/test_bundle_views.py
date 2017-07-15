@@ -94,7 +94,13 @@ class TestBundleViews(ApplicationLayerTest):
     def _get_bundle_ntiids(self, username, environ):
         bundle_href = '/dataserver2/users/%s/ContentBundles/VisibleContentBundles' % username
         admin_bundles = self.testapp.get(bundle_href, extra_environ=environ)
-        return [x['ntiid'] for x in admin_bundles.json_body['titles']]
+        admin_bundles = admin_bundles.json_body
+        titles = admin_bundles['titles']
+        if username.endswith('@nextthought.com'):
+            for title in titles:
+                self.require_link_href_with_rel(title, VIEW_BUNDLE_GRANT_ACCESS)
+                self.require_link_href_with_rel(title, VIEW_BUNDLE_REMOVE_ACCESS)
+        return [x['ntiid'] for x in titles]
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_restricted_bundles(self):
