@@ -19,6 +19,6 @@
 	<utility factory=".query._ContainedObjectsQuerier" />
 
 	<subscriber	factory=".query._UserContainersQuerier"
-				provides=".interfaces.IPublishablePredicate"/>
+				provides="nti.appserver.interfaces.IUserContainersQuerier"/>
 				
 </configure>
