@@ -27,16 +27,23 @@ from nti.contenttypes.presentation.interfaces import INTIVideo
 from nti.contenttypes.presentation.interfaces import INTIPollRef
 from nti.contenttypes.presentation.interfaces import INTISurveyRef
 
+from nti.dataserver.interfaces import IUser
+
 from nti.ntiids import ntiids
 
 from nti.site.site import get_component_hierarchy_names
 
 
+@component.adapter(IUser)
 @interface.implementer(IUserContainersQuerier)
 class _UserContainersQuerier(object):
 
+    def __init__(self, user=None):
+        self.user = user
+
     def query(self, user, ntiid, include_stream, stream_only):
         containers = ()
+        user = self.user if user is None else user
         if ntiid == ntiids.ROOT:
             containers = set(user.iterntiids(include_stream=include_stream,
                                              stream_only=stream_only))
