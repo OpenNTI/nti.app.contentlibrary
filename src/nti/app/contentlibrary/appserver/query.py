@@ -36,24 +36,20 @@ from nti.site.site import get_component_hierarchy_names
 
 @component.adapter(IUser)
 @interface.implementer(IUserContainersQuerier)
-class _UserContainersQuerier(object):
+class _LibraryContainersQuerier(object):
 
     def __init__(self, user=None):
         self.user = user
 
-    def query(self, user, ntiid, include_stream, stream_only):
+    def query(self, user, ntiid, *unused_args, **unused_kwargs):
         containers = ()
         user = self.user if user is None else user
-        if ntiid == ntiids.ROOT:
-            containers = set(user.iterntiids(include_stream=include_stream,
-                                             stream_only=stream_only))
-        else:
+        if ntiid != ntiids.ROOT:
             containers = set()
             library = component.queryUtility(IContentPackageLibrary)
             if library is not None:
                 containers.update(library.childrenOfNTIID(ntiid))
             containers.add(ntiid)  # item
-
             # include media containers.
             catalog = lib_catalog()
             if catalog is not None:  # test mode
@@ -67,11 +63,6 @@ class _UserContainersQuerier(object):
                 for obj in objects:
                     ntiid = getattr(obj, 'target', None) or obj.ntiid
                     containers.add(ntiid)
-
-        # We always include the unnamed root (which holds things like CIRCLED)
-        # NOTE: This is only in the stream. Normally we cannot store contained
-        # objects with an empty container key, so this takes internal magic
-        containers.add('')  # root
         return containers
     __call__ = query
 

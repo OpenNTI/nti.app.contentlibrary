@@ -15,10 +15,9 @@
 	<utility factory=".resolvers._DefaultContainerRootResolver" />
 
 	<!-- Query -->
-	<utility factory=".query._UserContainersQuerier" />
 	<utility factory=".query._ContainedObjectsQuerier" />
 
-	<subscriber	factory=".query._UserContainersQuerier"
+	<subscriber	factory=".query._LibraryContainersQuerier"
 				provides="nti.appserver.interfaces.IUserContainersQuerier"/>
 				
 </configure>
