@@ -15,9 +15,13 @@ from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_property
 
+from nti.testing.matchers import is_empty
+
 import fudge
 
 from zope import component
+
+from zope.intid.interfaces import IIntIds
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
@@ -28,6 +32,8 @@ from nti.externalization.externalization import to_external_object
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.recorder.interfaces import ITransactionRecordHistory
+
+from nti.recorder.index import get_transactions
 
 from nti.app.contentlibrary.tests import PersistentApplicationTestLayer
 
@@ -130,7 +136,17 @@ class TestEditViews(ApplicationLayerTest):
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             library = component.getUtility(IContentPackageLibrary)
             library.add(package, event=False)
-
+            
+        ext_obj = {'description' : 'Ichigo and Rukia'}
+        href = '/dataserver2/Library/%s' % ntiid
+        self.testapp.put_json(href, ext_obj, status=200)
+        with mock_dataserver.mock_db_trans(self.ds, site_name=u'platform.ou.edu'):
+            intids = component.getUtility(IIntIds)
+            package = find_object_with_ntiid(ntiid)
+            history = ITransactionRecordHistory(package)
+            pkg_trxs = {intids.queryId(x) for x in history.records()}
+            pkg_trxs.discard(None)
+            
         href = '/dataserver2/Library/%s' % ntiid
         self.testapp.delete(href, status=409)
 
@@ -139,3 +155,10 @@ class TestEditViews(ApplicationLayerTest):
 
         href = '/dataserver2/Library/%s' % ntiid
         self.testapp.get(href, status=404)
+        
+        with mock_dataserver.mock_db_trans(self.ds, site_name=u'platform.ou.edu'):
+            all_trxs = {intids.queryId(x) for x in get_transactions()}
+            all_trxs.discard(None)
+        
+        assert_that(all_trxs.intersection(pkg_trxs),
+                    is_empty())
