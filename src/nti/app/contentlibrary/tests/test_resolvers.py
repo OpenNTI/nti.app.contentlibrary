@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -32,26 +32,30 @@ from nti.app.testing.application_webtest import ApplicationLayerTest
 
 from nti.app.testing.decorators import WithSharedApplicationMockDS
 
-class TestApplicationMetadataResolvers(ApplicationLayerTest):
 
-	layer = ExLibraryApplicationTestLayer
+class TestResolvers(ApplicationLayerTest):
 
-	child_ntiid = b'tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.history_and_career_opportuniities'
+    layer = ExLibraryApplicationTestLayer
 
-	@WithSharedApplicationMockDS(users=True, testapp=True)
-	def test_metadata_from_ntiid(self):
-		metadata = get_metadata_from_content_location(self.child_ntiid)
-		assert_that(metadata, validly_provides(cp_interfaces.IContentMetadata))
-		# The URLs are properly mapped
-		assert_that(metadata, has_property('contentLocation',
-										   '/WithAssessment/tag_nextthought_com_2011-10_MN-HTML-MiladyCosmetology_history_and_career_opportuniities.html'))
-		
-		# Both a manual icon and a thumbnail are found
-		assert_that(metadata.images, has_length(2))
-		assert_that(metadata.images, contains(has_property('url',
-														   '/WithAssessment/icons/chapters/C1.png'),
-											  has_property('url',
-														   '/WithAssessment/thumbnails/tag_nextthought_com_2011-10_MN-HTML-MiladyCosmetology_history_and_career_opportuniities.png')))
+    child_ntiid = 'tag:nextthought.com,2011-10:MN-HTML-MiladyCosmetology.history_and_career_opportuniities'
 
-		# The lineage to do ACLs is intact
-		assert_that(find_interface(metadata, lib_interfaces.IContentPackage), is_(not_none()))
+    @WithSharedApplicationMockDS(users=True, testapp=True)
+    def test_metadata_from_ntiid(self):
+        metadata = get_metadata_from_content_location(self.child_ntiid)
+        assert_that(metadata, validly_provides(cp_interfaces.IContentMetadata))
+        # The URLs are properly mapped
+        assert_that(metadata, 
+					has_property('contentLocation',
+                                 '/WithAssessment/tag_nextthought_com_2011-10_MN-HTML-MiladyCosmetology_history_and_career_opportuniities.html'))
+
+        # Both a manual icon and a thumbnail are found
+        assert_that(metadata.images, has_length(2))
+        assert_that(metadata.images, 
+					contains(has_property('url', '/WithAssessment/icons/chapters/C1.png'),
+                             has_property('url', 
+										  '/WithAssessment/thumbnails/tag_nextthought_com_2011-10_MN-HTML-MiladyCosmetology_history_and_career_opportuniities.png')))
+
+        # The lineage to do ACLs is intact
+        assert_that(find_interface(metadata, lib_interfaces.IContentPackage),
+					is_(not_none()))
+

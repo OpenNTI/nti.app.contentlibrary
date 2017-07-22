@@ -173,6 +173,9 @@
 		root_interfaces=".interfaces.IContentUnitContents"
 		modules=".model" />
 
+	<!-- Recordables -->
+	<utility factory=".recordables.LibraryRecordables" name="library" />
+
 	<!-- Metadata -->
 	<subscriber	factory=".predicates._SystemContentPackages"
 				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
