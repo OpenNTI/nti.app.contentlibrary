@@ -107,6 +107,14 @@
 	<adapter factory=".subscribers.ContentPackageRolePermissionManager"
 				provides=".interfaces.IContentPackageRolePermissionManager" />
 
+    <adapter factory=".adapters._PackageAccessProvider"
+             provides="nti.dataserver.interfaces.IAccessProvider"
+             for="nti.contentlibrary.interfaces.IContentPackage"/>
+
+    <adapter factory=".adapters._BundleAccessProvider"
+             provides="nti.dataserver.interfaces.IAccessProvider"
+             for="nti.contentlibrary.interfaces.IContentPackageBundle"/>
+
 	<!-- Top-level/hierarchy -->
 	<adapter factory=".adapters._content_unit_to_bundle" />
 
@@ -182,7 +190,7 @@
 
 	<subscriber	factory=".predicates._UserContentPackages"
 				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
-				
+
 	<subscriber	factory=".predicates._SystemContentPackageBundles"
 				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
 

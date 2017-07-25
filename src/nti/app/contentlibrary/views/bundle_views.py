@@ -40,10 +40,6 @@ from nti.app.contentlibrary import MessageFactory as _
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 
-from nti.app.contentlibrary.acl import role_for_content_bundle
-
-from nti.app.contentlibrary.utils import role_for_content_package
-
 from nti.app.contentlibrary.utils.bundle import save_bundle
 
 from nti.app.contentlibrary.views import ContentBundlesPathAdapter
@@ -78,11 +74,8 @@ from nti.contentlibrary.utils import is_valid_presentation_assets_source
 from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
-from nti.dataserver.authorization import CONTENT_ROLE_PREFIX
 
-from nti.dataserver.authorization_acl import has_permission
-
-from nti.dataserver.interfaces import IMutableGroupMember
+from nti.dataserver.interfaces import IAccessProvider
 
 from nti.dataserver.users.communities import Community
 
@@ -338,53 +331,8 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView,
         return result
 
     @Lazy
-    def _packages(self):
-        return tuple(self.context.ContentPackages or ())
-
-    @Lazy
-    def _bundle_role(self):
-        return role_for_content_bundle(self.context)
-
-    @Lazy
-    def _package_context_roles(self):
-        result = set()
-        for package in self._packages:
-            package_role = role_for_content_package(package)
-            result.add(package_role)
-        return result
-
-    def _update_bundle_access(self):
-        for entity in self._entities:
-            logger.info("Updating access to bundle (%s) (%s) (type=%s)",
-                        self.context.ntiid, entity, self.type)
-            membership = component.getAdapter(entity,
-                                              IMutableGroupMember,
-                                              CONTENT_ROLE_PREFIX)
-            orig_groups = set(membership.groups)
-            new_groups = self._get_bundle_groups(orig_groups)
-            if new_groups != orig_groups:
-                # be idempotent
-                membership.setGroups(new_groups)
-
-    def _update_package_access(self):
-        for entity in self._entities:
-            membership = component.getAdapter(entity,
-                                              IMutableGroupMember,
-                                              CONTENT_ROLE_PREFIX)
-            orig_groups = set(membership.groups)
-            new_groups = self._get_new_package_groups(orig_groups,
-                                                      self._package_context_roles,
-                                                      entity)
-            if new_groups != orig_groups:
-                # be idempotent
-                membership.setGroups(new_groups)
-
-    def __call__(self):
-        # Must update bundle access first to determine whether we still have
-        # access to the underlying packages (perhaps from another entity).
-        self._update_bundle_access()
-        self._update_package_access()
-        return hexc.HTTPNoContent()
+    def access_provider(self):
+        return IAccessProvider(self.context)
 
 
 @view_config(route_name='objects.generic.traversal',
@@ -394,14 +342,14 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView,
              permission=ACT_NTI_ADMIN,
              context=IContentPackageBundle)
 class BundleGrantAccessView(AbstractBundleUpdateAccessView):
+    """
+    Grant access to a particular bundle.
+    """
 
-    type = "GRANT"
-
-    def _get_bundle_groups(self, original_groups):
-        return original_groups | set((self._bundle_role,))
-
-    def _get_new_package_groups(self, original_groups, context_roles, unused_entity):
-        return original_groups | context_roles
+    def __call__(self):
+        for entity in self._entities:
+            self.access_provider.grant_access(entity)
+        return hexc.HTTPNoContent()
 
 
 @view_config(route_name='objects.generic.traversal',
@@ -412,56 +360,10 @@ class BundleGrantAccessView(AbstractBundleUpdateAccessView):
              context=IContentPackageBundle)
 class BundleRemoveAccessView(AbstractBundleUpdateAccessView):
     """
-    Remove access to a particular bundle, making sure we handle permissioning
-    appropriately.
+    Remove access to a particular bundle.
     """
 
-    type = "REMOVE"
-
-    def _get_bundle_groups(self, original_groups):
-        return original_groups - set((self._bundle_role,))
-
-    def _has_access(self, bundle, entity):
-        # Make sure we do not include our context
-        # This is tricky; normally bundles that are completely visible only
-        # point to packages that are also completely visible. We should not
-        # interfere in that relationship (e.g. unrestricted bundles that point
-        # to restricted packages is an undefined relationship).
-        # XXX: Must pass entity here to get effective principals.
-        # XXX: Must skip cache since bundle access has changed.
-        return  bundle != self.context \
-            and bundle.RestrictedAccess \
-            and has_permission(ACT_READ, bundle, entity,
-                               skip_cache=True)
-
-    def _get_accessible_packages(self, entity):
-        """
-        We're losing access to a set of packages, but take care to make sure
-        we do not have access via an alternate bundle.
-        """
-        # This might be expensive once we get a lot of bundles; should be fine
-        # for now though.
-        result = set()
-        bundle_library = component.getUtility(IContentPackageBundleLibrary)
-        for bundle in bundle_library.getBundles() or ():
-            if self._has_access(bundle, entity):
-                result.update(bundle.ContentPackages)
-        return result
-
-    def _get_context_roles_to_remove(self, roles_to_remove, entity):
-        accessible_packages = set(self._packages) \
-                            & self._get_accessible_packages(entity)
-        accessible_roles = set(role_for_content_package(x) for x in accessible_packages)
-        return roles_to_remove - accessible_roles
-
-    def _get_new_package_groups(self, original_groups, context_roles, entity):
-        # If we still have access to the bundle (from another
-        # entity/membership perhaps), we are a no-op since the entity should
-        # still have access to the underlying packages.
-        if not has_permission(ACT_READ, self.context, entity.username):
-            context_roles = self._get_context_roles_to_remove(context_roles,
-                                                              entity)
-            result = original_groups - context_roles
-        else:
-            result = original_groups
-        return result
+    def __call__(self):
+        for entity in self._entities:
+            self.access_provider.remove_access(entity)
+        return hexc.HTTPNoContent()

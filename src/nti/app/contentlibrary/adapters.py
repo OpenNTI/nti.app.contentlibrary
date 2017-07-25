@@ -14,6 +14,8 @@ import time
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import Lazy
+
 from zope.deprecation import deprecated
 
 from zope.intid.interfaces import IIntIds
@@ -23,6 +25,10 @@ from zope.location.interfaces import IContained
 from zope.security.interfaces import IPrincipal
 
 from BTrees.OOBTree import OOBTree
+
+from nti.app.contentlibrary.acl import role_for_content_bundle
+
+from nti.app.contentlibrary.utils import role_for_content_package
 
 from nti.appserver.context_providers import get_top_level_contexts
 
@@ -42,6 +48,11 @@ from nti.contentlibrary.indexed_data import get_library_catalog
 
 from nti.contenttypes.presentation.interfaces import IPresentationAssetContainer
 
+from nti.dataserver.authorization import ACT_READ
+from nti.dataserver.authorization import CONTENT_ROLE_PREFIX
+
+from nti.dataserver.authorization_acl import has_permission
+
 from nti.dataserver.contenttypes.forums.interfaces import IPost
 from nti.dataserver.contenttypes.forums.interfaces import ITopic
 from nti.dataserver.contenttypes.forums.interfaces import IForum
@@ -49,6 +60,8 @@ from nti.dataserver.contenttypes.forums.interfaces import IForum
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import system_user
+from nti.dataserver.interfaces import IAccessProvider
+from nti.dataserver.interfaces import IMutableGroupMember
 
 from nti.dataserver.users.communities import Community
 
@@ -241,3 +254,157 @@ def presentation_asset_items_factory(context):
         result.__parent__ = context
         result.__name__ = '_presentation_asset_item_container'
         return result
+
+
+@component.adapter(IContentPackage)
+@interface.implementer(IAccessProvider)
+class _PackageAccessProvider(object):
+    """
+    An access provider that grants and removes access to a package.
+    """
+
+    def __init__(self, context):
+        self.context = self.bundle = context
+
+    @Lazy
+    def _package_role(self):
+        return role_for_content_package(self.context)
+
+    def _get_membership(self, entity):
+        membership = component.getAdapter(entity,
+                                          IMutableGroupMember,
+                                          CONTENT_ROLE_PREFIX)
+        return membership
+
+    def grant_access(self, entity):
+        """
+        Grant access to the package.
+        """
+        logger.info("Granting access to package (%s) (%s)",
+                    self.context.ntiid, entity.username)
+        membership = self._get_membership(entity)
+        original_groups = set(membership.groups)
+        new_groups = original_groups | set((self._package_role,))
+        if new_groups != original_groups:
+            # be idempotent
+            membership.setGroups(new_groups)
+
+    def remove_access(self, entity):
+        """
+        Remove access to the package.
+        """
+        logger.info("Removing access to package (%s) (%s)",
+                    self.context.ntiid, entity.username)
+        membership = self._get_membership(entity)
+        original_groups = set(membership.groups)
+        new_groups = original_groups - set((self._package_role,))
+        if new_groups != original_groups:
+            # be idempotent
+            membership.setGroups(new_groups)
+
+
+@component.adapter(IContentPackageBundle)
+@interface.implementer(IAccessProvider)
+class _BundleAccessProvider(object):
+    """
+    An access provider that grants and removes access to a bundle and its
+    underlying packages.
+    """
+
+    def __init__(self, context):
+        self.context = self.bundle = context
+
+    @Lazy
+    def _packages(self):
+        return tuple(self.context.ContentPackages or ())
+
+    @Lazy
+    def _bundle_role(self):
+        return role_for_content_bundle(self.context)
+
+    @Lazy
+    def _package_context_roles(self):
+        result = set()
+        for package in self._packages:
+            package_role = role_for_content_package(package)
+            result.add(package_role)
+        return result
+
+    def _get_membership(self, entity):
+        membership = component.getAdapter(entity,
+                                          IMutableGroupMember,
+                                          CONTENT_ROLE_PREFIX)
+        return membership
+
+    def grant_access(self, entity):
+        """
+        Grant access to the bundle and all :class:`IContentPackage` objects
+        within the bundle.
+        """
+        logger.info("Granting access to bundle (%s) (%s)",
+                    self.context.ntiid, entity.username)
+        membership = self._get_membership(entity)
+        original_groups = set(membership.groups)
+        new_groups = original_groups | set((self._bundle_role,)) | self._package_context_roles
+        if new_groups != original_groups:
+            # be idempotent
+            membership.setGroups(new_groups)
+
+    def _has_access(self, bundle, entity):
+        # Make sure we do not include our context
+        # This is tricky; normally bundles that are completely visible only
+        # point to packages that are also completely visible. We should not
+        # interfere in that relationship (e.g. unrestricted bundles that point
+        # to restricted packages is an undefined relationship).
+        # XXX: Must pass entity here to get effective principals.
+        # XXX: Must skip cache since bundle access has changed.
+        return  bundle != self.context \
+            and bundle.RestrictedAccess \
+            and has_permission(ACT_READ, bundle, entity,
+                               skip_cache=True)
+
+    def _get_accessible_packages(self, entity):
+        """
+        We're losing access to a set of packages, but take care to make sure
+        we do not have access via an alternate bundle.
+        """
+        # This might be expensive once we get a lot of bundles; should be fine
+        # for now though.
+        result = set()
+        bundle_library = component.getUtility(IContentPackageBundleLibrary)
+        for bundle in bundle_library.getBundles() or ():
+            if self._has_access(bundle, entity):
+                result.update(bundle.ContentPackages)
+        return result
+
+    def _get_context_roles_to_remove(self, entity):
+        accessible_packages = set(self._packages) \
+                            & self._get_accessible_packages(entity)
+        accessible_roles = set(role_for_content_package(x) for x in accessible_packages)
+        return self._package_context_roles - accessible_roles
+
+    def remove_access(self, entity):
+        """
+        Grant access to the bundle and all :class:`IContentPackage` objects
+        within the bundle that are not accessible otherwise.
+        """
+        logger.info("Removing access to bundle (%s) (%s)",
+                    self.context.ntiid, entity.username)
+        membership = self._get_membership(entity)
+        original_groups = set(membership.groups)
+        # Must update bundle access first to determine whether we still have
+        # access to the underlying packages (perhaps from another entity).
+        new_bundle_groups = original_groups - set((self._bundle_role,))
+        if new_bundle_groups != original_groups:
+            # be idempotent
+            membership.setGroups(new_bundle_groups)
+        # If we still have access to the bundle (from another entity/membership
+        # perhaps), we are a no-op since the entity should still have access to
+        # the underlying packages.
+        if not has_permission(ACT_READ, self.context, entity.username):
+            context_roles = self._get_context_roles_to_remove(entity)
+            new_groups = new_bundle_groups - context_roles
+            if new_groups != new_bundle_groups:
+                # be idempotent
+                membership.setGroups(new_groups)
+
