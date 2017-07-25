@@ -300,7 +300,7 @@ class _PackageAccessProvider(object):
                                           CONTENT_ROLE_PREFIX)
         return membership
 
-    def grant_access(self, entity):
+    def grant_access(self, entity, *args, **kwargs):
         """
         Grant access to the package.
         """
@@ -360,7 +360,7 @@ class _BundleAccessProvider(object):
                                           CONTENT_ROLE_PREFIX)
         return membership
 
-    def grant_access(self, entity):
+    def grant_access(self, entity, *args, **kwargs):
         """
         Grant access to the bundle and all :class:`IContentPackage` objects
         within the bundle.
