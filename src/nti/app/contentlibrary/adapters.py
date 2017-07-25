@@ -431,4 +431,3 @@ class _BundleAccessProvider(object):
             if new_groups != new_bundle_groups:
                 # be idempotent
                 membership.setGroups(new_groups)
-
