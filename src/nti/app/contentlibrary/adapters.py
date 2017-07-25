@@ -26,6 +26,8 @@ from zope.security.interfaces import IPrincipal
 
 from BTrees.OOBTree import OOBTree
 
+from pyramid.interfaces import IRequest
+
 from nti.app.contentlibrary.acl import role_for_content_bundle
 
 from nti.app.contentlibrary.utils import role_for_content_package
@@ -132,7 +134,7 @@ def _get_bundles_from_container(obj):
 
 @component.adapter(interface.Interface, IUser)
 @interface.implementer(IHierarchicalContextProvider)
-def _hierarchy_from_obj(obj, user):
+def _hierarchy_from_obj(obj, _):
     container_bundles = _get_bundles_from_container(obj)
     results = [(bundle,) for bundle in container_bundles]
     results = (results,) if results else results
@@ -141,7 +143,7 @@ def _hierarchy_from_obj(obj, user):
 
 @component.adapter(IContentUnit, IUser)
 @interface.implementer(ITopLevelContainerContextProvider)
-def _bundles_from_unit(obj, user):
+def _bundles_from_unit(obj, _):
     # We could tweak the adapter above to return
     # all possible bundles, or use the container index.
     bundle = IContentPackageBundle(obj, None)
@@ -206,6 +208,28 @@ def _bundles_from_container_object(obj):
         if is_readable(bundle):
             results.add(bundle)
     return results
+
+
+# traversal
+
+
+@component.adapter(IRequest)
+@interface.implementer(IContentUnit)
+def _unit_from_request(request):
+    """
+    We may have our content unit instance stashed in the request if it 
+    was in our path.
+    """
+    try:
+        return request.unit_traversal_context
+    except AttributeError:
+        return None
+
+
+@component.adapter(IRequest)
+@interface.implementer(IContentPackage)
+def _package_from_request(request):
+    return _unit_from_request(request)
 
 
 # Containers

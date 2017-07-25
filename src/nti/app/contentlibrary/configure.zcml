@@ -184,6 +184,17 @@
 	<!-- Recordables -->
 	<utility factory=".recordables.LibraryRecordables" name="library" />
 
+	<!-- Traversal -->
+	<adapter factory=".adapters._unit_from_request"
+			 provides="nti.contentlibrary.interfaces.IContentUnit"
+			 for="pyramid.interfaces.IRequest" />
+
+	<adapter factory=".adapters._package_from_request"
+			 provides="nti.contentlibrary.interfaces.IContentPackage"
+			 for="pyramid.interfaces.IRequest" />
+
+	<subscriber handler=".subscribers.unit_traversal_context_subscriber" />
+		
 	<!-- Metadata -->
 	<subscriber	factory=".predicates._SystemContentPackages"
 				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />

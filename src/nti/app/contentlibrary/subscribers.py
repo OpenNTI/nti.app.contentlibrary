@@ -18,11 +18,16 @@ from zope.lifecycleevent.interfaces import IObjectAddedEvent
 
 from zope.securitypolicy.rolepermission import AnnotationRolePermissionManager
 
+from zope.traversing.interfaces import IBeforeTraverseEvent
+
+from pyramid.threadlocal import get_current_request
+
 from nti.app.contentlibrary.interfaces import IContentBoard
 from nti.app.contentlibrary.interfaces import IContentPackageRolePermissionManager
 
 from nti.app.contentlibrary.model import ContentBundleCommunity
 
+from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -110,3 +115,17 @@ def _on_content_bundle_published(bundle, unused_event):
     board = IContentBoard(bundle, None)
     if board is not None:
         board.createDefaultForum()
+
+
+# traversal
+
+
+@component.adapter(IContentUnit, IBeforeTraverseEvent)
+def unit_traversal_context_subscriber(unit, _):
+    """
+    We commonly need access to the unit context in underlying
+    requests/decorators. Store that here for easy access.
+    """
+    request = get_current_request()
+    if request is not None:
+        request.unit_traversal_context = unit
