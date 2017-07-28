@@ -86,6 +86,21 @@
 			 for="nti.contentlibrary.interfaces.IContentPackageBundle"
 			 provides="nti.dataserver.interfaces.ICommunity" />
 
+	<!-- Traversal -->
+	<adapter factory="nti.traversal.traversal.DefaultAdapterTraversable"
+			 for="nti.contentlibrary.interfaces.IEditableContentPackage pyramid.interfaces.IRequest" />
+
+	<adapter factory="nti.traversal.traversal.DefaultAdapterTraversable"
+			 for="nti.contentlibrary.interfaces.IEditableContentPackage" />
+
+	<adapter factory=".adapters._unit_from_request"
+			 provides="nti.contentlibrary.interfaces.IContentUnit"
+			 for="pyramid.interfaces.IRequest" />
+
+	<adapter factory=".adapters._package_from_request"
+			 provides="nti.contentlibrary.interfaces.IContentPackage"
+			 for="pyramid.interfaces.IRequest" />
+
 	<!-- Externalization -->
 	<!-- Note that we want to use the externalization already present, we just need the
 	correct factories registered -->
@@ -183,16 +198,7 @@
 
 	<!-- Recordables -->
 	<utility factory=".recordables.LibraryRecordables" name="library" />
-
-	<!-- Traversal -->
-	<adapter factory=".adapters._unit_from_request"
-			 provides="nti.contentlibrary.interfaces.IContentUnit"
-			 for="pyramid.interfaces.IRequest" />
-
-	<adapter factory=".adapters._package_from_request"
-			 provides="nti.contentlibrary.interfaces.IContentPackage"
-			 for="pyramid.interfaces.IRequest" />
-
+			 
 	<subscriber handler=".subscribers.unit_traversal_context_subscriber" />
 		
 	<!-- Metadata -->
