@@ -57,6 +57,8 @@ from nti.base._compat import bytes_
 
 from nti.common.string import is_true
 
+from nti.contentlibrary import RST_MIMETYPE
+
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackage
@@ -90,8 +92,6 @@ from nti.site.hostpolicy import get_host_site
 from nti.site.interfaces import IHostPolicyFolder
 
 from nti.traversal.traversal import find_interface
-
-RST_MIMETYPE = b'text/x-rst'
 
 CLASS = StandardExternalFields.CLASS
 LINKS = StandardExternalFields.LINKS
