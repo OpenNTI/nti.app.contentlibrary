@@ -97,6 +97,11 @@ class TestEditViews(ApplicationLayerTest):
             library = component.getUtility(IContentPackageLibrary)
             library.add(package, event=False)
 
+        href = '/dataserver2/Library/%s' % ntiid
+        res = self.testapp.get(href, status=200)
+        self.require_link_href_with_rel(res.json_body, 'contents')
+        self.require_link_href_with_rel(res.json_body, 'export')
+        
         href = '/dataserver2/Library/%s/@@contents?attachment=True' % ntiid
         res = self.testapp.get(href, status=200)
         assert_that(res.body, has_length(0))
@@ -123,6 +128,14 @@ class TestEditViews(ApplicationLayerTest):
                     has_entry('contentType', is_(str('text/x-rst'))))
         assert_that(res.json_body,
                     has_entry('data', is_(str('ichigo'))))
+
+        href = '/dataserver2/Library/%s/@@export' % ntiid
+        res = self.testapp.get(href, status=200)
+        assert_that(res.json_body,
+                    has_entry('contentType', is_(str('text/x-rst'))))
+        assert_that(res.json_body,
+                    has_entry('contents', is_(u'eJzLTM7ITM8HAAiDAnQ=')))
+
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
     @fudge.patch('nti.app.contentlibrary.views.edit_views.resolve_content_unit_associations')
