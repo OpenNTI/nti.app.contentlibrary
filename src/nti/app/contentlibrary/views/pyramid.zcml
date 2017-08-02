@@ -12,6 +12,7 @@
 	<pyramid:scan package='.admin_views' />
 	<pyramid:scan package='.asset_views' />
 	<pyramid:scan package='.bundle_views' />
+	<pyramid:scan package='.export_views' />
 	<pyramid:scan package='.library_views' />
 	<pyramid:scan package='.glossary_views' />
 

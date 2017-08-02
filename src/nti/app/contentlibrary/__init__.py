@@ -18,6 +18,9 @@ from nti.app.contentlibrary.utils import PAGE_INFO_MT_JSON
 #: Contents
 VIEW_CONTENTS = 'contents'
 
+#: Export
+VIEW_EXPORT = 'export'
+
 #: A view to fetch the published contentx
 VIEW_PUBLISH_CONTENTS = 'PublishContents'
 

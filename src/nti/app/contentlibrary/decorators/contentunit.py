@@ -14,6 +14,7 @@ from zope import interface
 
 from pyramid.interfaces import IRequest
 
+from nti.app.contentlibrary import VIEW_EXPORT
 from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import LIBRARY_ADAPTER
 from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
@@ -51,7 +52,7 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
     Decorates with `contents` rel if we are an editor.
     """
 
-    def _predicate(self, context, result):
+    def _predicate(self, context, unused_result):
         result = self._is_authenticated \
              and has_permission(ACT_CONTENT_EDIT, context, self.request)
         return result
@@ -69,9 +70,9 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _do_decorate_external(self, context, result):
         _links = result.setdefault(LINKS, [])
-        rels = (VIEW_CONTENTS,)
+        rels = (VIEW_CONTENTS, VIEW_EXPORT)
         if self._need_publish_contents_link(context):
-            rels = (VIEW_CONTENTS, VIEW_PUBLISH_CONTENTS)
+            rels = (VIEW_CONTENTS, VIEW_PUBLISH_CONTENTS, VIEW_EXPORT)
         for rel in rels:
             link = Link(context,
                         rel=rel,
@@ -85,7 +86,7 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
 @component.adapter(IRenderableContentPackage, IRequest)
 class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
-    def _predicate(self, context, result):
+    def _predicate(self, context, unused_result):
         result = self._is_authenticated \
              and has_permission(ACT_CONTENT_EDIT, context, self.request)
         return result
@@ -112,7 +113,7 @@ class RenderablePackagePublishLinkDecorator(AbstractAuthenticatedRequestAwareDec
 @interface.implementer(IExternalMappingDecorator)
 class ContentUnitContentsDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
-    def _predicate(self, context, result):
+    def _predicate(self, context, unused_result):
         unit = find_object_with_ntiid(context.ntiid)
         result = self._is_authenticated \
              and has_permission(ACT_CONTENT_EDIT, unit, self.request)
