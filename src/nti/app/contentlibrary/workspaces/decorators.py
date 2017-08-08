@@ -11,6 +11,8 @@ logger = __import__('logging').getLogger(__name__)
 
 from pyramid.interfaces import IRequest
 
+from pyramid.traversal import find_interface
+
 from zope import component
 from zope import interface
 
@@ -25,7 +27,7 @@ from nti.app.site.workspaces.workspaces import ISiteAdminWorkspace
 # make sure we use nti.dataserver.traversal to find the root site
 from nti.dataserver.traversal import find_nearest_site as ds_find_nearest_site
 
-from nti.dataserver.interfaces import IDataserver
+from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.externalization.interfaces import IExternalMappingDecorator
 from nti.externalization.interfaces import IExternalObjectDecorator
@@ -33,7 +35,8 @@ from nti.externalization.interfaces import StandardExternalFields
 
 from nti.externalization.singleton import SingletonDecorator
 
-from nti.links import links
+from nti.links.links import Link
+
 from nti.links import render_link
 
 LINKS = StandardExternalFields.LINKS

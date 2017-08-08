@@ -31,6 +31,7 @@ from nti.contentlibrary import ALL_CONTENT_MIMETYPES
 from nti.contentlibrary.index import get_contentbundle_catalog
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
+from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 

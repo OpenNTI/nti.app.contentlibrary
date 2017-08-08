@@ -20,7 +20,6 @@ from nti.app.testing.application_webtest import ApplicationLayerTest
 
 from nti.app.testing.decorators import WithSharedApplicationMockDS
 
-
 class TestAdminViews(ApplicationLayerTest):
 
     layer = PersistentApplicationTestLayer
@@ -58,3 +57,4 @@ class TestAdminViews(ApplicationLayerTest):
         assert_that(res.json_body,
                     has_entries('TotalItemCount', is_(greater_than_or_equal_to(0)),
                                 'ItemCount', is_(greater_than_or_equal_to(0))))
+        

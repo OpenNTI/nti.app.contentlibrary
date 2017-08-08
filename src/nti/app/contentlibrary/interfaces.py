@@ -138,7 +138,6 @@ class IContentUnitInfo(INTIIDEntry):
                                     Bulk collections/requests will not have it.
                                     """)
 
-
 # Mixins
 
 class IContentUnitContents(interface.Interface):

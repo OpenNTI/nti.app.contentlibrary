@@ -75,7 +75,6 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.traversal.traversal import find_interface
 
-
 # Bundles
 
 
@@ -431,3 +430,4 @@ class _BundleAccessProvider(object):
             if new_groups != new_bundle_groups:
                 # be idempotent
                 membership.setGroups(new_groups)
+    
