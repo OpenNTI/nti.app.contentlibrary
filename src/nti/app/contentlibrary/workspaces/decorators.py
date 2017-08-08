@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from pyramid.interfaces import IRequest
+
 from zope import component
 from zope import interface
 
@@ -16,16 +18,28 @@ from zope.location.interfaces import ILocation
 
 from nti.app.contentlibrary.interfaces import IContentUnitInfo
 
+from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
+
+from nti.app.site.workspaces.workspaces import ISiteAdminWorkspace
+
 # make sure we use nti.dataserver.traversal to find the root site
 from nti.dataserver.traversal import find_nearest_site as ds_find_nearest_site
 
+from nti.dataserver.interfaces import IDataserver
+
 from nti.externalization.interfaces import IExternalMappingDecorator
+from nti.externalization.interfaces import IExternalObjectDecorator
+from nti.externalization.interfaces import StandardExternalFields
 
 from nti.externalization.singleton import SingletonDecorator
 
 from nti.links import links
 from nti.links import render_link
 
+LINKS = StandardExternalFields.LINKS
+
+SYNC_LIBRARIES = 'SyncAllLibraries'
+REMOVE_LOCK = 'RemoveSyncLocks'
 
 @component.adapter(IContentUnitInfo)
 @interface.implementer(IExternalMappingDecorator)
@@ -58,3 +72,19 @@ class ContentUnitInfoHrefDecorator(object):
         interface.alsoProvides(link, ILocation)
 
         mapping['href'] = render_link(link, nearest_site=nearest_site)['href']
+
+@component.adapter(ISiteAdminWorkspace, IRequest)
+@interface.implementer(IExternalObjectDecorator)
+class AdminSyncLibrariesDecorator(AbstractAuthenticatedRequestAwareDecorator):
+
+    __metaclass_ = SingletonDecorator
+
+    def _do_decorate_external(self, context, result_map):
+        links = result_map.setdefault("Links", [])
+        rels = [SYNC_LIBRARIES, REMOVE_LOCK]
+        ds2 = find_interface(context, IDataserverFolder)
+        for rel in rels:
+            link = Link(ds2,
+                        rel=rel,
+                        elements=("@@%s" % rel,))
+            links.append(link)

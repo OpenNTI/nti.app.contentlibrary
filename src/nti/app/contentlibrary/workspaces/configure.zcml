@@ -75,5 +75,10 @@
 	<!-- Decorators -->
 	<subscriber factory=".decorators.ContentUnitInfoHrefDecorator"
 				provides="nti.externalization.interfaces.IExternalMappingDecorator"/>
+	
+	<subscriber factory="nti.app.site.workspaces.decorators.AdminSyncLibrariesDecorator"
+				provides="nti.externalization.interfaces.IExternalObjectDecorator"
+				for="nti.app.site.workspaces.interfaces.ISiteAdminWorkspace
+					 pyramid.interfaces.IRequest"/>
 
 </configure>
