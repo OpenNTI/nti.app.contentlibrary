@@ -44,6 +44,7 @@ LINKS = StandardExternalFields.LINKS
 SYNC_LIBRARIES = 'SyncAllLibraries'
 REMOVE_LOCK = 'RemoveSyncLocks'
 
+
 @component.adapter(IContentUnitInfo)
 @interface.implementer(IExternalMappingDecorator)
 class ContentUnitInfoHrefDecorator(object):
@@ -68,7 +69,7 @@ class ContentUnitInfoHrefDecorator(object):
                          type(context))
             return
 
-        link = links.Link(nearest_site, elements=('Objects', context.ntiid))
+        link = Link(nearest_site, elements=('Objects', context.ntiid))
         # Nearest site may be IRoot, which has no __parent__
         link.__parent__ = getattr(nearest_site, '__parent__', None)
         link.__name__ = ''
