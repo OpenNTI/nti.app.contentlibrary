@@ -396,3 +396,31 @@ class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
                              },
                              None)
         return self._process_package(package)
+
+
+@view_config(context=IDataserverFolder)
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               permission=ACT_SYNC_LIBRARY,
+               name='SyncMetadata')
+class SyncMetadataView(IsSyncInProgressView):
+
+    @Lazy
+    def last_synchronized(self):
+        try:
+            hostsites = component.getUtility(IEtcNamespace, name='hostsites')
+            return hostsites.lastSynchronized or 0
+        except AttributeError:
+            return 0
+
+    @Lazy
+    def is_locked(self):
+        lock, acquired = self.acquire()
+        self.release(lock, acquired)
+        return not acquired
+
+    def __call__(self):
+        results = LocatedExternalDict()
+        results['lastSynchronized'] = self.last_synchronized
+        results['isLocked'] = self.is_locked
+        return results

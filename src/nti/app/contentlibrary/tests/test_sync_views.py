@@ -10,6 +10,8 @@ __docformat__ = "restructuredtext en"
 from hamcrest import empty
 from hamcrest import is_not
 from hamcrest import assert_that
+from hamcrest import not_none
+from hamcrest import has_entry
 
 from zope.component import eventtesting
 
@@ -55,3 +57,10 @@ class TestSyncViews(ApplicationLayerTest):
         self.testapp.get('/dataserver2/@@IsSyncInProgress', status=200)
         self.testapp.post('/dataserver2/@@RemoveSyncLock', status=204)
         self.testapp.get('/dataserver2/@@LastSyncTime', status=200)
+        
+    @WithSharedApplicationMockDS(users=True, testapp=True)
+    def test_metadata_view(self):
+        res = self.testapp.get('/dataserver2/@@SyncMetadata')
+
+        assert_that(res.json_body, has_entry('lastSynchronized', not_none()))
+        assert_that(res.json_body, has_entry('isLocked', not_none()))
