@@ -9,12 +9,12 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope import component
+from zope import interface
+
 from pyramid.interfaces import IRequest
 
 from pyramid.traversal import find_interface
-
-from zope import component
-from zope import interface
 
 from zope.location.interfaces import ILocation
 
@@ -29,9 +29,9 @@ from nti.dataserver.traversal import find_nearest_site as ds_find_nearest_site
 
 from nti.dataserver.interfaces import IDataserverFolder
 
+from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 from nti.externalization.interfaces import IExternalObjectDecorator
-from nti.externalization.interfaces import StandardExternalFields
 
 from nti.externalization.singleton import SingletonDecorator
 
@@ -41,9 +41,9 @@ from nti.links import render_link
 
 LINKS = StandardExternalFields.LINKS
 
-SYNC_LIBRARIES = 'SyncAllLibraries'
-REMOVE_LOCK = 'RemoveSyncLocks'
 SYNC_META = 'SyncMetadata'
+REMOVE_LOCK = 'RemoveSyncLocks'
+SYNC_LIBRARIES = 'SyncAllLibraries'
 
 
 @component.adapter(IContentUnitInfo)
@@ -77,6 +77,7 @@ class ContentUnitInfoHrefDecorator(object):
         interface.alsoProvides(link, ILocation)
 
         mapping['href'] = render_link(link, nearest_site=nearest_site)['href']
+
 
 @component.adapter(ISiteAdminWorkspace, IRequest)
 @interface.implementer(IExternalObjectDecorator)
