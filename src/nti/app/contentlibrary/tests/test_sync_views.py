@@ -60,7 +60,10 @@ class TestSyncViews(ApplicationLayerTest):
         
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_metadata_view(self):
-        res = self.testapp.get('/dataserver2/@@SyncMetadata')
+        res = self.testapp.get('/dataserver2/users/sjohnson@nextthought.com/SiteAdmin')
+        href = self.require_link_href_with_rel(res.json_body, 'SyncMetadata')
+        
+        res = self.testapp.get(href)
 
         assert_that(res.json_body, has_entry('lastSynchronized', not_none()))
         assert_that(res.json_body, has_entry('isLocked', not_none()))
