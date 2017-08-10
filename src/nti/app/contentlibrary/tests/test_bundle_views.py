@@ -288,7 +288,7 @@ class TestBundleViews(ApplicationLayerTest):
         try:
             path = self.presentation_assets_zip(tmpdir)
             with open(path, "rb") as fp:
-                source = SourceFile("assets.zip", fp.read())
+                source = SourceFile(name="assets.zip", data=fp.read())
             mock_src.is_callable().with_args().returns({"assets.zip":source})
             href = '/dataserver2/ContentBundles'
             bundle = PublishableContentPackageBundle(title=u'Bleach',
