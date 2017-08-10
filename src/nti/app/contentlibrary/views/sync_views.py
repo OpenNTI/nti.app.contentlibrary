@@ -65,10 +65,10 @@ from nti.contentlibrary.synchronize import ContentPackageSyncResults
 
 from nti.contentlibrary.utils import get_content_package_site
 
+from nti.dataserver.authorization import ACT_SYNC_LIBRARY
+
 from nti.dataserver.interfaces import IRedisClient
 from nti.dataserver.interfaces import IDataserverFolder
-
-from nti.dataserver.authorization import ACT_SYNC_LIBRARY
 
 from nti.externalization.interfaces import LocatedExternalDict
 
@@ -316,7 +316,6 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
                                ntiids=ntiids,
                                allowRemoval=allowRemoval)
         return result
-
 
 
 @view_config(name='Sync')
