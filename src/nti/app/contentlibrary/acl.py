@@ -13,8 +13,6 @@ from zope import interface
 
 from zope.cachedescriptors.property import Lazy
 
-from zope.interface.interfaces import ComponentLookupError
-
 from nti.app.contentlibrary.utils import role_for_content_bundle
 from nti.app.contentlibrary.utils import role_for_content_package
 
@@ -119,7 +117,7 @@ class _AbstractDelimitedHierarchyEntryACLProvider(object):
                     raise ValueError("ACL file had no valid contents.")
                 if self._add_default_deny_to_acl_from_file:
                     __acl__.append(ace_denying_all('Default Deny After File ACL'))
-            except (ValueError, AssertionError, TypeError, ComponentLookupError):
+            except (ValueError, AssertionError, TypeError, LookupError):
                 logger.exception("Failed to read acl from %s/%s; denying all access.",
                                  self.context, self._acl_sibling_entry_name)
                 __acl__ = _ACL((ace_denying_all('Default Deny Due to Parsing Error'),))
