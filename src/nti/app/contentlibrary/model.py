@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import time
+
 from datetime import datetime
 
 from zope import interface
@@ -54,16 +56,16 @@ class ContentTrackingRedisClient(SchemaConfigured):
         SchemaConfigured.__init__(self, *args, **kwargs)
         
     def _mark_as_held(self, user):
-        self.holding_user = user.username
+        self.holding_user = user.username if user is not None else u''
         self.last_released = None
-        self.last_locked = datetime.now()
+        self.last_locked = time.mktime(datetime.now().timetuple())
         self.is_locked = True
         
     def _mark_as_released(self):
         self.holding_user = None
         self.is_locked = False
         self.last_locked = None
-        self.last_released = datetime.now()
+        self.last_released = time.mktime(datetime.now().timetuple())
 
     def acquire_lock(self, user, lock_name,
                      lock_timeout, blocking_timeout=1):
@@ -78,7 +80,8 @@ class ContentTrackingRedisClient(SchemaConfigured):
 
     def release_lock(self, user):
         try:
-            if self.is_locked and user.username == self.holding_user:
+            u_name = user.username if user is not None else u''
+            if self.is_locked and u_name == self.holding_user:
                 self.lock.release()
                 self._mark_as_released()
         except Exception:

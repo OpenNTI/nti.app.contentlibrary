@@ -86,5 +86,5 @@ class TestSyncViews(ApplicationLayerTest):
         assert_that(res.json_body, has_entry('holding_user', None))
         assert_that(res.json_body, has_entry('last_released', not_none()))
         assert_that(res.json_body, is_not(has_key('last_locked')))
-
+        
         assert_that(res.json_body, has_entry('last_synchronized', not_none()))

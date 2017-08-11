@@ -41,9 +41,9 @@ from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IShouldHaveTraversablePath
 
 from nti.schema.field import List
+from nti.schema.field import Float
 from nti.schema.field import Bool
 from nti.schema.field import Object
-from nti.schema.field import DateTime
 from nti.schema.field import TextLine as ValidTextLine
 
 
@@ -172,12 +172,12 @@ class IContentTrackingRedisClient(interface.Interface):
                    description=u"The Redis client")
     redis.setTaggedValue('_ext_excluded_out', True)
     
-    last_released = DateTime(title=u"Last Released",
+    last_released = Float(title=u"Last Released",
                          description=u"Timestamp of last Redis lock release",
                          default=None,
                          required=False)
     
-    last_locked = DateTime(title=u"Last Locked",
+    last_locked = Float(title=u"Last Locked",
                          description=u"Timestamp of last Redis lock",
                          default=None,
                          required=False)
