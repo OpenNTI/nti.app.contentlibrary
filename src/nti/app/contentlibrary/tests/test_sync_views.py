@@ -12,6 +12,8 @@ from hamcrest import is_not
 from hamcrest import assert_that
 from hamcrest import not_none
 from hamcrest import has_entry
+from hamcrest import equal_to
+from hamcrest import has_key
 
 from zope.component import eventtesting
 
@@ -62,8 +64,27 @@ class TestSyncViews(ApplicationLayerTest):
     def test_metadata_view(self):
         res = self.testapp.get('/dataserver2/users/sjohnson@nextthought.com/SiteAdmin')
         href = self.require_link_href_with_rel(res.json_body, 'SyncMetadata')
+        self.testapp.post('/dataserver2/@@SetSyncLock', status=204)
         
         res = self.testapp.get(href)
+        assert_that(res.json_body, has_entry('is_locked', True))
+        assert_that(res.json_body, has_entry('holding_user', 'sjohnson@nextthought.com'))
+        assert_that(res.json_body, has_entry('last_locked', not_none()))
+        assert_that(res.json_body, is_not(has_key('last_released')))
+        
+        res = self.testapp.get('/dataserver2/@@IsSyncInProgress', status=200)
+        assert_that(res.json_body, equal_to(True))
 
-        assert_that(res.json_body, has_entry('lastSynchronized', not_none()))
-        assert_that(res.json_body, has_entry('isLocked', not_none()))
+        self.testapp.post('/dataserver2/@@RemoveSyncLock', status=204)
+        res = self.testapp.get(href)
+        
+        res = self.testapp.get('/dataserver2/@@IsSyncInProgress', status=200)
+        assert_that(res.json_body, equal_to(False))
+        
+        res = self.testapp.get(href)
+        assert_that(res.json_body, has_entry('is_locked', False))
+        assert_that(res.json_body, has_entry('holding_user', None))
+        assert_that(res.json_body, has_entry('last_released', not_none()))
+        assert_that(res.json_body, is_not(has_key('last_locked')))
+
+        assert_that(res.json_body, has_entry('last_synchronized', not_none()))

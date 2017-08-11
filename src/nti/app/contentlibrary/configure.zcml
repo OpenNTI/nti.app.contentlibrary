@@ -108,6 +108,9 @@
 	<include package="nti.externalization" />
 
 	<ext:registerMimeFactories module=".forum" />
+		
+	<utility factory=".model.ContentTrackingRedisClient"
+			 provides=".interfaces.IContentTrackingRedisClient" />
 
 	<!-- Decorators -->
 	<include package=".decorators" />
@@ -193,7 +196,8 @@
 
 	<!-- Externalization -->
 	<ext:registerAutoPackageIO
-		root_interfaces=".interfaces.IContentUnitContents"
+		root_interfaces=".interfaces.IContentUnitContents
+						 .interfaces.IContentTrackingRedisClient"
 		modules=".model" />
 
 	<!-- Recordables -->

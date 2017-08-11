@@ -22,6 +22,7 @@ from zope.securitypolicy.interfaces import IRolePermissionManager
 
 from nti.contentlibrary.interfaces import IContentUnit
 
+from nti.coremetadata.interfaces import IRedisClient
 # Content-specific boards and forums
 # We define these as a distinct set of classes/interfaces/mimetypes/ntiids
 # so that things like analytics and notable data can distinguish them.
@@ -40,7 +41,9 @@ from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IShouldHaveTraversablePath
 
 from nti.schema.field import List
+from nti.schema.field import Bool
 from nti.schema.field import Object
+from nti.schema.field import DateTime
 from nti.schema.field import TextLine as ValidTextLine
 
 
@@ -159,3 +162,46 @@ class IContentUnitContents(interface.Interface):
         missing_value=b'',
         required=False,
     )
+
+class IContentTrackingRedisClient(interface.Interface):
+    """
+    Tracks the operations of an IRedisClient for metadata
+    """
+    redis = Object(IRedisClient,
+                   title=u"Redis Client",
+                   description=u"The Redis client")
+    redis.setTaggedValue('_ext_excluded_out', True)
+    
+    last_released = DateTime(title=u"Last Released",
+                         description=u"Timestamp of last Redis lock release",
+                         default=None,
+                         required=False)
+    
+    last_locked = DateTime(title=u"Last Locked",
+                         description=u"Timestamp of last Redis lock",
+                         default=None,
+                         required=False)
+    
+    holding_user = ValidTextLine(title=u"Current User",
+                            description=u"The current user holding the lock",
+                            default=None,
+                            required=False)
+    
+    is_locked = Bool(title=u"IsLocked",
+                     description=u"If the Redis client is locked.",
+                     default=False)
+    
+    def acquire_lock(self, lock_name, lock_timeout, blocking_timeout):
+        """
+        Attempt to acquire the Redis lock.
+        """
+    
+    def release_lock(self):
+        """
+        Release Redis lock
+        """
+    
+    def delete_lock(self):
+        """
+        Delete Redis lock
+        """

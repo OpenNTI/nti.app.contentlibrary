@@ -402,8 +402,9 @@ class _BundleAccessProvider(object):
 
     def _get_context_roles_to_remove(self, entity):
         accessible_packages = set(self._packages) \
-                            & self._get_accessible_packages(entity)
-        accessible_roles = set(role_for_content_package(x) for x in accessible_packages)
+            & self._get_accessible_packages(entity)
+        accessible_roles = set(role_for_content_package(x)
+                               for x in accessible_packages)
         return self._package_context_roles - accessible_roles
 
     def remove_access(self, entity):
@@ -430,4 +431,3 @@ class _BundleAccessProvider(object):
             if new_groups != new_bundle_groups:
                 # be idempotent
                 membership.setGroups(new_groups)
-    

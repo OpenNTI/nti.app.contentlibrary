@@ -42,7 +42,7 @@ from nti.links import render_link
 LINKS = StandardExternalFields.LINKS
 
 SYNC_META = 'SyncMetadata'
-REMOVE_LOCK = 'RemoveSyncLocks'
+REMOVE_LOCK = 'RemoveSyncLock'
 SYNC_LIBRARIES = 'SyncAllLibraries'
 
 

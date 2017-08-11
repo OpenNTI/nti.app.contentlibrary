@@ -46,6 +46,8 @@ from nti.app.contentlibrary import MessageFactory as _
 from nti.app.contentlibrary import LOCK_TIMEOUT
 from nti.app.contentlibrary import SYNC_LOCK_NAME
 
+from nti.app.contentlibrary.interfaces import IContentTrackingRedisClient
+
 from nti.app.contentlibrary.synchronize import syncContentPackages
 
 from nti.app.contentlibrary.synchronize.subscribers import update_indices_when_content_changes
@@ -72,6 +74,8 @@ from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.externalization.interfaces import LocatedExternalDict
 
+from nti.externalization.externalization import to_external_object
+
 from nti.publishing.interfaces import IPublishable
 
 from nti.site.hostpolicy import get_host_site
@@ -87,10 +91,10 @@ class RemoveSyncLockView(AbstractAuthenticatedView):
 
     @Lazy
     def redis(self):
-        return component.getUtility(IRedisClient)
+        return component.getUtility(IContentTrackingRedisClient)
 
     def __call__(self):
-        self.redis.delete(SYNC_LOCK_NAME)
+        self.redis.delete_lock(SYNC_LOCK_NAME)
         return hexc.HTTPNoContent()
 
 
@@ -104,26 +108,10 @@ class IsSyncInProgressView(AbstractAuthenticatedView):
 
     @Lazy
     def redis(self):
-        return component.getUtility(IRedisClient)
-
-    def acquire(self):
-        lock = self.redis.lock(SYNC_LOCK_NAME,
-                               LOCK_TIMEOUT,
-                               blocking_timeout=1)
-        acquired = lock.acquire(blocking=False)
-        return (lock, acquired)
-
-    def release(self, lock, acquired):
-        try:
-            if acquired:
-                lock.release()
-        except Exception:
-            pass
+        return component.getUtility(IContentTrackingRedisClient)
 
     def __call__(self):
-        lock, acquired = self.acquire()
-        self.release(lock, acquired)
-        return not acquired
+        return self.redis.is_locked
 
 
 @view_config(permission=ACT_SYNC_LIBRARY)
@@ -138,14 +126,15 @@ class SetSyncLockView(AbstractAuthenticatedView):
 
     @Lazy
     def redis(self):
-        return component.getUtility(IRedisClient)
+        return component.getUtility(IContentTrackingRedisClient)
 
     def acquire(self):
         # Fail fast if we cannot acquire the lock.
-        lock = self.redis.lock(SYNC_LOCK_NAME, LOCK_TIMEOUT)
-        acquired = lock.acquire(blocking=self.blocking)
+        acquired = self.redis.acquire_lock(self.remoteUser, SYNC_LOCK_NAME, LOCK_TIMEOUT,
+                                           blocking_timeout=self.blocking)
+        #acquired = lock.acquire(blocking=self.blocking)
         if acquired:
-            return lock
+            return self.redis.lock
         raise_json_error(self.request,
                          hexc.HTTPLocked,
                          {
@@ -188,9 +177,9 @@ class _AbstractSyncAllLibrariesView(SetSyncLockView,
             result.update(values)
         return result
 
-    def release(self, lock):
+    def release(self):
         try:
-            lock.release()
+            self.redis.release_lock(self.remoteUser)
         except Exception:
             logger.exception("Error while releasing Sync lock")
 
@@ -237,7 +226,7 @@ class _AbstractSyncAllLibrariesView(SetSyncLockView,
                              result,
                              exc_traceback)
         finally:
-            self.release(lock)
+            self.release()
             restoreInteraction()
 
 
@@ -412,14 +401,12 @@ class SyncMetadataView(IsSyncInProgressView):
         except AttributeError:
             return 0
 
-    @Lazy
-    def is_locked(self):
-        lock, acquired = self.acquire()
-        self.release(lock, acquired)
-        return not acquired
-
     def __call__(self):
-        results = LocatedExternalDict()
-        results['lastSynchronized'] = self.last_synchronized
-        results['isLocked'] = self.is_locked
+        tracking_redis = component.getUtility(IContentTrackingRedisClient)
+        results = to_external_object(tracking_redis)
+        results['last_synchronized'] = self.last_synchronized
+        if results['last_released'] == None:
+            results.pop('last_released')
+        else:
+            results.pop('last_locked')
         return results
