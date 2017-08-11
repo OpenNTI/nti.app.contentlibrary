@@ -33,7 +33,7 @@ from nti.contentlibrary.utils import get_content_package_site
 from nti.contenttypes.presentation.interfaces import IPresentationAssetContainer
 from nti.contenttypes.presentation.interfaces import IContentBackedPresentationAsset
 
-from nti.contenttypes.presentation import iface_of_asset as iface_of_thing
+from nti.contenttypes.presentation import interface_of_asset as iface_of_thing
 
 from nti.dataserver import authorization as nauth
 

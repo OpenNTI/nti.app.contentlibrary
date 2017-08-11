@@ -36,7 +36,7 @@ from nti.contentlibrary.interfaces import IContentPackageRenderedEvent
 
 from nti.contentlibrary.synchronize import ContentPackageSyncResults
 
-from nti.contenttypes.presentation import iface_of_asset
+from nti.contenttypes.presentation import interface_of_asset
 
 from nti.contenttypes.presentation.interfaces import INTIAudio
 from nti.contenttypes.presentation.interfaces import INTIVideo
@@ -361,7 +361,7 @@ def _index_item(item, content_package, container_id, catalog, intids, connection
 def _copy_remove_transactions(items, registry=None):
     registry = get_site_registry(registry)
     for item in items or ():
-        provided = iface_of_asset(item)
+        provided = interface_of_asset(item)
         obj = registry.queryUtility(provided, name=item.ntiid)
         if obj is None:
             remove_transaction_history(item)
@@ -431,7 +431,7 @@ def _clear_assets_by_interface(content_package, iface, force=False):
         container = IPresentationAssetContainer(unit)
         for key, value in tuple(container.items()):  # mutating
             registered = None
-            provided = iface_of_asset(value)
+            provided = interface_of_asset(value)
             if not force:
                 registered = component.queryUtility(provided, name=key)
             if     registered is None \
