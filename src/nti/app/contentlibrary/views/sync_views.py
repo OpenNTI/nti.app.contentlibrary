@@ -391,20 +391,11 @@ class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
                renderer='rest',
                permission=ACT_SYNC_LIBRARY,
                name='SyncMetadata')
-class SyncMetadataView(IsSyncInProgressView):
-
-    @Lazy
-    def last_synchronized(self):
-        try:
-            hostsites = component.getUtility(IEtcNamespace, name='hostsites')
-            return hostsites.lastSynchronized or 0
-        except AttributeError:
-            return 0
-
+class SyncMetadataView(AbstractAuthenticatedView):
+    
     def __call__(self):
         tracking_redis = component.getUtility(IContentTrackingRedisClient)
         results = to_external_object(tracking_redis)
-        results['last_synchronized'] = self.last_synchronized
         if results['last_released'] == None:
             results.pop('last_released')
         else:

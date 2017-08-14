@@ -182,6 +182,10 @@ class IContentTrackingRedisClient(interface.Interface):
                          default=None,
                          required=False)
     
+    last_synchronized = Float(title=u"Last synced",
+                              description=u"The last time a sync finished",
+                              default=0.0)
+    
     holding_user = ValidTextLine(title=u"Current User",
                             description=u"The current user holding the lock",
                             default=None,

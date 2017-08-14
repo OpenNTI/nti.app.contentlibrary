@@ -5,7 +5,7 @@
 
 	<include package="zope.component" file="meta.zcml" />
 	<include package="zope.component" />
-	
+
 	<subscriber factory=".decorators._ContentUnitPreferencesDecorator"
 				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
 

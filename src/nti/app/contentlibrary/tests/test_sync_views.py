@@ -71,6 +71,8 @@ class TestSyncViews(ApplicationLayerTest):
         assert_that(res.json_body, has_entry('holding_user', 'sjohnson@nextthought.com'))
         assert_that(res.json_body, has_entry('last_locked', not_none()))
         assert_that(res.json_body, is_not(has_key('last_released')))
+        assert_that(res.json_body, has_entry('last_synchronized', not_none()))
+        
         
         res = self.testapp.get('/dataserver2/@@IsSyncInProgress', status=200)
         assert_that(res.json_body, equal_to(True))
@@ -86,5 +88,5 @@ class TestSyncViews(ApplicationLayerTest):
         assert_that(res.json_body, has_entry('holding_user', None))
         assert_that(res.json_body, has_entry('last_released', not_none()))
         assert_that(res.json_body, is_not(has_key('last_locked')))
-        
         assert_that(res.json_body, has_entry('last_synchronized', not_none()))
+        
