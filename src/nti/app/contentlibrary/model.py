@@ -11,8 +11,6 @@ logger = __import__('logging').getLogger(__name__)
 
 import time
 
-from datetime import datetime
-
 from zope import interface
 from zope import component
 
@@ -58,15 +56,15 @@ class ContentTrackingRedisClient(SchemaConfigured):
     def _mark_as_held(self, user):
         self.holding_user = user.username if user is not None else u''
         self.last_released = None
-        self.last_locked = time.mktime(datetime.now().timetuple())
+        self.last_locked = time.time()
         self.is_locked = True
         
     def _mark_as_released(self):
         self.holding_user = None
         self.is_locked = False
         self.last_locked = None
-        self.last_released = time.mktime(datetime.now().timetuple())
-        self.last_synchronized = time.mktime(datetime.now().timetuple())
+        self.last_released = time.time()
+        self.last_synchronized = time.time()
 
     def acquire_lock(self, user, lock_name,
                      lock_timeout, blocking_timeout=1):
