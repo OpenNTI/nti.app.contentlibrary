@@ -396,6 +396,11 @@ class SyncMetadataView(AbstractAuthenticatedView):
     def __call__(self):
         tracking_redis = component.getUtility(IContentTrackingRedisClient)
         results = to_external_object(tracking_redis)
+        try:
+            hostsites = component.getUtility(IEtcNamespace, name='hostsites')
+            results['last_synchronized'] = hostsites.lastSynchronized or 0
+        except AttributeError:
+            results['last_synchronized'] = 0
         if results['last_released'] == None:
             results.pop('last_released')
         else:

@@ -64,7 +64,6 @@ class ContentTrackingRedisClient(SchemaConfigured):
         self.is_locked = False
         self.last_locked = None
         self.last_released = time.time()
-        self.last_synchronized = time.time()
 
     def acquire_lock(self, user, lock_name,
                      lock_timeout, blocking_timeout=1):
