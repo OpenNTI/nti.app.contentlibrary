@@ -14,7 +14,6 @@ from zope import interface
 
 from pyramid.interfaces import IRequest
 
-from nti.app.contentlibrary import VIEW_EXPORT
 from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import LIBRARY_ADAPTER
 from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
@@ -70,9 +69,9 @@ class EditablePackageDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _do_decorate_external(self, context, result):
         _links = result.setdefault(LINKS, [])
-        rels = (VIEW_CONTENTS, VIEW_EXPORT)
+        rels = (VIEW_CONTENTS,)
         if self._need_publish_contents_link(context):
-            rels = (VIEW_CONTENTS, VIEW_PUBLISH_CONTENTS, VIEW_EXPORT)
+            rels = (VIEW_CONTENTS, VIEW_PUBLISH_CONTENTS,)
         for rel in rels:
             link = Link(context,
                         rel=rel,
