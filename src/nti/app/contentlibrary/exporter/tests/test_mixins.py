@@ -7,6 +7,7 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
+from hamcrest import none
 from hamcrest import is_in
 from hamcrest import is_not
 from hamcrest import has_key
@@ -59,7 +60,9 @@ class TestMixins(ApplicationLayerTest):
             
             salted_video = hash_ntiid(self.video, self.salt)
             assert_that(result,
-                        has_entry('Items', has_entry(salted_video, has_entry('NTIID', salted_video))))
+                        has_entry('Items', has_entry(salted_video, 
+                                                     has_entries('NTIID', salted_video,
+                                                                 'MimeType', is_not(none())))))
             
             salted_container = hash_ntiid(self.container, self.salt)
             assert_that(result,
