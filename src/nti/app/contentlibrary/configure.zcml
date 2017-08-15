@@ -13,6 +13,7 @@
 	<include package="nti.contentfragments" />
 
 	<include package=".views" />
+	<include package=".exporter" />
 	<include package=".policies" />
 	<include package=".appserver" />
 	<include package=".synchronize" />
