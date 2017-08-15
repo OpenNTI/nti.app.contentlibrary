@@ -35,7 +35,7 @@ class _EditableContentPackageExporterDecorator(AssetExporterMixin):
             return
         if filer is not None:
             bucket = getattr(filer, 'default_bucket', None)
-            if filter.contains(self.VIDEO_INDEX, bucket):
+            if filer.contains(self.VIDEO_INDEX, bucket):
                 source = filer.get(self.VIDEO_INDEX, bucket)
                 result = self.merge(result, source)
             source = self.dump(result)
