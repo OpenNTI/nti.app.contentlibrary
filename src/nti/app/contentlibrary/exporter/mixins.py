@@ -14,6 +14,8 @@ from collections import Mapping
 
 import simplejson
 
+from nti.cabinet.filer import read_source
+
 from nti.contenttypes.presentation.interfaces import IPresentationAsset
 from nti.contenttypes.presentation.interfaces import IPresentationAssetContainer
 
@@ -35,13 +37,20 @@ LAST_MODIFIED = StandardExternalFields.LAST_MODIFIED
 
 INTERNAL_NTIID = StandardInternalFields.NTIID
 
+CONTAINERS = 'Containers'
+
+def prepare_json_text(s):
+    result = s.decode('utf-8') if isinstance(s, bytes) else s
+    return result
+
 
 class AssetExporterMixin(object):
 
     def __init__(self, *args, **kwargs):
         super(AssetExporterMixin, self).__init__(*args, **kwargs)
 
-    def dump(self, ext_obj):
+    @classmethod
+    def dump(cls, ext_obj):
         source = StringIO()
         simplejson.dump(ext_obj, source, indent='\t', sort_keys=True)
         source.seek(0)
@@ -61,6 +70,35 @@ class AssetExporterMixin(object):
         if isinstance(ext_obj, (set, tuple, list)):
             for value in ext_obj:
                 self._prunner(value, backup, salt)
+
+    @classmethod
+    def merge(cls, result, source):
+        data = read_source(source)
+        if data:
+            if not isinstance(data, Mapping):
+                data = prepare_json_text(data)
+                external = simplejson.loads(data)
+            else:
+                external = data
+        
+            items = result.get(ITEMS, None) or dict()
+            source_items = external.get(ITEMS) or ()
+            for ntiid in source_items:
+                if not ntiid in items:
+                    items[ntiid] = source_items[ntiid]
+    
+            containers = result.get(CONTAINERS, None) or dict()
+            source_containers = external.get(CONTAINERS) or ()
+            for ntiid in source_containers:
+                a = set(source_containers[ntiid] or ())
+                b = set(containers.get(ntiid) or ())
+                b.update(a)
+                containers[ntiid] = sorted(b)
+
+            result[ITEMS] = items
+            result[CONTAINERS] = containers
+
+        return result
 
     def do_export(self, package, provided=IPresentationAsset, backup=True, salt=None):
 
