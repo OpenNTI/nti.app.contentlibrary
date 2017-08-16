@@ -375,7 +375,7 @@ def copy_remove_transactions(items, registry=None):
 _copy_remove_transactions = copy_remove_transactions
 
 
-def store_asset(content_package, container_id, ntiid, item):
+def _store_asset(content_package, container_id, ntiid, item):
     try:
         unit = content_package[container_id]
     except KeyError:
@@ -399,7 +399,6 @@ def store_asset(content_package, container_id, ntiid, item):
 
     container[ntiid] = item
     return True
-_store_asset = store_asset
 
 
 def _index_items(content_package, index, item_iface, catalog, registry,
@@ -462,14 +461,26 @@ def clear_assets_by_interface(content_package, iface, registry=None,
 _clear_assets_by_interface = clear_assets_by_interface
 
 
+def get_sibling_entry(source, unit=None, buckets=None):
+    # seek in buckets first
+    for bucket in buckets or ():
+        if bucket is not None:
+            result = bucket.getChildNamed(source) 
+            if result is not None:
+                return result
+    if unit is not None:
+        return unit.does_sibling_entry_exist(source)  # returns a key
+    return None
+
+
 def _update_index_when_content_changes(content_package,
                                        index_filename,
                                        item_iface,
                                        object_creator,
                                        catalog=None,
-                                       sync_results=None):
-    catalog = get_library_catalog() if catalog is None else catalog
-    sibling_key = content_package.does_sibling_entry_exist(index_filename)
+                                       sync_results=None,
+                                       buckets=()):
+    sibling_key = get_sibling_entry(index_filename, content_package, buckets)
     if not sibling_key:
         # Nothing to do
         return
@@ -477,12 +488,12 @@ def _update_index_when_content_changes(content_package,
     if sync_results is None:
         sync_results = _new_sync_results(content_package)
 
-    index_text = content_package.read_contents_of_sibling_entry(index_filename)
-    if isinstance(index_text, bytes):
-        index_text = index_text.decode('utf-8')
+    index_text = sibling_key.readContents()
+    index_text = prepare_json_text(index_text)
 
     registry = get_site_registry()
-    
+    catalog = get_library_catalog() if catalog is None else catalog
+
     # remove assets with the specified interface
     removed = clear_assets_by_interface(content_package, item_iface,
                                         registry=registry, 
@@ -690,7 +701,7 @@ def clear_content_package_assets(content_package, force=True, process_global=Fal
     """
     result = []
     catalog = get_library_catalog()
-    _clear_assets(content_package, force)
+    clear_package_assets(content_package, force)
 
     # Remove indexes for our contained items; ignoring the global library.
     # Not sure if this will work when we have shared items
