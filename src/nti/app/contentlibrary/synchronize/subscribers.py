@@ -474,7 +474,7 @@ def get_sibling_entry(source, unit=None, buckets=None):
 
 
 def _update_index_when_content_changes(content_package, index_filename,
-                                       buckets=(), sync_results=None):
+                                       buckets=(), force=False, sync_results=None):
     sibling_key = get_sibling_entry(index_filename, content_package, buckets)
     if not sibling_key:
         # Nothing to do
@@ -493,20 +493,23 @@ def _update_index_when_content_changes(content_package, index_filename,
 
     # remove assets with the specified interface
     removed = clear_assets_by_interface(content_package, item_iface,
+                                        force=force,
+                                        unregister=True,
                                         registry=registry, 
-                                        unregister=True, 
                                         sync_results=sync_results)
 
     index = simplejson.loads(index_text)
     connection = get_connection(registry)
     intids = component.getUtility(IIntIds)
 
-    removed.extend(_remove_from_registry(namespace=content_package.ntiid,
-                                         provided=item_iface,
-                                         registry=registry,
-                                         catalog=catalog,
-                                         intids=intids,
-                                         sync_results=sync_results))
+    removed.extend(
+        _remove_from_registry(namespace=content_package.ntiid,
+                              provided=item_iface,
+                              registry=registry,
+                              catalog=catalog,
+                              intids=intids,
+                              force=force,
+                              sync_results=sync_results))
 
     # These are structured as follows:
     # {
@@ -520,13 +523,20 @@ def _update_index_when_content_changes(content_package, index_filename,
     if item_iface.isOrExtends(INTISlideDeck):
         # Also remove our other slide types
         for provided in (INTISlide, INTISlideVideo):
-            clear_assets_by_interface(content_package, provided)
-            removed.extend(_remove_from_registry(namespace=content_package.ntiid,
-                                                 provided=provided,
-                                                 registry=registry,
-                                                 catalog=catalog,
-                                                 intids=intids,
-                                                 sync_results=sync_results))
+            removed.extend(
+                clear_assets_by_interface(content_package, provided,
+                                          force=force,
+                                          unregister=True,
+                                          registry=registry,
+                                          sync_results=sync_results))
+            removed.extend(
+                _remove_from_registry(namespace=content_package.ntiid,
+                                      provided=provided,
+                                      registry=registry,
+                                      catalog=catalog,
+                                      intids=intids,
+                                      force=force,
+                                      sync_results=sync_results))
 
         added = _load_and_register_slidedeck_json(index_text,
                                                   registry=registry,
