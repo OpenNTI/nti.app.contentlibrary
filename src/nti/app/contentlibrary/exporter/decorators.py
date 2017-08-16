@@ -29,20 +29,10 @@ class _EditableContentPackageExporterDecorator(AssetExporterMixin):
     def __init__(self, *args):
         pass
 
-    def export_videos(self, package, external, backup=True, salt=None, filer=None):
+    def export_videos(self, package, external, backup=True, salt=None):
         result = self.do_export(package, INTIVideo, backup, salt)
-        if not result:
-            return
-        if filer is not None:
-            bucket = getattr(filer, 'default_bucket', None)
-            if filer.contains(self.VIDEO_INDEX, bucket):
-                source = filer.get(self.VIDEO_INDEX, bucket)
-                result = self.merge(result, source)
-            source = self.dump(result)
-            filer.save(self.VIDEO_INDEX, source,
-                       contentType="application/json", overwrite=True)
-        else:
+        if result:
             external[self.VIDEO_INDEX] = result
 
-    def decorateExternalObject(self, package, external, backup=True, salt=None, filer=None):
-        self.export_videos(package, external, backup, salt, filer)
+    def decorateExternalObject(self, package, external, backup=True, salt=None, unused_filer=None):
+        self.export_videos(package, external, backup, salt)
