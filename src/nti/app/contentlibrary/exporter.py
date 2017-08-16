@@ -14,8 +14,15 @@ from collections import Mapping
 
 import simplejson
 
+from zope import component
+from zope import interface
+
 from nti.cabinet.filer import read_source
 
+from nti.contentlibrary.interfaces import IEditableContentPackage
+from nti.contentlibrary.interfaces import IContentPackageExporterDecorator
+
+from nti.contenttypes.presentation.interfaces import INTIVideo
 from nti.contenttypes.presentation.interfaces import IPresentationAsset
 from nti.contenttypes.presentation.interfaces import IPresentationAssetContainer
 
@@ -38,6 +45,7 @@ LAST_MODIFIED = StandardExternalFields.LAST_MODIFIED
 INTERNAL_NTIID = StandardInternalFields.NTIID
 
 CONTAINERS = 'Containers'
+
 
 def prepare_json_text(s):
     result = s.decode('utf-8') if isinstance(s, bytes) else s
@@ -80,13 +88,13 @@ class AssetExporterMixin(object):
                 external = simplejson.loads(data)
             else:
                 external = data
-        
+
             items = result.get(ITEMS, None) or dict()
             source_items = external.get(ITEMS) or ()
             for ntiid in source_items:
                 if not ntiid in items:
                     items[ntiid] = source_items[ntiid]
-    
+
             containers = result.get(CONTAINERS, None) or dict()
             source_containers = external.get(CONTAINERS) or ()
             for ntiid in source_containers:
@@ -141,3 +149,21 @@ class AssetExporterMixin(object):
             result[ITEMS] = items
             result['Containers'] = containers
         return result
+
+
+@component.adapter(IEditableContentPackage)
+@interface.implementer(IContentPackageExporterDecorator)
+class _EditableContentPackageExporterDecorator(AssetExporterMixin):
+
+    VIDEO_INDEX = 'video_index.json'
+
+    def __init__(self, *args):
+        pass
+
+    def export_videos(self, package, external, backup=True, salt=None):
+        result = self.do_export(package, INTIVideo, backup, salt)
+        if result:
+            external[self.VIDEO_INDEX] = result
+
+    def decorateExternalObject(self, package, external, backup=True, salt=None, unused_filer=None):
+        self.export_videos(package, external, backup, salt)
