@@ -20,7 +20,7 @@ does_not = is_not
 import os
 import unittest
 
-from nti.app.contentlibrary.exporter.mixins import AssetExporterMixin
+from nti.app.contentlibrary.exporter import AssetExporterMixin
 
 from nti.contenttypes.presentation.interfaces import INTIVideo
 
