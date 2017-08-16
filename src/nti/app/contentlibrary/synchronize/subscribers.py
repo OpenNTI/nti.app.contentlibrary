@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import six
+
 import simplejson
 
 from zope import component
@@ -91,6 +93,13 @@ def prepare_json_text(s):
     return result
 
 
+def load_json_text(s):
+    result = prepare_json_text(s)
+    if isinstance(result, six.string_types):
+        result = simplejson.loads(result)
+    return result
+
+
 def get_connection(registry=None):
     registry = get_site_registry(registry)
     if registry == component.getGlobalSiteManager():
@@ -116,8 +125,7 @@ def register_utility(item, provided, ntiid, registry=None):
             assert is_valid_ntiid_string(ntiid), "Invalid NTIID %s" % ntiid
             registerUtility(registry, item, provided=provided, name=ntiid)
             logger.debug("(%s,%s) has been registered",
-                        provided.__name__,
-                        ntiid)
+                         provided.__name__, ntiid)
             return (True, item)
         return (False, registered)
     return (False, None)
@@ -143,8 +151,7 @@ def _load_and_register_item(item_iterface,
     return result
 
 
-def _load_and_register_items(item_iterface,
-                             items,
+def _load_and_register_items(item_iterface, items,
                              registry=None,
                              external_object_creator=create_object_from_external):
     result = []
@@ -160,46 +167,37 @@ def _load_and_register_items(item_iterface,
     return result
 
 
-def _load_and_register_json(item_iterface,
-                            jtext,
+def _load_and_register_json(item_iterface, jtext,
                             registry=None,
                             external_object_creator=create_object_from_external):
-    index = simplejson.loads(prepare_json_text(jtext))
+    index = load_json_text(jtext)
     items = index.get(ITEMS) or {}
-    result = _load_and_register_items(item_iterface,
-                                      items,
+    result = _load_and_register_items(item_iterface, items,
                                       registry=registry,
                                       external_object_creator=external_object_creator)
     return result
 
 
-def load_and_register_media_item(item_iterface,
-                                 ext_obj,
-                                 ntiid=None,
-                                 registry=None,
+def load_and_register_media_item(item_iterface, ext_obj,
+                                 ntiid=None, registry=None,
                                  external_object_creator=create_object_from_external):
     ntiid = ntiid or ext_obj.get(NTIID) or ext_obj.get('ntiid')
-    internal = _load_and_register_item(item_iterface,
-                                       ntiid,
-                                       ext_obj,
+    internal = _load_and_register_item(item_iterface, ntiid, ext_obj,
                                        registry=registry,
                                        external_object_creator=external_object_creator)
     return internal
 _load_and_register_media_item = load_and_register_media_item
 
 
-def load_and_register_media_json(item_iterface,
-                                 jtext,
+def load_and_register_media_json(item_iterface, jtext,
                                  registry=None,
                                  external_object_creator=create_object_from_external):
     result = []
+    index = load_json_text(jtext)
     registry = get_site_registry(registry)
-    index = simplejson.loads(prepare_json_text(jtext))
     items = index.get(ITEMS) or {}
-    for ntiid, data in items.items(): # parse media
-        internal = load_and_register_media_item(item_iterface,
-                                                ntiid=ntiid,
-                                                ext_obj=data,
+    for ntiid, data in items.items():  # parse media
+        internal = load_and_register_media_item(item_iterface, data, ntiid,
                                                 registry=registry,
                                                 external_object_creator=external_object_creator)
         if internal is not None:
@@ -212,10 +210,8 @@ def _canonicalize(items, item_iface, registry):
     recorded = []
     for idx, item in enumerate(items or ()):
         ntiid = item.ntiid
-        result, registered = _register_utility(item,
-                                               item_iface,
-                                               ntiid,
-                                               registry)
+        result = register_utility(item, item_iface, ntiid, registry)
+        result, registered = result
         if result:
             recorded.append(item)
         else:
@@ -227,15 +223,15 @@ def load_and_register_slidedeck_json(jtext,
                                      registry=None,
                                      object_creator=create_object_from_external):
     result = []
+    index = load_json_text(jtext)
     registry = get_site_registry(registry)
-    index = simplejson.loads(prepare_json_text(jtext))
     items = index.get(ITEMS) or {}
     for ntiid, data in items.items():
         internal = object_creator(data, notify=False)
-        if         INTISlide.providedBy(internal) \
+        if      INTISlide.providedBy(internal) \
             and _was_utility_registered(internal, INTISlide, ntiid, registry):
             result.append(internal)
-        elif     INTISlideVideo.providedBy(internal) \
+        elif    INTISlideVideo.providedBy(internal) \
             and _was_utility_registered(internal, INTISlideVideo, ntiid, registry):
             result.append(internal)
         elif INTISlideDeck.providedBy(internal):
@@ -255,8 +251,8 @@ _is_obj_locked = is_obj_locked
 
 
 def can_be_removed(registered, force=False):
-    result =     registered is not None \
-            and (force or not _is_obj_locked(registered))
+    result = registered is not None \
+        and (force or not _is_obj_locked(registered))
     return result
 _can_be_removed = can_be_removed
 
@@ -268,7 +264,7 @@ def removed_registered(provided, name, intids=None, registry=None,
     if item is None:
         registered = registry.queryUtility(provided, name=name)
     intids = component.getUtility(IIntIds) if intids is None else intids
-    if _can_be_removed(registered, force=force):
+    if can_be_removed(registered, force=force):
         catalog = get_library_catalog() if catalog is None else catalog
         catalog.unindex(registered, intids=intids)
         if not unregisterUtility(registry, provided=provided, name=name):
@@ -430,7 +426,7 @@ def _index_items(content_package, index, item_iface, catalog, registry,
     return result
 
 
-def clear_assets_by_interface(content_package, iface, registry=None, 
+def clear_assets_by_interface(content_package, iface, registry=None,
                               unregister=False, force=False, sync_results=None):
     result = []
     registry = get_site_registry(registry)
@@ -465,7 +461,7 @@ def get_sibling_entry(source, unit=None, buckets=None):
     # seek in buckets first
     for bucket in buckets or ():
         if bucket is not None:
-            result = bucket.getChildNamed(source) 
+            result = bucket.getChildNamed(source)
             if result is not None:
                 return result
     if unit is not None:
@@ -484,24 +480,21 @@ def _update_index_when_content_changes(content_package, index_filename,
         sync_results = _new_sync_results(content_package)
 
     item_iface, object_creator = INDICES[index_filename]
-                                       
+
     index_text = sibling_key.readContents()
-    index_text = prepare_json_text(index_text)
+    index = load_json_text(index_text)
 
     registry = get_site_registry()
     catalog = get_library_catalog()
+    connection = get_connection(registry)
+    intids = component.getUtility(IIntIds)
 
     # remove assets with the specified interface
     removed = clear_assets_by_interface(content_package, item_iface,
                                         force=force,
                                         unregister=True,
-                                        registry=registry, 
+                                        registry=registry,
                                         sync_results=sync_results)
-
-    index = simplejson.loads(index_text)
-    connection = get_connection(registry)
-    intids = component.getUtility(IIntIds)
-
     removed.extend(
         _remove_from_registry(namespace=content_package.ntiid,
                               provided=item_iface,
@@ -538,21 +531,20 @@ def _update_index_when_content_changes(content_package, index_filename,
                                       force=force,
                                       sync_results=sync_results))
 
-        added = _load_and_register_slidedeck_json(index_text,
-                                                  registry=registry,
-                                                  object_creator=object_creator)
+        added = load_and_register_slidedeck_json(index,
+                                                 registry=registry,
+                                                 object_creator=object_creator)
     elif item_iface.isOrExtends(INTIAudio) or item_iface.isOrExtends(INTIVideo):
-        added = _load_and_register_media_json(item_iface,
-                                              index_text,
-                                              registry=registry,
-                                              external_object_creator=object_creator)
+        added = load_and_register_media_json(item_iface, index,
+                                             registry=registry,
+                                             external_object_creator=object_creator)
     elif object_creator is not None:
-        added = _load_and_register_json(item_iface,
-                                        index_text,
+        added = _load_and_register_json(item_iface, index,
                                         registry=registry,
                                         external_object_creator=object_creator)
-    registered_count = len(added)
+
     removed_count = len(removed)
+    registered_count = len(added)
 
     is_global_manager = bool(registry == component.getGlobalSiteManager())
 
@@ -676,6 +668,7 @@ def _update_container(old_unit, new_unit, new_children_dict, new_package=None):
 
 def _get_children_dict(new_package):
     accum = dict()
+
     def _recur(obj, accum):
         accum[obj.ntiid] = obj
         for child in obj.children:
@@ -716,7 +709,7 @@ def clear_content_package_assets(content_package, force=True, process_global=Fal
     # across multiple content packages.
     if not process_global and IGlobalContentPackage.providedBy(content_package):
         return result
-    _clear_last_modified(content_package, catalog)
+    clear_namespace_last_modified(content_package, catalog)
 
     for data in INDICES.values():
         item_iface = data[0]
