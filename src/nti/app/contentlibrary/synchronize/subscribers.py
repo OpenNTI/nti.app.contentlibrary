@@ -108,7 +108,7 @@ def intid_register(item, intids, connection):
     return False
 
 
-def _register_utility(item, provided, ntiid, registry=None):
+def register_utility(item, provided, ntiid, registry=None):
     if provided.providedBy(item):
         registry = get_site_registry(registry)
         registered = registry.queryUtility(provided, name=ntiid)
@@ -121,11 +121,13 @@ def _register_utility(item, provided, ntiid, registry=None):
             return (True, item)
         return (False, registered)
     return (False, None)
+_register_utility = register_utility
 
 
-def _was_utility_registered(item, item_iface, ntiid, registry=None):
+def was_utility_registered(item, item_iface, ntiid, registry=None):
     result, _ = _register_utility(item, item_iface, ntiid, registry=registry)
     return result
+_was_utility_registered = was_utility_registered
 
 
 def _load_and_register_item(item_iterface,
@@ -186,23 +188,24 @@ def load_and_register_media_item(item_iterface,
 _load_and_register_media_item = load_and_register_media_item
 
 
-def _load_and_register_media_json(item_iterface,
-                                  jtext,
-                                  registry=None,
-                                  external_object_creator=create_object_from_external):
+def load_and_register_media_json(item_iterface,
+                                 jtext,
+                                 registry=None,
+                                 external_object_creator=create_object_from_external):
     result = []
     registry = get_site_registry(registry)
     index = simplejson.loads(prepare_json_text(jtext))
     items = index.get(ITEMS) or {}
     for ntiid, data in items.items(): # parse media
-        internal = _load_and_register_media_item(item_iterface,
-                                                 ntiid=ntiid,
-                                                 ext_obj=data,
-                                                 registry=registry,
-                                                 external_object_creator=external_object_creator)
+        internal = load_and_register_media_item(item_iterface,
+                                                ntiid=ntiid,
+                                                ext_obj=data,
+                                                registry=registry,
+                                                external_object_creator=external_object_creator)
         if internal is not None:
             result.append(internal)
     return result
+_load_and_register_media_json = load_and_register_media_json
 
 
 def _canonicalize(items, item_iface, registry):
@@ -220,9 +223,9 @@ def _canonicalize(items, item_iface, registry):
     return recorded
 
 
-def _load_and_register_slidedeck_json(jtext,
-                                      registry=None,
-                                      object_creator=create_object_from_external):
+def load_and_register_slidedeck_json(jtext,
+                                     registry=None,
+                                     object_creator=create_object_from_external):
     result = []
     registry = get_site_registry(registry)
     index = simplejson.loads(prepare_json_text(jtext))
@@ -243,21 +246,23 @@ def _load_and_register_slidedeck_json(jtext,
             if _was_utility_registered(internal, INTISlideDeck, ntiid, registry):
                 result.append(internal)
     return result
+_load_and_register_slidedeck_json = load_and_register_slidedeck_json
 
 
-def _is_obj_locked(node):
+def is_obj_locked(node):
     return IRecordable.providedBy(node) and node.isLocked()
+_is_obj_locked = is_obj_locked
 
 
-def _can_be_removed(registered, force=False):
+def can_be_removed(registered, force=False):
     result =     registered is not None \
             and (force or not _is_obj_locked(registered))
     return result
-can_be_removed = _can_be_removed
+_can_be_removed = can_be_removed
 
 
-def _removed_registered(provided, name, intids=None, registry=None,
-                        catalog=None, force=False, item=None):
+def removed_registered(provided, name, intids=None, registry=None,
+                       catalog=None, force=False, item=None):
     registered = item
     registry = get_site_registry(registry)
     if item is None:
@@ -279,7 +284,7 @@ def _removed_registered(provided, name, intids=None, registry=None,
                     provided.__name__, name)
         registered = None  # set to None since it was not removed
     return registered
-removed_registered = _removed_registered
+_removed_registered = removed_registered
 
 
 def _remove_from_registry(namespace=None,
@@ -306,13 +311,13 @@ def _remove_from_registry(namespace=None,
                                            namespace=namespace,
                                            sites=sites):
             ntiid = item.ntiid
-            removed = _removed_registered(provided,
-                                          name=ntiid,
-                                          force=force,
-                                          intids=intids,
-                                          catalog=catalog,
-                                          registry=registry,
-                                          item=item)
+            removed = removed_registered(provided,
+                                         name=ntiid,
+                                         force=force,
+                                         intids=intids,
+                                         catalog=catalog,
+                                         registry=registry,
+                                         item=item)
             if removed is not None:
                 result.append(removed)
             elif sync_results is not None:
@@ -358,7 +363,7 @@ def _index_item(item, content_package, container_id, catalog, intids, connection
     return result
 
 
-def _copy_remove_transactions(items, registry=None):
+def copy_remove_transactions(items, registry=None):
     registry = get_site_registry(registry)
     for item in items or ():
         provided = interface_of_asset(item)
@@ -367,9 +372,10 @@ def _copy_remove_transactions(items, registry=None):
             remove_transaction_history(item)
         else:
             copy_transaction_history(item, obj)
+_copy_remove_transactions = copy_remove_transactions
 
 
-def _store_asset(content_package, container_id, ntiid, item):
+def store_asset(content_package, container_id, ntiid, item):
     try:
         unit = content_package[container_id]
     except KeyError:
@@ -393,6 +399,7 @@ def _store_asset(content_package, container_id, ntiid, item):
 
     container[ntiid] = item
     return True
+_store_asset = store_asset
 
 
 def _index_items(content_package, index, item_iface, catalog, registry,
@@ -424,10 +431,14 @@ def _index_items(content_package, index, item_iface, catalog, registry,
     return result
 
 
-def _clear_assets_by_interface(content_package, iface, force=False):
-    def recur(unit):
+def clear_assets_by_interface(content_package, iface, registry=None, 
+                              unregister=False, force=False, sync_results=None):
+    result = []
+    registry = get_site_registry(registry)
+
+    def _recur(unit):
         for child in unit.children or ():
-            recur(child)
+            _recur(child)
         container = IPresentationAssetContainer(unit)
         for key, value in tuple(container.items()):  # mutating
             registered = None
@@ -437,7 +448,18 @@ def _clear_assets_by_interface(content_package, iface, force=False):
             if     registered is None \
                 or (provided.isOrExtends(iface) and can_be_removed(registered, force)):
                 del container[key]
-    recur(content_package)
+                if unregister and registered is not None:
+                    removed = removed_registered(provided, key,
+                                                 force=force,
+                                                 registry=registry,
+                                                 item=registered)
+                    if removed is not None:
+                        result.append(removed)
+                    elif sync_results is not None:
+                        sync_results.add_asset(key, locked=True)
+    _recur(content_package)
+    return result
+_clear_assets_by_interface = clear_assets_by_interface
 
 
 def _update_index_when_content_changes(content_package,
@@ -459,20 +481,24 @@ def _update_index_when_content_changes(content_package,
     if isinstance(index_text, bytes):
         index_text = index_text.decode('utf-8')
 
+    registry = get_site_registry()
+    
     # remove assets with the specified interface
-    _clear_assets_by_interface(content_package, item_iface)
+    removed = clear_assets_by_interface(content_package, item_iface,
+                                        registry=registry, 
+                                        unregister=True, 
+                                        sync_results=sync_results)
 
     index = simplejson.loads(index_text)
-    registry = get_site_registry()
     connection = get_connection(registry)
     intids = component.getUtility(IIntIds)
 
-    removed = _remove_from_registry(namespace=content_package.ntiid,
-                                    provided=item_iface,
-                                    registry=registry,
-                                    catalog=catalog,
-                                    intids=intids,
-                                    sync_results=sync_results)
+    removed.extend(_remove_from_registry(namespace=content_package.ntiid,
+                                         provided=item_iface,
+                                         registry=registry,
+                                         catalog=catalog,
+                                         intids=intids,
+                                         sync_results=sync_results))
 
     # These are structured as follows:
     # {
@@ -486,7 +512,7 @@ def _update_index_when_content_changes(content_package,
     if item_iface.isOrExtends(INTISlideDeck):
         # Also remove our other slide types
         for provided in (INTISlide, INTISlideVideo):
-            _clear_assets_by_interface(content_package, provided)
+            clear_assets_by_interface(content_package, provided)
             removed.extend(_remove_from_registry(namespace=content_package.ntiid,
                                                  provided=provided,
                                                  registry=registry,
@@ -537,10 +563,10 @@ def _update_index_when_content_changes(content_package,
                 sibling_key, registered_count, index_item_count, removed_count)
 
 
-def _clear_assets(content_package, force=False):
-    def recur(unit):
+def clear_package_assets(content_package, force=False):
+    def _recur(unit):
         for child in unit.children or ():
-            recur(child)
+            _recur(child)
         container = IPresentationAssetContainer(unit)
         if force:
             container.clear()
@@ -548,12 +574,11 @@ def _clear_assets(content_package, force=False):
             for key, value in tuple(container.items()):  # mutating
                 if can_be_removed(value, force):
                     del container[key]
+    _recur(content_package)
+_clear_assets = clear_package_assets
 
-    recur(content_package)
-clear_package_assets = _clear_assets
 
-
-def _clear_last_modified(content_package, catalog=None):
+def clear_namespace_last_modified(content_package, catalog=None):
     catalog = get_library_catalog() if catalog is None else catalog
     if catalog is None:
         # XXX: Seen this in tests. It means our configuration is
@@ -566,7 +591,7 @@ def _clear_last_modified(content_package, catalog=None):
     for name, _, _ in INDICES:
         namespace = _get_file_last_mod_namespace(content_package, name)
         catalog.remove_last_modified(namespace)
-clear_namespace_last_modified = _clear_last_modified
+_clear_last_modified = clear_namespace_last_modified
 
 
 # update events
