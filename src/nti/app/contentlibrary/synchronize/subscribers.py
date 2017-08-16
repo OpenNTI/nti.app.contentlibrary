@@ -77,13 +77,13 @@ from nti.site.utils import unregisterUtility
 NTIID = StandardExternalFields.NTIID
 ITEMS = StandardExternalFields.ITEMS
 
-INDICES = (
-    ('audio_index.json', INTIAudio, create_ntiaudio_from_external),
-    ('video_index.json', INTIVideo, create_ntivideo_from_external),
-    ('slidedeck_index.json', INTISlideDeck, create_object_from_external),
-    ('timeline_index.json', INTITimeline, create_ntitimeline_from_external),
-    ('related_content_index.json', INTIRelatedWorkRef, create_relatedworkref_from_external)
-)
+INDICES = {
+    'audio_index.json': (INTIAudio, create_ntiaudio_from_external),
+    'video_index.json': (INTIVideo, create_ntivideo_from_external),
+    'slidedeck_index.json': (INTISlideDeck, create_object_from_external),
+    'timeline_index.json': (INTITimeline, create_ntitimeline_from_external),
+    'related_content_index.json': (INTIRelatedWorkRef, create_relatedworkref_from_external)
+}
 
 
 def prepare_json_text(s):
@@ -473,13 +473,8 @@ def get_sibling_entry(source, unit=None, buckets=None):
     return None
 
 
-def _update_index_when_content_changes(content_package,
-                                       index_filename,
-                                       item_iface,
-                                       object_creator,
-                                       catalog=None,
-                                       sync_results=None,
-                                       buckets=()):
+def _update_index_when_content_changes(content_package, index_filename,
+                                       buckets=(), sync_results=None):
     sibling_key = get_sibling_entry(index_filename, content_package, buckets)
     if not sibling_key:
         # Nothing to do
@@ -488,11 +483,13 @@ def _update_index_when_content_changes(content_package,
     if sync_results is None:
         sync_results = _new_sync_results(content_package)
 
+    item_iface, object_creator = INDICES[index_filename]
+                                       
     index_text = sibling_key.readContents()
     index_text = prepare_json_text(index_text)
 
     registry = get_site_registry()
-    catalog = get_library_catalog() if catalog is None else catalog
+    catalog = get_library_catalog()
 
     # remove assets with the specified interface
     removed = clear_assets_by_interface(content_package, item_iface,
@@ -573,6 +570,8 @@ def _update_index_when_content_changes(content_package,
     logger.info('Finished indexing %s (registered=%s) (indexed=%s) (removed=%s)',
                 sibling_key, registered_count, index_item_count, removed_count)
 
+    return (added, removed)
+
 
 def clear_package_assets(content_package, force=False):
     def _recur(unit):
@@ -599,7 +598,7 @@ def clear_namespace_last_modified(content_package, catalog=None):
         logger.warning("Failed to find catalog")
         return
 
-    for name, _, _ in INDICES:
+    for name in INDICES:
         namespace = _get_file_last_mod_namespace(content_package, name)
         catalog.remove_last_modified(namespace)
 _clear_last_modified = clear_namespace_last_modified
@@ -628,15 +627,14 @@ def _get_sync_results(content_package, event):
     return result
 
 
-def update_indices_when_content_changes(content_package, sync_results=None):
+def update_indices_when_content_changes(content_package, sync_results=None, buckets=()):
     if sync_results is None:
         sync_results = _new_sync_results(content_package)
 
-    for name, item_iface, func in INDICES:
+    for name in INDICES:
         _update_index_when_content_changes(content_package,
+                                           buckets=buckets,
                                            index_filename=name,
-                                           object_creator=func,
-                                           item_iface=item_iface,
                                            sync_results=sync_results)
     return sync_results
 
@@ -710,7 +708,8 @@ def clear_content_package_assets(content_package, force=True, process_global=Fal
         return result
     _clear_last_modified(content_package, catalog)
 
-    for _, item_iface, _ in INDICES:
+    for data in INDICES.values():
+        item_iface = data[0]
         removed = _remove_from_registry(namespace=content_package.ntiid,
                                         provided=item_iface,
                                         catalog=catalog,
