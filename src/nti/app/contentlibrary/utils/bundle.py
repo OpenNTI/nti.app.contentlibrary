@@ -100,8 +100,8 @@ def save_bundle_to_disk(bundle, target, assets=None, name=None):
             raise_json_error(get_current_request(),
                              hexc.HTTPUnprocessableEntity,
                              {
-                                'message': _(u"Invalid presentation assets directory."),
-                                'code': 'LibraryNotAvailable',
+                                 'message': _(u"Invalid presentation assets directory."),
+                                 'code': 'LibraryNotAvailable',
                              },
                              None)
         path = os.path.join(tmpdir, 'presentation-assets')
@@ -133,7 +133,7 @@ def save_bundle(bundle, target, assets=None, name=None):
     raise_json_error(get_current_request(),
                      hexc.HTTPUnprocessableEntity,
                      {
-                        'message': _(u"Only saving to file system is supported."),
+                         'message': _(u"Only saving to file system is supported."),
                      },
                      None)
 
@@ -154,6 +154,6 @@ def remove_bundle(bundle, target, name=None):
     raise_json_error(get_current_request(),
                      hexc.HTTPUnprocessableEntity,
                      {
-                        'message': _(u"Only removing from file system is supported."),
+                         'message': _(u"Only removing from file system is supported."),
                      },
                      None)
