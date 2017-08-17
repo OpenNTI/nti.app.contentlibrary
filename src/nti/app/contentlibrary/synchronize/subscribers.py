@@ -469,16 +469,14 @@ def get_sibling_entry(source, unit=None, buckets=None):
     return None
 
 
-def _update_index_when_content_changes(content_package, index_filename,
-                                       buckets=(), force=False, sync_results=None):
+def update_index_when_content_changes(content_package, index_filename,
+                                      buckets=(), force=False, sync_results=None):
     sibling_key = get_sibling_entry(index_filename, content_package, buckets)
     if not sibling_key:
         # Nothing to do
         return
-
     if sync_results is None:
         sync_results = _new_sync_results(content_package)
-
     item_iface, object_creator = INDICES[index_filename]
 
     index_text = sibling_key.readContents()
@@ -573,6 +571,7 @@ def _update_index_when_content_changes(content_package, index_filename,
                 sibling_key, registered_count, index_item_count, removed_count)
 
     return (added, removed)
+_update_index_when_content_changes = update_index_when_content_changes
 
 
 def clear_package_assets(content_package, force=False):
