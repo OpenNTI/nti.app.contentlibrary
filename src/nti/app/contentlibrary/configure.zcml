@@ -200,6 +200,11 @@
 						 .interfaces.IContentTrackingRedisClient"
 		modules=".model" />
 
+	<!-- Exporter -->
+	<subscriber factory=".exporter._EditableContentPackageExporterDecorator"
+				provides="nti.contentlibrary.interfaces.IContentPackageExporterDecorator"
+				for="nti.contentlibrary.interfaces.IEditableContentPackage" />
+
 	<!-- Recordables -->
 	<utility factory=".recordables.LibraryRecordables" name="library" />
 			 
