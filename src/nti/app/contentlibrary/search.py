@@ -65,7 +65,7 @@ class _DefaultSearchPacakgeResolver(object):
 @interface.implementer(ISearchHitPredicate)
 class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
 
-    __name__ = 'ContentUnit'
+    __name__ = u'ContentUnit'
 
     @Lazy
     def request(self):
