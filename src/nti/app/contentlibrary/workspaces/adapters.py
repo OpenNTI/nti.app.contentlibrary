@@ -52,7 +52,7 @@ class _PermissionedContentPackageLibrary(ProxyBase):
             permissioned to the current user, not the user in the path.
     """
 
-    def __new__(cls, base, request):
+    def __new__(cls, base, unused_request):
         return ProxyBase.__new__(cls, base)
 
     def __init__(self, base, request):
