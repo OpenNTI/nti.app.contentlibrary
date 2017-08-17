@@ -16,7 +16,7 @@ from zope.container.constraints import contains
 from zope.container.constraints import containers
 
 from zope.schema import Bytes as ValidBytes
-from zope.schema import BytesLine as ValidBytesLine 
+from zope.schema import BytesLine as ValidBytesLine
 
 from zope.securitypolicy.interfaces import IRolePermissionManager
 
@@ -127,6 +127,7 @@ class IContentPackageRolePermissionManager(IRolePermissionManager):
 
 # App server
 
+
 from nti.appserver.interfaces import INTIIDEntry
 
 
@@ -142,6 +143,7 @@ class IContentUnitInfo(INTIIDEntry):
                                     """)
 
 # Mixins
+
 
 class IContentUnitContents(interface.Interface):
 
@@ -163,6 +165,7 @@ class IContentUnitContents(interface.Interface):
         required=False,
     )
 
+
 class IContentTrackingRedisClient(interface.Interface):
     """
     Tracks the operations of an IRedisClient for metadata
@@ -171,36 +174,36 @@ class IContentTrackingRedisClient(interface.Interface):
                    title=u"Redis Client",
                    description=u"The Redis client")
     redis.setTaggedValue('_ext_excluded_out', True)
-    
+
     last_released = Float(title=u"Last Released",
-                         description=u"Timestamp of last Redis lock release",
-                         default=None,
-                         required=False)
-    
+                          description=u"Timestamp of last Redis lock release",
+                          default=None,
+                          required=False)
+
     last_locked = Float(title=u"Last Locked",
-                         description=u"Timestamp of last Redis lock",
-                         default=None,
-                         required=False)
-    
+                        description=u"Timestamp of last Redis lock",
+                        default=None,
+                        required=False)
+
     holding_user = ValidTextLine(title=u"Current User",
-                            description=u"The current user holding the lock",
-                            default=None,
-                            required=False)
-    
+                                 description=u"The current user holding the lock",
+                                 default=None,
+                                 required=False)
+
     is_locked = Bool(title=u"IsLocked",
                      description=u"If the Redis client is locked.",
                      default=False)
-    
+
     def acquire_lock(self, lock_name, lock_timeout, blocking_timeout):
         """
         Attempt to acquire the Redis lock.
         """
-    
+
     def release_lock(self):
         """
         Release Redis lock
         """
-    
+
     def delete_lock(self):
         """
         Delete Redis lock

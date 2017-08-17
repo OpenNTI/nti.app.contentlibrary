@@ -18,7 +18,7 @@ from nti.app.contentlibrary.interfaces import IContentUnitContents
 from nti.app.contentlibrary.interfaces import IContentBundleCommunity
 from nti.app.contentlibrary.interfaces import IContentTrackingRedisClient
 
-from nti.coremetadata.interfaces import IRedisClient
+from nti.dataserver.interfaces import IRedisClient
 
 from nti.dataserver.users.communities import Community
 
@@ -47,18 +47,17 @@ class ContentBundleCommunity(Community):
 
 @interface.implementer(IContentTrackingRedisClient)
 class ContentTrackingRedisClient(SchemaConfigured):
-
     createDirectFieldProperties(IContentTrackingRedisClient)
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
-        
+
     def _mark_as_held(self, user):
         self.holding_user = user.username if user is not None else u''
         self.last_released = None
         self.last_locked = time.time()
         self.is_locked = True
-        
+
     def _mark_as_released(self):
         self.holding_user = None
         self.is_locked = False
@@ -69,8 +68,8 @@ class ContentTrackingRedisClient(SchemaConfigured):
                      lock_timeout, blocking_timeout=1):
         redis = component.getUtility(IRedisClient)
         self.lock = redis.lock(lock_name,
-                                    lock_timeout,
-                                    blocking_timeout=blocking_timeout)
+                               lock_timeout,
+                               blocking_timeout=blocking_timeout)
         acquired = self.lock.acquire(blocking=False)
         if acquired:
             self._mark_as_held(user)

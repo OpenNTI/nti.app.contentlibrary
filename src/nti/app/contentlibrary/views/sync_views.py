@@ -69,7 +69,6 @@ from nti.contentlibrary.utils import get_content_package_site
 
 from nti.dataserver.authorization import ACT_SYNC_LIBRARY
 
-from nti.dataserver.interfaces import IRedisClient
 from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.externalization.interfaces import LocatedExternalDict
@@ -207,7 +206,7 @@ class _AbstractSyncAllLibrariesView(SetSyncLockView,
         # changes end up causing conflict issues when managing sessions. These
         # retries cause syncs to take much longer to perform.
         endInteraction()
-        lock = self.acquire()
+        self.acquire()
         try:
             logger.info('Starting sync %s', self._txn_id())
             return self._do_call()
@@ -392,7 +391,7 @@ class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
                permission=ACT_SYNC_LIBRARY,
                name='SyncMetadata')
 class SyncMetadataView(AbstractAuthenticatedView):
-    
+
     def __call__(self):
         tracking_redis = component.getUtility(IContentTrackingRedisClient)
         results = to_external_object(tracking_redis)
