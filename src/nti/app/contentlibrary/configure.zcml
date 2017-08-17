@@ -205,6 +205,11 @@
 				provides="nti.contentlibrary.interfaces.IContentPackageExporterDecorator"
 				for="nti.contentlibrary.interfaces.IEditableContentPackage" />
 
+	<!-- Importer -->
+	<subscriber factory=".importer._EditableContentPackageImporterUpdater"
+				provides="nti.contentlibrary.interfaces.IContentPackageImporterUpdater"
+				for="nti.contentlibrary.interfaces.IEditableContentPackage" />
+
 	<!-- Recordables -->
 	<utility factory=".recordables.LibraryRecordables" name="library" />
 			 
