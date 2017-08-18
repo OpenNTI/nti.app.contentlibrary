@@ -20,6 +20,7 @@ from nti.app.testing.application_webtest import ApplicationLayerTest
 
 from nti.app.testing.decorators import WithSharedApplicationMockDS
 
+
 class TestAdminViews(ApplicationLayerTest):
 
     layer = PersistentApplicationTestLayer
@@ -29,19 +30,19 @@ class TestAdminViews(ApplicationLayerTest):
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_rebuild_library_catalog(self):
         res = self.testapp.post('/dataserver2/Library/@@RebuildContentLibraryCatalog',
-                                 status=200)
+                                status=200)
         assert_that(res.json_body,
                     has_entries('Total', is_(greater_than_or_equal_to(0)),
                                 'ItemCount', is_(greater_than_or_equal_to(0))))
-       
+
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_rebuild_bundle_catalog(self):
         res = self.testapp.post('/dataserver2/Library/@@RebuildContentBundleCatalog',
-                                 status=200)
+                                status=200)
         assert_that(res.json_body,
                     has_entries('Total', is_(greater_than_or_equal_to(0)),
                                 'ItemCount', is_(greater_than_or_equal_to(0))))
- 
+
     @WithSharedApplicationMockDS(testapp=True, users=True)
     def test_all_content_packages(self):
         res = self.testapp.get('/dataserver2/Library/@@AllContentPackages',
@@ -57,4 +58,3 @@ class TestAdminViews(ApplicationLayerTest):
         assert_that(res.json_body,
                     has_entries('TotalItemCount', is_(greater_than_or_equal_to(0)),
                                 'ItemCount', is_(greater_than_or_equal_to(0))))
-        
