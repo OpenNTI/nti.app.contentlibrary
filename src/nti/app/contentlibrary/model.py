@@ -14,6 +14,8 @@ import time
 from zope import interface
 from zope import component
 
+from nti.app.contentlibrary import BLOCKING_TIMEOUT
+ 
 from nti.app.contentlibrary.interfaces import IContentUnitContents
 from nti.app.contentlibrary.interfaces import IContentBundleCommunity
 from nti.app.contentlibrary.interfaces import IContentTrackingRedisClient
@@ -53,10 +55,10 @@ class ContentTrackingRedisClient(SchemaConfigured):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
     def _mark_as_held(self, user):
-        self.holding_user = user.username if user is not None else u''
+        self.is_locked = True
         self.last_released = None
         self.last_locked = time.time()
-        self.is_locked = True
+        self.holding_user = user.username if user is not None else u''
 
     def _mark_as_released(self):
         self.holding_user = None
@@ -64,8 +66,8 @@ class ContentTrackingRedisClient(SchemaConfigured):
         self.last_locked = None
         self.last_released = time.time()
 
-    def acquire_lock(self, user, lock_name,
-                     lock_timeout, blocking_timeout=1):
+    def acquire_lock(self, user, lock_name, lock_timeout,
+                     blocking_timeout=BLOCKING_TIMEOUT):
         redis = component.getUtility(IRedisClient)
         self.lock = redis.lock(lock_name,
                                lock_timeout,

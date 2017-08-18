@@ -44,3 +44,6 @@ SYNC_LOCK_NAME = '/var/libraries/Lock/sync'
 
 #: The amount of time for which we will hold the lock during sync
 LOCK_TIMEOUT = 80 * 60  # 80 minutes
+
+#: The maximum amount of time in seconds to spend trying to acquire the lock
+BLOCKING_TIMEOUT = 1.5

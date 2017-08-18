@@ -45,6 +45,7 @@ from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.contentlibrary import LOCK_TIMEOUT
 from nti.app.contentlibrary import SYNC_LOCK_NAME
+from nti.app.contentlibrary import BLOCKING_TIMEOUT
 
 from nti.app.contentlibrary.interfaces import IContentTrackingRedisClient
 
@@ -65,8 +66,6 @@ from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.synchronize import SynchronizationResults
 from nti.contentlibrary.synchronize import ContentPackageSyncResults
 
-from nti.contentlibrary.utils import get_content_package_site
-
 from nti.dataserver.authorization import ACT_SYNC_LIBRARY
 
 from nti.dataserver.interfaces import IDataserverFolder
@@ -77,7 +76,7 @@ from nti.externalization.externalization import to_external_object
 
 from nti.publishing.interfaces import IPublishable
 
-from nti.site.hostpolicy import get_host_site
+from nti.site.interfaces import IHostPolicyFolder
 
 
 @view_config(permission=ACT_SYNC_LIBRARY)
@@ -121,8 +120,6 @@ class IsSyncInProgressView(AbstractAuthenticatedView):
                name='SetSyncLock')
 class SetSyncLockView(AbstractAuthenticatedView):
 
-    blocking = False
-
     @Lazy
     def redis(self):
         return component.getUtility(IContentTrackingRedisClient)
@@ -130,8 +127,7 @@ class SetSyncLockView(AbstractAuthenticatedView):
     def acquire(self):
         # Fail fast if we cannot acquire the lock.
         acquired = self.redis.acquire_lock(self.remoteUser, SYNC_LOCK_NAME, LOCK_TIMEOUT,
-                                           blocking_timeout=self.blocking)
-        #acquired = lock.acquire(blocking=self.blocking)
+                                           BLOCKING_TIMEOUT)
         if acquired:
             return self.redis.lock
         raise_json_error(self.request,
@@ -317,18 +313,16 @@ class SyncContentPackageView(_AbstractSyncAllLibrariesView):
     A view that synchronizes a content package
     """
 
-    blocking = True
-
     def _replace(self, package):
         ntiid = package.ntiid
-        site = get_content_package_site(package)
         # prepare results
+        folder = IHostPolicyFolder(package)
         sync_results = SynchronizationResults()
-        results = ContentPackageSyncResults(Site=site,
+        results = ContentPackageSyncResults(Site=folder.__name__,
                                             ContentPackageNTIID=package.ntiid)
         sync_results.add(results)
         # do sync
-        with current_site(get_host_site(site)):  # use pkg site
+        with current_site(folder):  # use pkg site
             library = component.getUtility(IContentPackageLibrary)
             # enumerate all content packages
             enumeration = library.enumeration
@@ -366,11 +360,9 @@ class SyncContentPackageView(_AbstractSyncAllLibrariesView):
                name='SyncPresentationAssets')
 class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
 
-    blocking = True
-
     def _process_package(self, package):
-        site = get_content_package_site(package)
-        with current_site(get_host_site(site)):  # use pkg site
+        folder = IHostPolicyFolder(package)
+        with current_site(folder):  # use pkg site
             return update_indices_when_content_changes(package)
 
     def _do_call(self):
