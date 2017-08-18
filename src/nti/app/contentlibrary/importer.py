@@ -26,8 +26,6 @@ from nti.cabinet.mixins import SourceBucket
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageImporterUpdater
 
-from nti.contenttypes.presentation.interfaces import INTIVideo
-
 
 def prepare_json_text(s):
     result = s.decode('utf-8') if isinstance(s, bytes) else s
@@ -37,7 +35,7 @@ def prepare_json_text(s):
 class FakeSource(SourceFile):
 
     def __init__(self, index_filename, data):
-        SourceFile.__init__(self, data=data, name=index_filename)
+        SourceFile.__init__(self, name=index_filename, data=data)
 
 
 class FakeBucket(SourceBucket):
@@ -82,7 +80,7 @@ class _EditableContentPackageImporterUpdater(AssetImporterMixin):
     def import_videos(self, package, external):
         data = external.get(self.VIDEO_INDEX, None)
         if data:
-            self.do_import(package, data, INTIVideo)
+            self.do_import(package, data, self.VIDEO_INDEX)
 
     def updateFromExternalObject(self, package, external, *unused_args, **unused_kwargs):
         self.import_videos(package, external)
