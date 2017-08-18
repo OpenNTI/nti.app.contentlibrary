@@ -133,6 +133,12 @@
              provides="nti.dataserver.interfaces.IAccessProvider"
              for="nti.contentlibrary.interfaces.IContentPackageBundle"/>
 
+	<adapter factory=".adapters._ContentPackageSyncMetadataFactory" />
+	
+	<class class=".adapters._ContentPackageSyncMetadataFactory">
+		<implements interface="zope.annotation.interfaces.IAttributeAnnotatable" />
+	</class>
+
 	<!-- Top-level/hierarchy -->
 	<adapter factory=".adapters._content_unit_to_bundle" />
 
@@ -197,8 +203,9 @@
 	<!-- Externalization -->
 	<ext:registerAutoPackageIO
 		root_interfaces=".interfaces.IContentUnitContents
-						 .interfaces.IContentTrackingRedisClient"
-		modules=".model" />
+						 .interfaces.IContentTrackingRedisClient
+						 .interfaces.IContentPackageMetadata"
+		modules=".model .adapters" />
 
 	<!-- Exporter -->
 	<subscriber factory=".exporter._EditableContentPackageExporterDecorator"

@@ -11,8 +11,12 @@ logger = __import__('logging').getLogger(__name__)
 
 import time
 
+from persistent.mapping import PersistentMapping
+
 from zope import component
 from zope import interface
+
+from zope.annotation.factory import factory as an_factory
 
 from zope.cachedescriptors.property import Lazy
 
@@ -26,9 +30,13 @@ from zope.security.interfaces import IPrincipal
 
 from BTrees.OOBTree import OOBTree
 
+from persistent import Persistent
+
 from pyramid.interfaces import IRequest
 
 from nti.app.contentlibrary.acl import role_for_content_bundle
+
+from nti.app.contentlibrary.interfaces import IContentPackageMetadata
 
 from nti.app.contentlibrary.utils import role_for_content_package
 
@@ -431,3 +439,19 @@ class _BundleAccessProvider(object):
             if new_groups != new_bundle_groups:
                 # be idempotent
                 membership.setGroups(new_groups)
+
+@component.adapter(IContentPackage)
+@interface.implementer(IContentPackageMetadata)
+class _ContentPackageSyncMetadata(Persistent):
+    
+    def __init__(self):
+        self.package_description = ""
+        self.package_title = ""
+        self.last_synced_by = ""
+        self.last_synced_time = 0
+
+
+SYNC_KEY = 'ContentPackageSyncMetadata'
+_ContentPackageSyncMetadataFactory = an_factory(_ContentPackageSyncMetadata,
+                                                key=SYNC_KEY)
+

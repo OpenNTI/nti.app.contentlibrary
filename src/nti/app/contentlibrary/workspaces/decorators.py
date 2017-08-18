@@ -44,6 +44,7 @@ LINKS = StandardExternalFields.LINKS
 SYNC_META = 'SyncMetadata'
 REMOVE_LOCK = 'RemoveSyncLock'
 SYNC_LIBRARIES = 'SyncAllLibraries'
+SYNCABLE_PACKAGES = 'SyncableContentPackages'
 
 
 @component.adapter(IContentUnitInfo)
@@ -87,7 +88,7 @@ class AdminSyncLibrariesDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault("Links", [])
-        rels = [SYNC_LIBRARIES, REMOVE_LOCK, SYNC_META]
+        rels = [SYNC_LIBRARIES, REMOVE_LOCK, SYNC_META, SYNCABLE_PACKAGES]
         ds2 = find_interface(context, IDataserverFolder)
         for rel in rels:
             link = Link(ds2,

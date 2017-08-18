@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, absolute_import, division
+from nti.app.products.courseware.tests import PersistentInstructedCourseApplicationTestLayer
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -89,4 +90,25 @@ class TestSyncViews(ApplicationLayerTest):
         assert_that(res.json_body, has_entry('last_released', not_none()))
         assert_that(res.json_body, is_not(has_key('last_locked')))
         assert_that(res.json_body, has_entry('last_synchronized', not_none()))
+        
+        
+class TestSyncableViews(ApplicationLayerTest):
+    
+    layer = PersistentInstructedCourseApplicationTestLayer
+    
+    default_origin = b'http://platform.ou.edu'
+    
+    package_hrefs = ['/dataserver2/NTIIDs/tag%3Anextthought.com%2C2011-10%3AOU-HTML-CS1323_F_2015_Intro_to_Computer_Programming.introduction_to_computer_programming/',
+                     '/dataserver2/NTIIDs/tag%3Anextthought.com%2C2011-10%3AOU-HTML-CLC3403_LawAndJustice.clc_3403_law_and_justice/']
+    
+    @WithSharedApplicationMockDS(users=True, testapp=True)
+    def test_get_syncable(self):
+        for href in self.package_hrefs:
+            self.testapp.post(href+"@@Sync")
+        
+        view_link = '/dataserver2/@@SyncableContentPackages'
+        res = self.testapp.get(view_link)
+         
+        for i in range(len(self.package_hrefs)):
+            self.require_link_href_with_rel(res.json_body.get("Items")[i], 'Sync')
         

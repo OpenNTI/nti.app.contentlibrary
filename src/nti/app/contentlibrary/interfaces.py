@@ -41,6 +41,7 @@ from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IShouldHaveTraversablePath
 
 from nti.schema.field import List
+from nti.schema.field import Dict
 from nti.schema.field import Float
 from nti.schema.field import Bool
 from nti.schema.field import Object
@@ -175,6 +176,7 @@ class IContentTrackingRedisClient(interface.Interface):
                    description=u"The Redis client")
     redis.setTaggedValue('_ext_excluded_out', True)
 
+    
     last_released = Float(title=u"Last Released",
                           description=u"Timestamp of last Redis lock release",
                           default=None,
@@ -194,17 +196,34 @@ class IContentTrackingRedisClient(interface.Interface):
                      description=u"If the Redis client is locked.",
                      default=False)
 
-    def acquire_lock(self, lock_name, lock_timeout, blocking_timeout):
+    def acquire_lock(lock_name, lock_timeout, blocking_timeout):
         """
         Attempt to acquire the Redis lock.
         """
 
-    def release_lock(self):
+    def release_lock():
         """
         Release Redis lock
         """
 
-    def delete_lock(self):
+    def delete_lock():
         """
         Delete Redis lock
         """
+
+class IContentPackageMetadata(interface.Interface):
+    """
+    Holds metadata for a content package including sync information
+    """
+    
+    last_synced_by = ValidTextLine(title=u"Last Modified By",
+                                   description=u"The user to last sync the content package")
+    
+    last_synced_time = Float(title=u"Last Synced Time",
+                             description=u"The last sync time of the content package")
+    
+    package_title = ValidTextLine(title=u"Package Title",
+                                  description=u"Title of package for this metadata object")
+
+    package_description = ValidTextLine(title=u"Package Description",
+                                        description=u"Description of the package for this metadata object")

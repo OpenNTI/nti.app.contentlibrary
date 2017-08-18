@@ -48,6 +48,7 @@ from nti.app.contentlibrary import SYNC_LOCK_NAME
 from nti.app.contentlibrary import BLOCKING_TIMEOUT
 
 from nti.app.contentlibrary.interfaces import IContentTrackingRedisClient
+from nti.app.contentlibrary.interfaces import IContentPackageMetadata
 
 from nti.app.contentlibrary.synchronize import syncContentPackages
 
@@ -73,11 +74,17 @@ from nti.dataserver.interfaces import IDataserverFolder
 from nti.externalization.interfaces import LocatedExternalDict
 
 from nti.externalization.externalization import to_external_object
+from nti.externalization.externalization import StandardExternalFields
+
+from nti.links.links import Link
 
 from nti.publishing.interfaces import IPublishable
 
 from nti.site.interfaces import IHostPolicyFolder
 
+ITEMS = StandardExternalFields.ITEMS
+ITEM_COUNT = StandardExternalFields.ITEM_COUNT
+LINKS = StandardExternalFields.LINKS
 
 @view_config(permission=ACT_SYNC_LIBRARY)
 @view_defaults(route_name='objects.generic.traversal',
@@ -177,6 +184,13 @@ class _AbstractSyncAllLibrariesView(SetSyncLockView,
             self.redis.release_lock(self.remoteUser)
         except Exception:
             logger.exception("Error while releasing Sync lock")
+
+    def _mark_sync_data(self, package):
+        metadata = IContentPackageMetadata(package)
+        metadata.last_synced_time = time.time()
+        metadata.last_synced_by = self.remoteUser.username
+        metadata.package_title = package.title
+        metadata.package_description = package.description
 
     def _txn_id(self):
         return "txn.%s" % get_thread_ident()
@@ -338,6 +352,7 @@ class SyncContentPackageView(_AbstractSyncAllLibrariesView):
                                  None)
             # replace w/ new one
             library.replace(content_packages[0], results=sync_results)
+            self._mark_sync_data(package)
         return results
 
     def _do_call(self):
@@ -374,6 +389,7 @@ class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
                                  'message': _(u'Content has not been published.'),
                              },
                              None)
+        self._mark_sync_data(package)
         return self._process_package(package)
 
 
@@ -396,4 +412,26 @@ class SyncMetadataView(AbstractAuthenticatedView):
             results.pop('last_released')
         else:
             results.pop('last_locked')
+        return results
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             permission=ACT_SYNC_LIBRARY,
+             context=IDataserverFolder,
+             name='SyncableContentPackages')
+class GetSyncablePackagesView(AbstractAuthenticatedView):
+    
+    def __call__(self):
+        results = LocatedExternalDict()
+        library = component.getUtility(IContentPackageLibrary)
+        syncable_packages = [x for x in library.enumeration.enumerateContentPackages()]
+        results[ITEM_COUNT] = len(syncable_packages)
+        results[ITEMS] = []
+        for package in syncable_packages:
+            metadata = IContentPackageMetadata(package)
+            ext_object = to_external_object(metadata)
+            ext_object[LINKS] = [Link(package,
+                                      rel="Sync",
+                                      elements=("@@Sync",))]
+            results[ITEMS].append(ext_object)
         return results
