@@ -135,7 +135,7 @@
 
     <adapter factory=".adapters.content_package_sync_meta_factory"
              for="nti.contentlibrary.interfaces.IContentPackage"
-             provides="nti.contentlibrary.interfaces.IContentPackageMetadata" />
+             provides="nti.app.contentlibrary.interfaces.IContentPackageMetadata" />
 
 	<!-- Top-level/hierarchy -->
 	<adapter factory=".adapters._content_unit_to_bundle" />

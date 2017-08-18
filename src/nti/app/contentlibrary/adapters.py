@@ -14,9 +14,8 @@ import time
 from zope import component
 from zope import interface
 
-from zope.annotation.interfaces import IAttributeAnnotatable
-
 from zope.cachedescriptors.property import Lazy
+from zope.cachedescriptors.property import readproperty
 
 from zope.deprecation import deprecated
 
@@ -439,14 +438,23 @@ class _BundleAccessProvider(object):
                 membership.setGroups(new_groups)
 
 
-@interface.implementer(IContentPackageMetadata, IAttributeAnnotatable)
-class _ContentPackageSyncMetadata(PersistentCreatedAndModifiedTimeObject):
+@interface.implementer(IContentPackageMetadata, IContained)
+class ContentPackageSyncMetadata(PersistentCreatedAndModifiedTimeObject):
     
+    __name__ = None
+    __parent__ = None
+
     def __init__(self):
-        self.package_title = ""
         self.last_synced_by = ""
         self.last_synced_time = 0
-        self.package_description = ""
+
+    @readproperty
+    def package_title(self):
+        return self.__parent__.title
+
+    @readproperty
+    def package_description(self):
+        return self.__parent__.description
 
 
 @component.adapter(IContentPackage)
@@ -455,7 +463,7 @@ def content_package_sync_meta_factory(context):
     try:
         result = context._content_package_sync_metadata
     except AttributeError:
-        result = context._content_package_sync_metadata = _ContentPackageSyncMetadata()
+        result = context._content_package_sync_metadata = ContentPackageSyncMetadata()
         result.createdTime = time.time()
         result.__parent__ = context
         result.__name__ = '_content_package_sync_metadata'

@@ -47,8 +47,8 @@ from nti.app.contentlibrary import LOCK_TIMEOUT
 from nti.app.contentlibrary import SYNC_LOCK_NAME
 from nti.app.contentlibrary import BLOCKING_TIMEOUT
 
-from nti.app.contentlibrary.interfaces import IContentTrackingRedisClient
 from nti.app.contentlibrary.interfaces import IContentPackageMetadata
+from nti.app.contentlibrary.interfaces import IContentTrackingRedisClient
 
 from nti.app.contentlibrary.synchronize import syncContentPackages
 
@@ -83,8 +83,9 @@ from nti.publishing.interfaces import IPublishable
 from nti.site.interfaces import IHostPolicyFolder
 
 ITEMS = StandardExternalFields.ITEMS
-ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 LINKS = StandardExternalFields.LINKS
+ITEM_COUNT = StandardExternalFields.ITEM_COUNT
+
 
 @view_config(permission=ACT_SYNC_LIBRARY)
 @view_defaults(route_name='objects.generic.traversal',
@@ -133,7 +134,9 @@ class SetSyncLockView(AbstractAuthenticatedView):
 
     def acquire(self):
         # Fail fast if we cannot acquire the lock.
-        acquired = self.redis.acquire_lock(self.remoteUser, SYNC_LOCK_NAME, LOCK_TIMEOUT,
+        acquired = self.redis.acquire_lock(self.remoteUser, 
+                                           SYNC_LOCK_NAME, 
+                                           LOCK_TIMEOUT,
                                            BLOCKING_TIMEOUT)
         if acquired:
             return self.redis.lock
@@ -189,8 +192,6 @@ class _AbstractSyncAllLibrariesView(SetSyncLockView,
         metadata = IContentPackageMetadata(package)
         metadata.last_synced_time = time.time()
         metadata.last_synced_by = self.remoteUser.username
-        metadata.package_title = package.title
-        metadata.package_description = package.description
 
     def _txn_id(self):
         return "txn.%s" % get_thread_ident()
@@ -413,6 +414,7 @@ class SyncMetadataView(AbstractAuthenticatedView):
         else:
             results.pop('last_locked')
         return results
+
 
 @view_config(route_name='objects.generic.traversal',
              renderer='rest',

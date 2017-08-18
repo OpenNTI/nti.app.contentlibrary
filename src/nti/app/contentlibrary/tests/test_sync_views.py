@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, absolute_import, division
-from nti.app.products.courseware.tests import PersistentInstructedCourseApplicationTestLayer
+from hamcrest.library.object.haslength import has_length
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -10,11 +10,11 @@ __docformat__ = "restructuredtext en"
 
 from hamcrest import empty
 from hamcrest import is_not
-from hamcrest import assert_that
+from hamcrest import has_key
+from hamcrest import equal_to
 from hamcrest import not_none
 from hamcrest import has_entry
-from hamcrest import equal_to
-from hamcrest import has_key
+from hamcrest import assert_that
 
 from zope.component import eventtesting
 
@@ -91,24 +91,25 @@ class TestSyncViews(ApplicationLayerTest):
         assert_that(res.json_body, is_not(has_key('last_locked')))
         assert_that(res.json_body, has_entry('last_synchronized', not_none()))
         
-        
+
+from nti.app.contentlibrary.tests import PersistentApplicationTestLayer
+
+
 class TestSyncableViews(ApplicationLayerTest):
     
-    layer = PersistentInstructedCourseApplicationTestLayer
+    layer = PersistentApplicationTestLayer
     
-    default_origin = b'http://platform.ou.edu'
+    default_origin = 'http://platform.ou.edu'
     
-    package_hrefs = ['/dataserver2/NTIIDs/tag%3Anextthought.com%2C2011-10%3AOU-HTML-CS1323_F_2015_Intro_to_Computer_Programming.introduction_to_computer_programming/',
-                     '/dataserver2/NTIIDs/tag%3Anextthought.com%2C2011-10%3AOU-HTML-CLC3403_LawAndJustice.clc_3403_law_and_justice/']
+    ntiid = 'tag:nextthought.com,2011-10:OU-HTML-CS1323_F_2015_Intro_to_Computer_Programming.introduction_to_computer_programming'
     
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_get_syncable(self):
-        for href in self.package_hrefs:
-            self.testapp.post(href+"@@Sync")
+        href = '/dataserver2/Objects/%s/@@Sync' % self.ntiid
+        self.testapp.post(href)
         
         view_link = '/dataserver2/@@SyncableContentPackages'
         res = self.testapp.get(view_link)
-         
-        for i in range(len(self.package_hrefs)):
-            self.require_link_href_with_rel(res.json_body.get("Items")[i], 'Sync')
-        
+        assert_that(res.json_body, has_entry('Items', has_length(4)))
+        for idx in range(4):
+            self.require_link_href_with_rel(res.json_body.get("Items")[idx], 'Sync')
