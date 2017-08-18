@@ -44,6 +44,5 @@ class TestImporter(ApplicationLayerTest):
             importer = AssetImporterMixin()
             source = os.path.join(os.path.dirname(__file__), 'video_index.json')
             with open(source, "r") as fp:
-                added, removed = importer.do_import(package, fp, 'video_index.json')
+                added, _ = importer.do_import(package, fp, 'video_index.json')
             assert_that(added, has_length(94))
-            assert_that(removed, has_length(92))
