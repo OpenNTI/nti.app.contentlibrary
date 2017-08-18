@@ -133,11 +133,9 @@
              provides="nti.dataserver.interfaces.IAccessProvider"
              for="nti.contentlibrary.interfaces.IContentPackageBundle"/>
 
-	<adapter factory=".adapters._ContentPackageSyncMetadataFactory" />
-	
-	<class class=".adapters._ContentPackageSyncMetadataFactory">
-		<implements interface="zope.annotation.interfaces.IAttributeAnnotatable" />
-	</class>
+    <adapter factory=".adapters.content_package_sync_meta_factory"
+             for="nti.contentlibrary.interfaces.IContentPackage"
+             provides="nti.contentlibrary.interfaces.IContentPackageMetadata" />
 
 	<!-- Top-level/hierarchy -->
 	<adapter factory=".adapters._content_unit_to_bundle" />

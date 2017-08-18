@@ -11,12 +11,10 @@ logger = __import__('logging').getLogger(__name__)
 
 import time
 
-from persistent.mapping import PersistentMapping
-
 from zope import component
 from zope import interface
 
-from zope.annotation.factory import factory as an_factory
+from zope.annotation.interfaces import IAttributeAnnotatable
 
 from zope.cachedescriptors.property import Lazy
 
@@ -29,8 +27,6 @@ from zope.location.interfaces import IContained
 from zope.security.interfaces import IPrincipal
 
 from BTrees.OOBTree import OOBTree
-
-from persistent import Persistent
 
 from pyramid.interfaces import IRequest
 
@@ -82,6 +78,7 @@ from nti.externalization.proxy import removeAllProxies
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.traversal.traversal import find_interface
+
 
 # Bundles
 
@@ -244,6 +241,7 @@ def _package_from_request(request):
 
 from persistent.mapping import PersistentMapping
 
+
 deprecated('_PresentationAssetContainer', 'no longer used')
 class _PresentationAssetContainer(PersistentMapping,
                                   PersistentCreatedAndModifiedTimeObject):
@@ -307,7 +305,7 @@ class _PackageAccessProvider(object):
                                           CONTENT_ROLE_PREFIX)
         return membership
 
-    def grant_access(self, entity, *args, **kwargs):
+    def grant_access(self, entity, *unused_args, **unused_kwargs):
         """
         Grant access to the package.
         """
@@ -367,7 +365,7 @@ class _BundleAccessProvider(object):
                                           CONTENT_ROLE_PREFIX)
         return membership
 
-    def grant_access(self, entity, *args, **kwargs):
+    def grant_access(self, entity, *unused_args, **unused_kwargs):
         """
         Grant access to the bundle and all :class:`IContentPackage` objects
         within the bundle.
@@ -440,18 +438,25 @@ class _BundleAccessProvider(object):
                 # be idempotent
                 membership.setGroups(new_groups)
 
-@component.adapter(IContentPackage)
-@interface.implementer(IContentPackageMetadata)
-class _ContentPackageSyncMetadata(Persistent):
+
+@interface.implementer(IContentPackageMetadata, IAttributeAnnotatable)
+class _ContentPackageSyncMetadata(PersistentCreatedAndModifiedTimeObject):
     
     def __init__(self):
-        self.package_description = ""
         self.package_title = ""
         self.last_synced_by = ""
         self.last_synced_time = 0
+        self.package_description = ""
 
 
-SYNC_KEY = 'ContentPackageSyncMetadata'
-_ContentPackageSyncMetadataFactory = an_factory(_ContentPackageSyncMetadata,
-                                                key=SYNC_KEY)
-
+@component.adapter(IContentPackage)
+@interface.implementer(IContentPackageMetadata)
+def content_package_sync_meta_factory(context):
+    try:
+        result = context._content_package_sync_metadata
+    except AttributeError:
+        result = context._content_package_sync_metadata = _ContentPackageSyncMetadata()
+        result.createdTime = time.time()
+        result.__parent__ = context
+        result.__name__ = '_content_package_sync_metadata'
+    return result
