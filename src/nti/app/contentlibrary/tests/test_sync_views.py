@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, absolute_import, division
-from hamcrest.library.object.haslength import has_length
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -15,6 +14,7 @@ from hamcrest import equal_to
 from hamcrest import not_none
 from hamcrest import has_entry
 from hamcrest import assert_that
+from hamcrest import has_length
 
 from zope.component import eventtesting
 
@@ -23,6 +23,7 @@ from zope.interface.interfaces import IRegistered
 from nti.contentlibrary.interfaces import IContentPackageLibraryModifiedOnSyncEvent
 
 from nti.app.contentlibrary.tests import ContentLibraryApplicationTestLayer
+from nti.app.contentlibrary.tests import PersistentApplicationTestLayer
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
@@ -90,9 +91,6 @@ class TestSyncViews(ApplicationLayerTest):
         assert_that(res.json_body, has_entry('last_released', not_none()))
         assert_that(res.json_body, is_not(has_key('last_locked')))
         assert_that(res.json_body, has_entry('last_synchronized', not_none()))
-        
-
-from nti.app.contentlibrary.tests import PersistentApplicationTestLayer
 
 
 class TestSyncableViews(ApplicationLayerTest):
