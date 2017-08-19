@@ -70,6 +70,8 @@ from nti.recorder.interfaces import IRecordable
 from nti.recorder.record import copy_transaction_history
 from nti.recorder.record import remove_transaction_history
 
+from nti.site.interfaces import IHostPolicyFolder
+
 from nti.site.site import get_component_hierarchy_names
 
 from nti.site.utils import registerUtility
@@ -671,7 +673,6 @@ def _update_container(old_unit, new_unit, new_children_dict, new_package=None):
 
 def _get_children_dict(new_package):
     accum = dict()
-
     def _recur(obj, accum):
         accum[obj.ntiid] = obj
         for child in obj.children:
@@ -714,22 +715,28 @@ def clear_content_package_assets(content_package, force=True, process_global=Fal
         return result
     clear_namespace_last_modified(content_package, catalog)
 
+    folder = IHostPolicyFolder(content_package, None)
+    registry = folder.getSiteManager() if folder is not None else None
+
     for data in INDICES.values():
         item_iface = data[0]
         removed = _remove_from_registry(namespace=content_package.ntiid,
                                         provided=item_iface,
+                                        registry=registry,
                                         catalog=catalog,
                                         force=force)
         result.extend(removed)
 
     removed = _remove_from_registry(namespace=content_package.ntiid,
                                     provided=INTISlide,
+                                    registry=registry,
                                     catalog=catalog,
                                     force=force)
     result.extend(removed)
 
     removed = _remove_from_registry(namespace=content_package.ntiid,
                                     provided=INTISlideVideo,
+                                    registry=registry,
                                     catalog=catalog,
                                     force=force)
     result.extend(removed)
@@ -744,10 +751,10 @@ _clear_when_removed = clear_content_package_assets
 
 
 @component.adapter(IContentPackage, IObjectRemovedEvent)
-def _clear_index_when_content_removed(content_package, unused_event):
-    clear_content_package_assets(content_package)
+def _clear_index_when_content_removed(content_package, unused_event=None):
+    return clear_content_package_assets(content_package)
 
 
 @component.adapter(IContentPackage, IObjectUnpublishedEvent)
-def _clear_index_when_content_unpublished(content_package, unused_event):
-    return clear_content_package_assets(content_package, force=True)
+def _clear_index_when_content_unpublished(content_package, unused_event=None):
+    return _clear_index_when_content_removed(content_package)
