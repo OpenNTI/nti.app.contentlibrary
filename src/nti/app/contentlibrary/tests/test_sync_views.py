@@ -13,8 +13,8 @@ from hamcrest import has_key
 from hamcrest import equal_to
 from hamcrest import not_none
 from hamcrest import has_entry
-from hamcrest import assert_that
 from hamcrest import has_length
+from hamcrest import assert_that
 
 from zope.component import eventtesting
 
@@ -22,8 +22,8 @@ from zope.interface.interfaces import IRegistered
 
 from nti.contentlibrary.interfaces import IContentPackageLibraryModifiedOnSyncEvent
 
-from nti.app.contentlibrary.tests import ContentLibraryApplicationTestLayer
 from nti.app.contentlibrary.tests import PersistentApplicationTestLayer
+from nti.app.contentlibrary.tests import ContentLibraryApplicationTestLayer
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
