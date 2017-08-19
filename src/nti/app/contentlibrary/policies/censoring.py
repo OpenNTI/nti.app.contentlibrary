@@ -23,7 +23,7 @@ from nti.dataserver.interfaces import IUser
 
 @interface.implementer(ICensoredContentPolicy)
 @component.adapter(IUser, IDelimitedHierarchyContentUnit)
-def user_filesystem_censor_policy(user, file_content_unit):
+def user_filesystem_censor_policy(unused_user, file_content_unit):
     """
     Profanity filtering may be turned off in specific content units
     by the use of a '.nti_disable_censoring' flag file.

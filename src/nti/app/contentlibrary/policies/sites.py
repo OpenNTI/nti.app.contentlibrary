@@ -19,6 +19,6 @@ from nti.contentlibrary.interfaces import IRequestSiteNames
 @interface.implementer(IRequestSiteNames)
 class _RequestSiteNames(object):
 
-    def sites(self, key):
+    def sites(self, unused_key):
         return get_possible_site_names()
     names = sites
