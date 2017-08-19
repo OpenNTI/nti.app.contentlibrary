@@ -574,17 +574,22 @@ _update_index_when_content_changes = update_index_when_content_changes
 
 
 def clear_package_assets(content_package, force=False):
+    result = []
+
     def _recur(unit):
         for child in unit.children or ():
             _recur(child)
         container = IPresentationAssetContainer(unit)
         if force:
+            result.extend(container.values())
             container.clear()
         else:
             for key, value in tuple(container.items()):  # mutating
                 if can_be_removed(value, force):
                     del container[key]
+                    result.append(value)
     _recur(content_package)
+    return result
 _clear_assets = clear_package_assets
 
 
