@@ -200,8 +200,8 @@ class ContentPackageMixin(object):
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
                              {
-                                'message': _(u"Library not available."),
-                                'code': 'LibraryNotAvailable',
+                                 'message': _(u"Library not available."),
+                                 'code': 'LibraryNotAvailable',
                              },
                              None)
         return library
@@ -433,11 +433,11 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
         raise_json_error(self.request,
                          hexc.HTTPConflict,
                          {
-                            'code': code,
-                            'message': message,
-                            CLASS: 'DestructiveChallenge',
-                            LINKS: to_external_object(links),
-                            MIME_TYPE: 'application/vnd.nextthought.destructivechallenge'
+                             'code': code,
+                             'message': message,
+                             CLASS: 'DestructiveChallenge',
+                             LINKS: to_external_object(links),
+                             MIME_TYPE: 'application/vnd.nextthought.destructivechallenge'
                          },
                          None)
 
