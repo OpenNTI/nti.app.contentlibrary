@@ -30,7 +30,6 @@ from nti.contentlibrary.indexed_data import get_library_catalog
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
-from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IContentPackageSyncResults
 from nti.contentlibrary.interfaces import IContentPackageReplacedEvent
@@ -741,10 +740,7 @@ _clear_when_removed = clear_content_package_assets
 
 @component.adapter(IContentPackage, IObjectRemovedEvent)
 def _clear_index_when_content_removed(content_package, unused_event):
-    # XXX: Probably want content package assets to be cleaned up,
-    # but for now, let's leave them.
-    if not IEditableContentPackage.providedBy(content_package):
-        clear_content_package_assets(content_package)
+    clear_content_package_assets(content_package)
 
 
 @component.adapter(IContentPackage, IObjectUnpublishedEvent)
