@@ -15,7 +15,6 @@ from zope import component
 from zope import interface
 
 from zope.cachedescriptors.property import Lazy
-from zope.cachedescriptors.property import readproperty
 
 from zope.deprecation import deprecated
 
@@ -32,6 +31,8 @@ from pyramid.interfaces import IRequest
 from nti.app.contentlibrary.acl import role_for_content_bundle
 
 from nti.app.contentlibrary.interfaces import IContentPackageMetadata
+
+from nti.app.contentlibrary.model import ContentPackageSyncMetadata
 
 from nti.app.contentlibrary.utils import role_for_content_package
 
@@ -436,25 +437,6 @@ class _BundleAccessProvider(object):
             if new_groups != new_bundle_groups:
                 # be idempotent
                 membership.setGroups(new_groups)
-
-
-@interface.implementer(IContentPackageMetadata, IContained)
-class ContentPackageSyncMetadata(PersistentCreatedAndModifiedTimeObject):
-    
-    __name__ = None
-    __parent__ = None
-
-    def __init__(self):
-        self.last_synced_by = ""
-        self.last_synced_time = 0
-
-    @readproperty
-    def package_title(self):
-        return self.__parent__.title
-
-    @readproperty
-    def package_description(self):
-        return self.__parent__.description
 
 
 @component.adapter(IContentPackage)

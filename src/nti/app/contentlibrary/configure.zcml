@@ -201,9 +201,9 @@
 	<!-- Externalization -->
 	<ext:registerAutoPackageIO
 		root_interfaces=".interfaces.IContentUnitContents
-						 .interfaces.IContentTrackingRedisClient
-						 .interfaces.IContentPackageMetadata"
-		modules=".model .adapters" />
+						 .interfaces.IContentPackageMetadata
+						 .interfaces.IContentTrackingRedisClient"
+		modules=".model" />
 
 	<!-- Exporter -->
 	<subscriber factory=".exporter._EditableContentPackageExporterDecorator"

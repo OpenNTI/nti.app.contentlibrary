@@ -11,18 +11,25 @@ logger = __import__('logging').getLogger(__name__)
 
 import time
 
-from zope import interface
 from zope import component
+from zope import interface
+
+from zope.cachedescriptors.property import readproperty
+
+from zope.location.interfaces import IContained
 
 from nti.app.contentlibrary import BLOCKING_TIMEOUT
- 
+
 from nti.app.contentlibrary.interfaces import IContentUnitContents
 from nti.app.contentlibrary.interfaces import IContentBundleCommunity
+from nti.app.contentlibrary.interfaces import IContentPackageMetadata
 from nti.app.contentlibrary.interfaces import IContentTrackingRedisClient
 
 from nti.dataserver.interfaces import IRedisClient
 
 from nti.dataserver.users.communities import Community
+
+from nti.dublincore.time_mixins import PersistentCreatedAndModifiedTimeObject
 
 from nti.property.property import alias
 
@@ -90,3 +97,22 @@ class ContentTrackingRedisClient(SchemaConfigured):
         redis = component.getUtility(IRedisClient)
         redis.delete(lock_name)
         self._mark_as_released()
+
+
+@interface.implementer(IContentPackageMetadata, IContained)
+class ContentPackageSyncMetadata(PersistentCreatedAndModifiedTimeObject):
+
+    __name__ = None
+    __parent__ = None
+
+    def __init__(self):
+        self.last_synced_by = ""
+        self.last_synced_time = 0
+
+    @readproperty
+    def package_title(self):
+        return self.__parent__.title
+
+    @readproperty
+    def package_description(self):
+        return self.__parent__.description
