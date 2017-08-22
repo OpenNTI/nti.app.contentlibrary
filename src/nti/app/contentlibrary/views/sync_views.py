@@ -188,10 +188,11 @@ class _AbstractSyncAllLibrariesView(SetSyncLockView,
         except Exception:
             logger.exception("Error while releasing Sync lock")
 
-    def _mark_sync_data(self, package):
-        metadata = IContentPackageMetadata(package)
-        metadata.last_synced_time = time.time()
-        metadata.last_synced_by = self.remoteUser.username
+    def _mark_sync_data(self):
+        metadata = IContentPackageMetadata(self.context)
+        metadata.updateLastMod()
+        metadata.holding_user = self.remoteUser.username
+        metadata.is_locked = self.redis.is_locked
 
     def _txn_id(self):
         return "txn.%s" % get_thread_ident()
@@ -327,6 +328,14 @@ class SyncContentPackageView(_AbstractSyncAllLibrariesView):
     """
     A view that synchronizes a content package
     """
+    
+    def release(self):
+        super(SyncContentPackageView, self).release()
+        self._mark_sync_data()
+        
+    def acquire(self):
+        super(SyncContentPackageView, self).acquire()
+        self._mark_sync_data()
 
     def _replace(self, package):
         ntiid = package.ntiid
@@ -353,7 +362,6 @@ class SyncContentPackageView(_AbstractSyncAllLibrariesView):
                                  None)
             # replace w/ new one
             library.replace(content_packages[0], results=sync_results)
-            self._mark_sync_data(package)
         return results
 
     def _do_call(self):
@@ -374,7 +382,7 @@ class SyncContentPackageView(_AbstractSyncAllLibrariesView):
                renderer='rest',
                permission=ACT_SYNC_LIBRARY,
                name='SyncPresentationAssets')
-class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
+class SyncPresentationAssetsView(SyncContentPackageView):
 
     def _process_package(self, package):
         folder = IHostPolicyFolder(package)
@@ -390,7 +398,6 @@ class SyncPresentationAssetsView(_AbstractSyncAllLibrariesView):
                                  'message': _(u'Content has not been published.'),
                              },
                              None)
-        self._mark_sync_data(package)
         return self._process_package(package)
 
 

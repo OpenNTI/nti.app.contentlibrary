@@ -166,8 +166,18 @@ class IContentUnitContents(interface.Interface):
         required=False,
     )
 
+class ILockTrackingComponent(interface.Interface):
+    
+    holding_user = ValidTextLine(title=u"Current User",
+                                 description=u"The current user holding the lock",
+                                 default=None,
+                                 required=False)
 
-class IContentTrackingRedisClient(interface.Interface):
+    is_locked = Bool(title=u"IsLocked",
+                     description=u"If the Redis client is locked.",
+                     default=False)
+
+class IContentTrackingRedisClient(ILockTrackingComponent):
     """
     Tracks the operations of an IRedisClient for metadata
     """
@@ -187,15 +197,6 @@ class IContentTrackingRedisClient(interface.Interface):
                         default=None,
                         required=False)
 
-    holding_user = ValidTextLine(title=u"Current User",
-                                 description=u"The current user holding the lock",
-                                 default=None,
-                                 required=False)
-
-    is_locked = Bool(title=u"IsLocked",
-                     description=u"If the Redis client is locked.",
-                     default=False)
-
     def acquire_lock(lock_name, lock_timeout, blocking_timeout):
         """
         Attempt to acquire the Redis lock.
@@ -211,16 +212,10 @@ class IContentTrackingRedisClient(interface.Interface):
         Delete Redis lock
         """
 
-class IContentPackageMetadata(interface.Interface):
+class IContentPackageMetadata(ILockTrackingComponent):
     """
     Holds metadata for a content package including sync information
     """
-    
-    last_synced_by = ValidTextLine(title=u"Last Modified By",
-                                   description=u"The user to last sync the content package")
-    
-    last_synced_time = Float(title=u"Last Synced Time",
-                             description=u"The last sync time of the content package")
     
     package_title = ValidTextLine(title=u"Package Title",
                                   description=u"Title of package for this metadata object")

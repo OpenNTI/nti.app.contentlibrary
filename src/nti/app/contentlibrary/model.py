@@ -106,8 +106,9 @@ class ContentPackageSyncMetadata(PersistentCreatedAndModifiedTimeObject):
     __parent__ = None
 
     def __init__(self):
-        self.last_synced_by = ""
-        self.last_synced_time = 0
+        super(PersistentCreatedAndModifiedTimeObject, self).__init__()
+        self.holding_user = ""
+        self.is_locked = False
 
     @readproperty
     def package_title(self):
