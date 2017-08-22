@@ -134,8 +134,8 @@ class SetSyncLockView(AbstractAuthenticatedView):
 
     def acquire(self):
         # Fail fast if we cannot acquire the lock.
-        acquired = self.redis.acquire_lock(self.remoteUser, 
-                                           SYNC_LOCK_NAME, 
+        acquired = self.redis.acquire_lock(self.remoteUser,
+                                           SYNC_LOCK_NAME,
                                            LOCK_TIMEOUT,
                                            BLOCKING_TIMEOUT)
         if acquired:
@@ -328,11 +328,11 @@ class SyncContentPackageView(_AbstractSyncAllLibrariesView):
     """
     A view that synchronizes a content package
     """
-    
+
     def release(self):
         super(SyncContentPackageView, self).release()
         self._mark_sync_data()
-        
+
     def acquire(self):
         super(SyncContentPackageView, self).acquire()
         self._mark_sync_data()
@@ -429,11 +429,13 @@ class SyncMetadataView(AbstractAuthenticatedView):
              context=IDataserverFolder,
              name='SyncableContentPackages')
 class GetSyncablePackagesView(AbstractAuthenticatedView):
-    
+
     def __call__(self):
         results = LocatedExternalDict()
         library = component.getUtility(IContentPackageLibrary)
-        syncable_packages = [x for x in library.enumeration.enumerateContentPackages()]
+        syncable_packages = [
+            x for x in library.enumeration.enumerateContentPackages()
+        ]
         results[ITEM_COUNT] = len(syncable_packages)
         results[ITEMS] = []
         for package in syncable_packages:
