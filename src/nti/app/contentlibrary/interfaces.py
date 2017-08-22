@@ -40,10 +40,9 @@ from nti.dataserver.contenttypes.forums.interfaces import IGeneralHeadlineTopic
 from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IShouldHaveTraversablePath
 
-from nti.schema.field import List
-from nti.schema.field import Dict
-from nti.schema.field import Float
 from nti.schema.field import Bool
+from nti.schema.field import List
+from nti.schema.field import Float
 from nti.schema.field import Object
 from nti.schema.field import TextLine as ValidTextLine
 
@@ -166,8 +165,9 @@ class IContentUnitContents(interface.Interface):
         required=False,
     )
 
+
 class ILockTrackingComponent(interface.Interface):
-    
+
     holding_user = ValidTextLine(title=u"Current User",
                                  description=u"The current user holding the lock",
                                  default=None,
@@ -176,6 +176,7 @@ class ILockTrackingComponent(interface.Interface):
     is_locked = Bool(title=u"IsLocked",
                      description=u"If the Redis client is locked.",
                      default=False)
+
 
 class IContentTrackingRedisClient(ILockTrackingComponent):
     """
@@ -186,7 +187,6 @@ class IContentTrackingRedisClient(ILockTrackingComponent):
                    description=u"The Redis client")
     redis.setTaggedValue('_ext_excluded_out', True)
 
-    
     last_released = Float(title=u"Last Released",
                           description=u"Timestamp of last Redis lock release",
                           default=None,
@@ -212,11 +212,12 @@ class IContentTrackingRedisClient(ILockTrackingComponent):
         Delete Redis lock
         """
 
+
 class IContentPackageMetadata(ILockTrackingComponent):
     """
     Holds metadata for a content package including sync information
     """
-    
+
     package_title = ValidTextLine(title=u"Package Title",
                                   description=u"Title of package for this metadata object")
 
