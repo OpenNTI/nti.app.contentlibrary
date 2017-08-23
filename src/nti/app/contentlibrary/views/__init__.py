@@ -11,9 +11,14 @@ logger = __import__('logging').getLogger(__name__)
 
 from urllib import unquote
 
+from zope import component
 from zope import interface
 
+from zope.annotation.interfaces import IAnnotations
+
 from zope.cachedescriptors.property import Lazy
+
+from zope.component.hooks import getSite
 
 from zope.location.interfaces import IContained
 
@@ -29,6 +34,10 @@ from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
 from nti.app.contentlibrary import VIEW_PACKAGE_WITH_CONTENTS
 
 from nti.app.contentlibrary import MessageFactory
+
+from nti.appserver.policies.interfaces import ISitePolicyUserEventListener
+
+from nti.contentlibrary import NTI
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackageBundle
@@ -90,3 +99,12 @@ class ContentBundlesPathAdapter(PathAdapterMixin):
         if IContentPackageBundle.providedBy(result):
             return result
         raise KeyError(ntiid)
+
+
+def get_site_provider():
+    policy = component.queryUtility(ISitePolicyUserEventListener)
+    result = getattr(policy, 'PROVIDER', None)
+    if not result:
+        annontations = IAnnotations(getSite(), {})
+        result = annontations.get('PROVIDER')
+    return result or NTI

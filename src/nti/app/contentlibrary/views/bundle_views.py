@@ -42,6 +42,7 @@ from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 
 from nti.app.contentlibrary.utils.bundle import save_bundle
 
+from nti.app.contentlibrary.views import get_site_provider
 from nti.app.contentlibrary.views import ContentBundlesPathAdapter
 
 from nti.app.externalization.error import raise_json_error
@@ -67,7 +68,6 @@ from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import IFilesystemContentPackageLibrary
 from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 
-from nti.contentlibrary.utils import NTI
 from nti.contentlibrary.utils import make_content_package_bundle_ntiid
 from nti.contentlibrary.utils import is_valid_presentation_assets_source
 
@@ -153,8 +153,7 @@ class ContentPackageBundleMixin(object):
 
     @classmethod
     def make_bundle_ntiid(cls, bundle, provider=None, base=None, extra=None):
-        policy = component.queryUtility(ISitePolicyUserEventListener)
-        provider = provider or getattr(policy, 'PROVIDER', None) or NTI
+        provider = provider or get_site_provider()
         return make_content_package_bundle_ntiid(bundle, provider, base, extra)
 
 

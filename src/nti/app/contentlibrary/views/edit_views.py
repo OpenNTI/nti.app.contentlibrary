@@ -47,9 +47,8 @@ from nti.app.contentlibrary.views import VIEW_CONTENTS
 from nti.app.contentlibrary.views import VIEW_PUBLISH_CONTENTS
 from nti.app.contentlibrary.views import VIEW_PACKAGE_WITH_CONTENTS
 
+from nti.app.contentlibrary.views import get_site_provider
 from nti.app.contentlibrary.views import LibraryPathAdapter
-
-from nti.appserver.policies.interfaces import ISitePolicyUserEventListener
 
 from nti.appserver.ugd_edit_views import UGDPutView
 
@@ -66,7 +65,6 @@ from nti.contentlibrary.interfaces import resolve_content_unit_associations
 
 from nti.contentlibrary.library import register_content_units
 
-from nti.contentlibrary.utils import NTI
 from nti.contentlibrary.utils import get_published_contents
 from nti.contentlibrary.utils import make_content_package_ntiid
 
@@ -208,8 +206,7 @@ class ContentPackageMixin(object):
 
     @classmethod
     def make_package_ntiid(cls, context, provider=None, base=None, extra=None):
-        policy = component.queryUtility(ISitePolicyUserEventListener)
-        provider = provider or getattr(policy, 'PROVIDER', None) or NTI
+        provider = provider or get_site_provider()
         return make_content_package_ntiid(context, provider, base, extra)
 
 
