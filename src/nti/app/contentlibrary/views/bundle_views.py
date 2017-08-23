@@ -20,6 +20,7 @@ from zope import lifecycleevent
 
 from zope.cachedescriptors.property import Lazy
 
+from zope.component.hooks import getSite
 from zope.component.hooks import site as current_site
 
 from zope.file.file import File
@@ -55,8 +56,6 @@ from nti.app.publishing import VIEW_UNPUBLISH
 from nti.app.publishing.views import PublishView
 from nti.app.publishing.views import UnpublishView
 
-from nti.appserver.policies.interfaces import ISitePolicyUserEventListener
-
 from nti.appserver.ugd_edit_views import ContainerContextUGDPostView
 
 from nti.contentlibrary.bundle import DEFAULT_BUNDLE_MIME_TYPE
@@ -75,9 +74,8 @@ from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
+from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IAccessProvider
-
-from nti.dataserver.users.communities import Community
 
 from nti.dataserver.users.entity import Entity
 
@@ -282,11 +280,7 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView,
 
     @Lazy
     def _site_community(self):
-        site_policy = component.queryUtility(ISitePolicyUserEventListener)
-        community_username = getattr(site_policy, 'COM_USERNAME', '')
-        result = None
-        if community_username:
-            result = Community.get_community(community_username)
+        result = ICommunity(getSite(), None)
         return result
 
     def _get_entities(self, entity_iterable):
