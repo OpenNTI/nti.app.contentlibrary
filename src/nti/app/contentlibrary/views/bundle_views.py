@@ -41,9 +41,10 @@ from nti.app.contentlibrary import MessageFactory as _
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 
+from nti.app.contentlibrary.hostpolicy import get_site_provider
+
 from nti.app.contentlibrary.utils.bundle import save_bundle
 
-from nti.app.contentlibrary.views import get_site_provider
 from nti.app.contentlibrary.views import ContentBundlesPathAdapter
 
 from nti.app.externalization.error import raise_json_error

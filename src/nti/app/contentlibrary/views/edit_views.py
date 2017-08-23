@@ -41,13 +41,14 @@ from nti.app.externalization.internalization import read_body_as_external_object
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
+from nti.app.contentlibrary.hostpolicy import get_site_provider
+
 from nti.app.contentlibrary.model import ContentUnitContents
 
 from nti.app.contentlibrary.views import VIEW_CONTENTS
 from nti.app.contentlibrary.views import VIEW_PUBLISH_CONTENTS
 from nti.app.contentlibrary.views import VIEW_PACKAGE_WITH_CONTENTS
 
-from nti.app.contentlibrary.views import get_site_provider
 from nti.app.contentlibrary.views import LibraryPathAdapter
 
 from nti.appserver.ugd_edit_views import UGDPutView
