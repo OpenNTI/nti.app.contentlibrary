@@ -9,6 +9,7 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import six
 import time
 import uuid
 import mimetypes
@@ -33,13 +34,13 @@ from nti.app.base.abstract_views import get_all_sources
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
+from nti.app.contentfile.view_mixins import is_oid_external_link
+from nti.app.contentfile.view_mixins import get_file_from_oid_external_link
+
+from nti.app.contentfolder.utils import is_cf_io_href
+from nti.app.contentfolder.utils import get_file_from_cf_io_url
+
 from nti.app.contentlibrary import MessageFactory as _
-
-from nti.app.externalization.error import raise_json_error
-
-from nti.app.externalization.internalization import read_body_as_external_object
-
-from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
 from nti.app.contentlibrary.hostpolicy import get_site_provider
 
@@ -51,11 +52,19 @@ from nti.app.contentlibrary.views import VIEW_PACKAGE_WITH_CONTENTS
 
 from nti.app.contentlibrary.views import LibraryPathAdapter
 
+from nti.app.externalization.error import raise_json_error
+
+from nti.app.externalization.internalization import read_body_as_external_object
+
+from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
+
 from nti.appserver.ugd_edit_views import UGDPutView
 
 from nti.base._compat import bytes_
 
 from nti.common.string import is_true
+
+from nti.contentfile.interfaces import IContentBaseFile
 
 from nti.contentlibrary import RST_MIMETYPE
 
@@ -101,7 +110,7 @@ class ContentPackageMixin(object):
 
     @Lazy
     def _extra(self):
-        return str(uuid.uuid4()).split('-')[0].upper()
+        return str(uuid.uuid4().get_time_low()).upper()
 
     @classmethod
     def _get_contents(cls, ext_obj):
@@ -205,6 +214,28 @@ class ContentPackageMixin(object):
                              None)
         return library
 
+    def is_dataserver_asset(self, uri):
+        return is_cf_io_href(uri) or is_oid_external_link(uri)
+
+    def get_dataserver_asset(self, uri):
+        if is_cf_io_href(uri):
+            return get_file_from_cf_io_url(uri)
+        return get_file_from_oid_external_link(uri)
+
+    def associate(self, uri, context):
+        if      isinstance(uri, six.string_types) \
+            and self.is_dataserver_asset(uri):
+            asset = self.get_dataserver_asset(uri)
+            if IContentBaseFile.providedBy(asset):
+                asset.add_association(context)
+        
+    def disassociate(self, uri, context):
+        if      isinstance(uri, six.string_types) \
+            and self.is_dataserver_asset(uri):
+            asset = self.get_dataserver_asset(uri)
+            if IContentBaseFile.providedBy(asset):
+                asset.remove_association(context)
+                        
     @classmethod
     def make_package_ntiid(cls, context, provider=None, base=None, extra=None):
         provider = provider or get_site_provider()
@@ -245,6 +276,7 @@ class LibraryPostView(AbstractAuthenticatedView,
                 package.contentType = contentType
         # set creator
         package.creator = self.remoteUser.username
+        self.associate(package.icon, package)
         # add to library
         lifecycleevent.created(package)
         library.add(package, event=False)
@@ -266,6 +298,10 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
 
     def updateContentObject(self, contentObject, externalValue, set_id=False,
                             notify=True, pre_hook=None, object_hook=None):
+        # check for icon association
+        icon = externalValue.get('icon')
+        if icon:
+            self.disassociate(contentObject.icon, contentObject)
         UGDPutView.updateContentObject(self,
                                        contentObject,
                                        externalValue,
@@ -273,6 +309,10 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
                                        notify=notify,
                                        pre_hook=pre_hook,
                                        object_hook=object_hook)
+        # associate icon
+        if icon:
+            self.associate(icon, contentObject)
+        # check contents
         contents, contentType = self._check_content(externalValue)
         if contents is not None:
             contentObject.contents = contents
