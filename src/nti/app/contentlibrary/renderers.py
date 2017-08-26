@@ -36,5 +36,5 @@ class _ContentUnitInfoCacheController(object):
     def __init__(self, context):
         pass
 
-    def __call__(self, context, system):
+    def __call__(self, unused_context, system):
         return system['request'].response
