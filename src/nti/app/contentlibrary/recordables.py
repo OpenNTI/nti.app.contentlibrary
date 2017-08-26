@@ -26,6 +26,9 @@ class LibraryRecordables(object):
 
     __slots__ = ()
 
+    def __init__(self, *args):
+        pass
+
     def _process_package(self, package, result):
 
         def _recur(unit):
