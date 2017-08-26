@@ -24,7 +24,7 @@ from nti.processlifetime import IApplicationTransactionOpenedEvent
 
 
 @component.adapter(IApplicationTransactionOpenedEvent)
-def _sync_global_library(_):
+def _sync_global_library(unused):
     gsm = component.getGlobalSiteManager()
     library = gsm.queryUtility(IContentPackageLibrary)
     if library is not None:

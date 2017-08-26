@@ -41,7 +41,7 @@ class _ContentUnitPreferencesDecorator(AbstractAuthenticatedRequestAwareDecorato
     CLASS = 'SharingPagePreference'
     MIME_TYPE = 'application/vnd.nextthought.sharingpagepreference'
 
-    def _predicate(self, context, result):
+    def _predicate(self, context, unused_result):
         return self._is_authenticated and context.contentUnit is not None
 
     def find_prefs(self, contentUnit):

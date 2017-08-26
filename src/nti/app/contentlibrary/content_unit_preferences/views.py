@@ -64,8 +64,8 @@ class _ContentUnitPreferencesPutView(AbstractAuthenticatedView,
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
                              {
-                                'message': str(e),
-                                'code': e.__class__.__name__
+                                 'message': str(e),
+                                 'code': e.__class__.__name__
                              },
                              exc_info[2])
 

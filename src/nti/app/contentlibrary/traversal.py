@@ -27,7 +27,7 @@ class LibraryTraversable(object):
         self.context = context
         self.request = request
 
-    def traverse(self, key, remaining_path):
+    def traverse(self, key, unused_remaining_path):
         try:
             return self.context[key]
         except KeyError:

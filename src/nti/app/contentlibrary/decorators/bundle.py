@@ -65,7 +65,7 @@ class _ContentBundlePagesLinkDecorator(object):
 @component.adapter(IContentPackageBundle, IRequest)
 class _ContentBundleDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
-    def _predicate(self, context, result):
+    def _predicate(self, unused_context, unused_result):
         return is_admin(self.remoteUser)
 
     def _do_decorate_external(self, context, result):
@@ -83,7 +83,7 @@ class _ContentBundleDecorator(AbstractAuthenticatedRequestAwareDecorator):
 @component.adapter(IPublishableContentPackageBundle, IRequest)
 class _PublishableContentPackageBundleDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
-    def _predicate(self, context, result):
+    def _predicate(self, context, unused_result):
         result = self._is_authenticated \
              and has_permission(ACT_CONTENT_EDIT, context, self.request)
         return result

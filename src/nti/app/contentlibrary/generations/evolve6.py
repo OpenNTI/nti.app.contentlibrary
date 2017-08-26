@@ -27,6 +27,7 @@ from nti.dataserver.interfaces import IOIDResolver
 IX_CREATEDTIME = 'createdTime'
 IX_LASTMODIFIED = 'lastModified'
 
+
 @interface.implementer(IDataserver)
 class MockDataserver(object):
 
@@ -52,8 +53,8 @@ def do_evolve(context, generation=generation):
     component.provideUtility(mock_ds, IDataserver)
 
     with site(ds_folder):
-        assert  component.getSiteManager() == ds_folder.getSiteManager(), \
-                "Hooks not installed?"
+        assert component.getSiteManager() == ds_folder.getSiteManager(), \
+               "Hooks not installed?"
 
         lsm = ds_folder.getSiteManager()
         intids = lsm.getUtility(IIntIds)

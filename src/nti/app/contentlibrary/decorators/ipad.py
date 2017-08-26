@@ -32,7 +32,7 @@ class _IPad120BundleContentPackagesAdjuster(AbstractAuthenticatedRequestAwareDec
 
     _BAD_UAS = ("NTIFoundation DataLoader NextThought/1.2.0",)
 
-    def _predicate(self, context, result):
+    def _predicate(self, unused_context, unused_result):
         ua = self.request.environ.get('HTTP_USER_AGENT', '')
         if not ua:
             return False
@@ -41,7 +41,7 @@ class _IPad120BundleContentPackagesAdjuster(AbstractAuthenticatedRequestAwareDec
             if ua.startswith(bua):
                 return True
 
-    def _do_decorate_external(self, context, result):
+    def _do_decorate_external(self, unused_context, result):
         # Depending on what we're registered on, the result
         # may already contain externalized values or still ContentPackage
         # objects.

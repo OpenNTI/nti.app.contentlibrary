@@ -68,8 +68,9 @@ class _ContainerFieldsTraversable(object):
 
     def __init__(self, context, request=None):
         self.context = context
+        self.request = request
 
-    def traverse(self, name, remaining_path):
+    def traverse(self, name, unused_remaining_path):
         if name != 'sharingPreference':  # pragma: no cover
             raise LocationError(name)
         return _with_acl(IContentUnitPreferences(self.context))
@@ -88,7 +89,7 @@ class _ContentUnitFieldsTraversable(object):
         self.context = context
         self.request = request
 
-    def traverse(self, name, remaining_path):
+    def traverse(self, name, unusedremaining_path):
         if name != 'sharingPreference':  # pragma: no cover
             raise LocationError(name)
 

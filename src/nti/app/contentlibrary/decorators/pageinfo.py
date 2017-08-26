@@ -30,7 +30,7 @@ from nti.traversal.traversal import find_interface
 @interface.implementer(IExternalMappingDecorator)
 class _ContentUnitInfoDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
-    def _predicate(self, context, result):
+    def _predicate(self, context, unused_result):
         return self._is_authenticated and context.contentUnit is not None
 
     def _do_content_package(self, context, result):
