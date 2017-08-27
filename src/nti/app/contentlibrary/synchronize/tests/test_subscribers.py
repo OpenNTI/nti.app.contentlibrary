@@ -12,8 +12,8 @@ from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import contains_inanyorder
 
-import os
 import gc
+import os
 import fudge
 
 from zope import component
@@ -50,7 +50,8 @@ from nti.contenttypes.presentation.utils import create_relatedworkref_from_exter
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
-import nti.dataserver.tests.mock_dataserver as mock_dataserver
+from nti.dataserver.tests import mock_dataserver
+
 from nti.dataserver.tests.mock_dataserver import WithMockDSTrans
 
 
@@ -58,7 +59,8 @@ def _index_items(namespace, *registered):
     catalog = get_catalog()
     intids = component.queryUtility(IIntIds)
     for item in registered:
-        mock_dataserver.current_transaction.add(item)
+        current_transaction = mock_dataserver.current_transaction
+        current_transaction.add(item)
         intids.register(item)
         catalog.index(item, intids=intids, namespace=namespace)
     return catalog
@@ -95,7 +97,8 @@ class TestSubscribers(ApplicationLayerTest):
     @fudge.patch('nti.app.contentlibrary.synchronize.subscribers.get_component_hierarchy_names')
     def test_indexing(self, mock_registry, mock_sites):
         registry = PersistentComponents()
-        mock_dataserver.current_transaction.add(registry)
+        current_transaction = mock_dataserver.current_transaction
+        current_transaction.add(registry)
         mock_registry.is_callable().returns(registry)
         mock_sites.is_callable().returns(None)
 
@@ -189,7 +192,8 @@ class TestSubscribers(ApplicationLayerTest):
             source = fp.read()
 
         registry = PersistentComponents()
-        mock_dataserver.current_transaction.add(registry)
+        current_transaction = mock_dataserver.current_transaction
+        current_transaction.add(registry)
 
         result = _load_and_register_json(iface, source, registry=registry,
                                          external_object_creator=object_creator)
@@ -231,7 +235,8 @@ class TestSubscribers(ApplicationLayerTest):
             source = fp.read()
 
         registry = PersistentComponents()
-        mock_dataserver.current_transaction.add(registry)
+        current_transaction = mock_dataserver.current_transaction
+        current_transaction.add(registry)
 
         result = load_and_register_slidedeck_json(source, registry=registry)
         assert_that(result, has_length(742))
