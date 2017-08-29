@@ -191,9 +191,9 @@ class ContentPackageMixin(object):
                 contentType = contentType or source.contentType or RST_MIMETYPE
         if content is not None:
             content = bytes_(content)
-            contentType = bytes_(contentType or RST_MIMETYPE)
+            contentType = contentType or RST_MIMETYPE
             self._validate(ext_obj)
-        return content, contentType
+        return content, bytes_(contentType or RST_MIMETYPE)
 
     def get_library(self, context=None):
         if context is None:
