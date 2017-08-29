@@ -172,8 +172,8 @@ class LastSyncTimeView(AbstractAuthenticatedView):
 class _AbstractSyncAllLibrariesView(SetSyncLockView,
                                     ModeledContentUploadRequestUtilsMixin):
 
-    def readInput(self, value=None):
-        result = CaseInsensitiveDict()
+    def readInput(self, value=None, case_insensitive=True):
+        result = CaseInsensitiveDict() if case_insensitive else {}
         if self.request:
             if self.request.body:
                 values = super(_AbstractSyncAllLibrariesView, self).readInput(value)
