@@ -66,9 +66,9 @@ from nti.app.contentlibrary.content_unit_preferences.decorators import _ContentU
 
 from nti.contentlibrary import interfaces as lib_interfaces
 
-from nti.dataserver import users
+from nti.dataserver.users.users import User
 
-from nti.dataserver.contenttypes import Note
+from nti.dataserver.contenttypes.note import Note
 
 from nti.ntiids import ntiids
 
@@ -119,7 +119,7 @@ class ContentUnit(object):
     __parent__ = None
     lastModified = 0
 
-    def does_sibling_entry_exist(self, sib_name):
+    def does_sibling_entry_exist(self, unused_sib_name):
         return None
 
     def __conform__(self, iface):
@@ -132,8 +132,8 @@ class NIDMapper(object):
 
     def __init__(self, context):
         href = context.href
-        root_package = traversal.find_interface(
-            context, lib_interfaces.IContentPackage)
+        root_package = traversal.find_interface(context, 
+                                                lib_interfaces.IContentPackage)
         if root_package:
             href = root_package.root + '/' + context.href
         href = href.replace('//', '/')
@@ -185,7 +185,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
     @WithMockDSTrans
     def test_decorate_inherit(self):
-        user = users.User.create_user(username=self.rem_username)
+        user = User.create_user(username=self.rem_username)
 
         cid = u"tag:nextthought.com:foo,bar"
         root_cid = u''
@@ -223,7 +223,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
     @WithMockDSTrans
     def test_traverse_container_to_prefs(self):
-        user = users.User.create_user(username=u"foo@bar")
+        user = User.create_user(username=u"foo@bar")
 
         cont_obj = Note()
         cont_obj.containerId = u"tag:nextthought.com:foo,bar"
@@ -236,7 +236,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
     @WithMockDSTrans
     def test_traverse_content_unit_to_prefs(self):
-        user = users.User.create_user(username=self.rem_username)
+        user = User.create_user(username=self.rem_username)
 
         cont_obj = Note()
         cont_obj.containerId = u"tag:nextthought.com:foo,bar"
@@ -264,7 +264,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         class Accept(object):
 
-            def best_match(self, *args):
+            def best_match(self, *unused_args):
                 return 'application/json'
 
         self.request.accept = Accept()
@@ -273,7 +273,7 @@ class TestContainerPrefs(NewRequestLayerTest):
         class Lib(object):
             titles = ()
 
-            def pathToNTIID(self, ntiid):
+            def pathToNTIID(self, unused_ntiid):
                 return [content_unit]
 
         self.request.registry.registerUtility(Lib(),
@@ -287,7 +287,7 @@ class TestContainerPrefs(NewRequestLayerTest):
     @WithMockDSTrans
     def test_update_shared_with_in_preexisting_container(self):
 
-        user = users.User.create_user(username=self.rem_username)
+        user = User.create_user(username=self.rem_username)
         # Make the container exist
         cont_obj = Note()
         cont_obj.containerId = u"tag:nextthought.com:foo,bar"
@@ -300,8 +300,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
     @WithMockDSTrans
     def test_update_shared_with_in_non_existing_container(self):
-
-        _ = users.User.create_user(username=self.rem_username)
+        User.create_user(username=self.rem_username)
         # Note the container does not exist
         containerId = u"tag:nextthought.com:foo,bar"
 
@@ -314,8 +313,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
     @WithMockDSTrans
     def test_update_shared_with_in_root_inherits(self):
-
-        _ = users.User.create_user(username=self.rem_username)
+        User.create_user(username=self.rem_username)
         # Note the container does not exist
         containerId = u"tag:nextthought.com:foo,bar"
 
@@ -329,7 +327,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
     @WithMockDSTrans
     def test_prefs_from_content_unit(self):
-        _ = users.User.create_user(username=self.rem_username)
+        User.create_user(username=self.rem_username)
         # Note the container does not exist
         # containerId = "tag:nextthought.com:foo,bar"
 
@@ -341,8 +339,8 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         info = ContentUnitInfo()
         info.contentUnit = content_unit
-        decorator = _ContentUnitPreferencesDecorator(
-            info, get_current_request())
+        decorator = _ContentUnitPreferencesDecorator(info, 
+                                                     get_current_request())
         result_map = {}
 
         decorator.decorateExternalMapping(info, result_map)
