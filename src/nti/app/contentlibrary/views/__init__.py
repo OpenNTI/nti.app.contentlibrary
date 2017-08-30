@@ -44,6 +44,8 @@ from nti.dataserver.authorization_acl import acl_from_aces
 from nti.dataserver.interfaces import ALL_PERMISSIONS
 from nti.dataserver.interfaces import EVERYONE_GROUP_NAME
 
+from nti.externalization.proxy import removeAllProxies
+
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 
@@ -75,7 +77,7 @@ class LibraryPathAdapter(PathAdapterMixin):
         ntiid = unquote(ntiid)
         result = find_object_with_ntiid(ntiid)
         if IContentUnit.providedBy(result):
-            return result
+            return removeAllProxies(result)
         raise KeyError(ntiid)
 
 
@@ -89,5 +91,5 @@ class ContentBundlesPathAdapter(PathAdapterMixin):
         ntiid = unquote(ntiid)
         result = find_object_with_ntiid(ntiid)
         if IContentPackageBundle.providedBy(result):
-            return result
+            return removeAllProxies(result)
         raise KeyError(ntiid)
