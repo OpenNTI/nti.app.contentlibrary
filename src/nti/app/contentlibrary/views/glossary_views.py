@@ -88,7 +88,7 @@ class _GlossaryPathAdapter(Contained):
         self.request = request
         self.ntiid = context.ntiid
 
-    def traverse(self, key, remaining_path):
+    def traverse(self, key, unused_remaining_path):
         # Only one layer
         if self.term:
             raise LocationError(key)
@@ -152,7 +152,7 @@ class GlossaryView(object):
 
 
 @component.adapter(IContentPackage, IObjectCreatedEvent)
-def add_main_glossary_from_new_content(title, event):
+def add_main_glossary_from_new_content(title, unused_event):
     try:
         glossary_source = title.read_contents_of_sibling_entry(
             MAIN_CSV_CONTENT_GLOSSARY_FILENAME)

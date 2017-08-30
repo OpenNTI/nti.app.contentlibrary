@@ -259,7 +259,7 @@ class _LibraryTOCRedirectClassView(object):
         # we need to return one to get the right mime type header. So we
         # fake it by rendering here
 
-        def _t_ext_obj(**kwargs):
+        def _t_ext_obj(**unused_kwargs):
             return {CLASS: "Link",
                     MIMETYPE: self.link_mt,
                     "href": href,
