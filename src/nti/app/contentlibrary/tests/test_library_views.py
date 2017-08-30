@@ -52,7 +52,7 @@ class ContentUnit(object):
     lastModified = 0
     href = 'prealgebra'
 
-    def does_sibling_entry_exist(self, sib_name):
+    def does_sibling_entry_exist(self, unused_sib_name):
         return None
 
     def __conform__(self, iface):

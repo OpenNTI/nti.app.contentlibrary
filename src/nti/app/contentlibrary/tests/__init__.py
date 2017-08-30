@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -78,7 +78,7 @@ class SharedConfiguringTestLayer(ZopeComponentLayer,
 class _SharedSetup(object):
 
     @staticmethod
-    def _setup_library(layer, *args, **kwargs):
+    def _setup_library(layer, *unused_args, **unused_kwargs):
         return FileLibrary(layer.library_dir)
 
     @staticmethod
@@ -99,11 +99,10 @@ class _SharedSetup(object):
             ds['++etc++bundles'] = site
             site['bundles'] = global_bundle_library
 
-            bucket = layer.global_library._enumeration.root.getChildNamed(
-                'sites').getChildNamed('localsite').getChildNamed('ContentPackageBundles')
+            root = layer.global_library._enumeration.root
+            bucket = root.getChildNamed('sites').getChildNamed('localsite').getChildNamed('ContentPackageBundles')
 
-            ISyncableContentPackageBundleLibrary(
-                global_bundle_library).syncFromBucket(bucket)
+            ISyncableContentPackageBundleLibrary(global_bundle_library).syncFromBucket(bucket)
 
             ds.getSiteManager().registerUtility(site,
                                                 provided=IEtcNamespace,
@@ -135,10 +134,9 @@ class _SharedSetup(object):
             component.getGlobalSiteManager().registerUtility(old_library,
                                                              IContentPackageLibrary)
         else:
-            print(
-                "WARNING: when tearing down layer",
-                layer,
-                "no previous library to restore")
+            print("WARNING: when tearing down layer",
+                  layer,
+                  "no previous library to restore")
         del layer.global_library
         del layer._old_library
         gc.collect()
@@ -149,7 +147,7 @@ class CourseTestContentApplicationTestLayer(ApplicationTestLayer):
     library_dir = os.path.join(os.path.dirname(__file__), 'library')
 
     @classmethod
-    def _setup_library(cls, *args, **kwargs):
+    def _setup_library(cls, *unused_args, **unused_kwargs):
         return _SharedSetup._setup_library(cls)
 
     @classmethod
@@ -173,17 +171,16 @@ class CourseTestContentApplicationTestLayer(ApplicationTestLayer):
 
     # TODO: May need to recreate the application with this library?
 
+
 import nti.contentlibrary.tests
 
 
 class ContentLibraryApplicationTestLayer(ApplicationTestLayer):
 
-    library_dir = os.path.join(
-        os.path.dirname(
-            nti.contentlibrary.tests.__file__))
+    library_dir = os.path.join(os.path.dirname(nti.contentlibrary.tests.__file__))
 
     @classmethod
-    def _setup_library(cls, *args, **kwargs):
+    def _setup_library(cls, *unused_args, **unused_kwargs):
         return _SharedSetup._setup_library(cls)
 
     @classmethod
@@ -213,7 +210,7 @@ class ExLibraryApplicationTestLayer(ApplicationTestLayer):
     library_dir = os.path.join(os.path.dirname(__file__), 'ExLibrary')
 
     @classmethod
-    def _setup_library(cls, *args, **kwargs):
+    def _setup_library(cls, *unused_args, **unused_kwargs):
         return FileLibrary(cls.library_dir)
 
     @classmethod
@@ -314,7 +311,7 @@ class PersistentApplicationTestLayer(ApplicationTestLayer):
                                 _library_path)
 
     @staticmethod
-    def _setup_library(layer, *args, **kwargs):
+    def _setup_library(layer, *unused_args, **unused_kwargs):
         return FileLibrary(layer.library_path)
 
     @staticmethod

@@ -46,10 +46,10 @@ from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.contentlibrary.subscribers import sync_bundles_when_library_synched
 
-from nti.dataserver.users.communities import Community
-
 from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IGroupMember
+
+from nti.dataserver.users.communities import Community
 
 from nti.externalization.externalization import to_external_object
 
@@ -69,6 +69,7 @@ from nti.dataserver.tests import mock_dataserver
 class TestBundleViews(ApplicationLayerTest):
 
     layer = PersistentApplicationTestLayer
+
     default_origin = 'http://platform.ou.edu'
 
     pkg_ntiid = u'tag:nextthought.com,2011-10:OU-HTML-CS1323_F_2015_Intro_to_Computer_Programming.introduction_to_computer_programming'
@@ -340,4 +341,3 @@ class TestBundleViews(ApplicationLayerTest):
                                           bundle_path_part)
                 shutil.rmtree(new_bundle, ignore_errors=True)
             shutil.rmtree(tmpdir, ignore_errors=True)
-
