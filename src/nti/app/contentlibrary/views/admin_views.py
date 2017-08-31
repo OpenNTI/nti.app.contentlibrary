@@ -42,6 +42,8 @@ from nti.externalization.externalization import StandardExternalFields
 
 from nti.externalization.interfaces import LocatedExternalDict
 
+from nti.metadata import queue_add
+ 
 from nti.site.hostpolicy import get_all_host_sites
 
 ITEMS = StandardExternalFields.ITEMS
@@ -152,13 +154,6 @@ class AllContentPackageBundlesView(AbstractAuthenticatedView,
                permission=nauth.ACT_NTI_ADMIN)
 class RebuildContentPackageCatalogView(AbstractAuthenticatedView):
 
-    def _process_meta(self, package):
-        try:
-            from nti.metadata import queue_add
-            queue_add(package)
-        except ImportError:
-            pass
-
     def __call__(self):
         intids = component.getUtility(IIntIds)
         # remove indexes
@@ -176,8 +171,8 @@ class RebuildContentPackageCatalogView(AbstractAuthenticatedView):
                     if doc_id is None or doc_id in seen:
                         continue
                     seen.add(doc_id)
+                    queue_add(package)
                     catalog.index_doc(doc_id, package)
-                    self._process_meta(package)
         result = LocatedExternalDict()
         result[ITEM_COUNT] = result[TOTAL] = len(seen)
         return result
