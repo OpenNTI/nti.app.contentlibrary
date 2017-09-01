@@ -4,6 +4,9 @@
 			xmlns:ext="http://nextthought.com/ntp/ext"
 			xmlns:zcml="http://namespaces.zope.org/zcml">
 
+	<include package="zope.component" file="meta.zcml" />
+	<include package="zope.component" />
+
 	<!-- Renderers -->
 	<adapter factory="nti.app.renderers.caching.UseTheRequestContextCacheController"
 			 for=".interfaces.ILibraryCollection" />
