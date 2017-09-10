@@ -46,7 +46,7 @@ class TestPublishables(ApplicationLayerTest):
             library.add(package, event=False)
         
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
-            recordables = component.queryUtility(IPublishables, name="library")
-            assert_that(recordables, is_not(none()))
-            assert_that(list(recordables.iter_objects()),
+            publishables = component.queryUtility(IPublishables, name="library")
+            assert_that(publishables, is_not(none()))
+            assert_that(list(publishables.iter_objects()),
                         has_item(package))
