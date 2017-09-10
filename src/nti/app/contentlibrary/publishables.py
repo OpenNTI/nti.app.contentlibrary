@@ -33,20 +33,19 @@ class LibraryPublishables(object):
         pass
 
     def _process_package(self, package, result):
-
         def _recur(unit):
+            # check unit
             if IPublishable.providedBy(unit):
                 result.append(unit)
+            # assets
             container = IPresentationAssetContainer(unit)
             for asset in container.assets():
                 if IPublishable.providedBy(asset):
                     result.append(asset)
+            # check children
             for child in unit.children or ():
                 _recur(child)
         _recur(package)
-
-        if IPublishable.providedBy(package):
-            result.append(package)
 
     def _process_packages(self, result):
         library = component.queryUtility(IContentPackageLibrary)
