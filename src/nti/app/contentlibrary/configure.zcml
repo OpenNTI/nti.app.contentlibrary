@@ -217,6 +217,9 @@
 
 	<!-- Recordables -->
 	<utility factory=".recordables.LibraryRecordables" name="library" />
+
+	<!-- Publishables -->
+	<utility factory=".publishables.LibraryPublishables" name="library" />
 			 
 	<subscriber handler=".subscribers.unit_traversal_context_subscriber" />
 		

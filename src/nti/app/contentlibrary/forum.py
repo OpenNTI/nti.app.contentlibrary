@@ -104,7 +104,7 @@ class ContentForum(GeneralForum):
     def _ntiid_mask_creator(self):
         return (self.creator != system_user)
 
-    def xxx_isReadableByAnyIdOfUser(self, remote_user, my_ids, family):
+    def xxx_isReadableByAnyIdOfUser(self, *unused_args, **unused_kwargs):
         # if we get here, we're authenticated
         # See above about the sharing stuff
         return True
@@ -115,7 +115,7 @@ class ContentForum(GeneralForum):
 
 from nti.app.contentlibrary.interfaces import IContentHeadlineTopic
 
-from nti.dataserver import users
+from nti.dataserver.users.entity import Entity
 
 from nti.dataserver.contenttypes.forums.topic import GeneralHeadlineTopic
 
@@ -143,7 +143,7 @@ class ContentHeadlineTopic(GeneralHeadlineTopic):
         # interface.alsoProvides(auth, IEntity)
         result = []
         for name in self.publicationSharingTargets:
-            entity = users.Entity.get_entity(name)
+            entity = Entity.get_entity(name)
             if entity is not None:
                 result.append(entity)
         return tuple(result)
@@ -168,7 +168,7 @@ class ContentHeadlineTopic(GeneralHeadlineTopic):
             # find a community in site hierarchy
             names = chain((folder.__name__,), get_component_hierarchy_names())
             for name in names:
-                comm = users.Entity.get_entity(name or '')
+                comm = Entity.get_entity(name or '')
                 if ICommunity.providedBy(comm):  # we have community
                     self.publicationSharingTargets = (name,)
                     break
@@ -205,7 +205,7 @@ class ContentCommentPost(GeneralForumComment):
 
     mime_type = mimeType = 'application/vnd.nextthought.forums.contentforumcomment'
 
-    def xxx_isReadableByAnyIdOfUser(self, remote_user, my_ids, family):
+    def xxx_isReadableByAnyIdOfUser(self, *unused_args, **unused_kwargs):
         # if we get here, we're authenticated
         # See above about the sharing stuff
         return True

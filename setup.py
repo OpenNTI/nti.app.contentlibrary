@@ -16,6 +16,7 @@ TESTS_REQUIRE = [
     'nti.app.testing',
     'nti.testing',
     'zope.testrunner',
+    'zope.testrunner',
 ]
 
 def _read(fname):
