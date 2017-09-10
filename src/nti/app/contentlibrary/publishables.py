@@ -62,7 +62,7 @@ class LibraryPublishables(object):
         if board:
             for forum in board.values():
                 for topic in forum.values():
-                    if IPublishable.providedBy(forum):
+                    if IPublishable.providedBy(topic):
                         result.append(topic)
         return result
 
