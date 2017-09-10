@@ -19,6 +19,7 @@ TESTS_REQUIRE = [
     'zope.testrunner',
 ]
 
+
 def _read(fname):
     with codecs.open(fname, encoding='utf-8') as f:
         return f.read()
@@ -32,13 +33,16 @@ setup(
     description="NTI app contentlibrary",
     long_description=_read('README.rst'),
     license='Apache',
-    keywords='pyramid contentlibrary',
+    keywords='pyramid content library',
     classifiers=[
+        'Framework :: Zope',
+        'Framework :: Pyramid',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: Implementation :: CPython',
     ],
     url="https://github.com/NextThought/nti.app.contentlibrary",
     zip_safe=True,
@@ -49,7 +53,7 @@ setup(
     install_requires=[
         'setuptools',
         'nti.contentfragments',
-        'nti.contentlibrary'
+        'nti.contentlibrary',
     ],
     extras_require={
         'test': TESTS_REQUIRE,
