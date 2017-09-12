@@ -23,12 +23,12 @@ from nti.app.contentlibrary.content_unit_preferences.interfaces import IContentU
 
 from nti.dataserver import authorization_acl as nacl
 
-from nti.dataserver import users
-
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import ALL_PERMISSIONS
 from nti.dataserver.interfaces import ACLLocationProxy
+
+from nti.dataserver.users.users import User
 
 from nti.ntiids import ntiids
 
@@ -95,8 +95,8 @@ class _ContentUnitFieldsTraversable(object):
 
         request = self.request or get_current_request()
         registry = request.registry
-        remote_user = users.User.get_user(request.authenticated_userid,
-                                          dataserver=registry.getUtility(IDataserver))
+        remote_user = User.get_user(request.authenticated_userid,
+                                    dataserver=registry.getUtility(IDataserver))
         # Preferences for the root are actually stored
         # on the unnamed node
         ntiid = '' if self.context.ntiid == ntiids.ROOT else self.context.ntiid
