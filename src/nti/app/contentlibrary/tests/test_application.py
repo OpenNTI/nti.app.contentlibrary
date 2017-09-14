@@ -20,7 +20,7 @@ does_not = is_not
 import datetime
 from urllib import quote as UQ
 
-import anyjson as json
+import simplejson as json
 
 import webob.datetime_utils
 

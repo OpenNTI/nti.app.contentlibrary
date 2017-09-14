@@ -50,7 +50,7 @@ class TestAppFilesystem(ContentlibraryLayerTest):
         assert_that(IPrefs(unit), has_property('__parent__', unit))
 
 
-import anyjson as json
+import simplejson as json
 
 from zope import interface
 
