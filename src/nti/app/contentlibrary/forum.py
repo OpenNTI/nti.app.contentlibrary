@@ -33,9 +33,9 @@ from nti.dataserver.contenttypes.forums.board import AnnotatableBoardAdapter
 from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import system_user
 
-from nti.externalization.oids import to_external_ntiid_oid
-
 from nti.ntiids.ntiids import TYPE_OID
+
+from nti.ntiids.oids import to_external_ntiid_oid
 
 from nti.site.interfaces import IHostPolicyFolder
 

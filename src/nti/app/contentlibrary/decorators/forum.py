@@ -22,14 +22,14 @@ from nti.dataserver.contenttypes.forums.interfaces import IPost
 from nti.dataserver.contenttypes.forums.interfaces import ITopic
 from nti.dataserver.contenttypes.forums.interfaces import IForum
 
-from nti.externalization.externalization import to_external_ntiid_oid
-
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 
 from nti.externalization.singleton import SingletonDecorator
 
 from nti.links.links import Link
+
+from nti.ntiids.oids import to_external_ntiid_oid
 
 LINKS = StandardExternalFields.LINKS
 
