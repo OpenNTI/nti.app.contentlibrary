@@ -137,9 +137,7 @@ class AssetExporterMixin(object):
             asset_ntiid = ntiid if backup else hash_ntiid(ntiid, salt)
             ext_obj = to_external_object(asset,
                                          name="exporter",
-                                         decorate=False,
-                                         salt=salt,
-                                         backup=backup)
+                                         decorate=False)
             self._prunner(ext_obj, backup, salt)
             decorateMimeType(asset, ext_obj)
             ext_obj['mimeType'] = ext_obj[MIMETYPE]
