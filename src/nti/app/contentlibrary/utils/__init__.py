@@ -10,8 +10,8 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import six
-import urlparse
 import collections
+from six.moves import urllib_parse
 
 from zope import component
 
@@ -137,7 +137,7 @@ def update_users_content_roles(user, idurl, content_roles):
         return  # No-op
 
     # http://x.y.z.nextthought.com/openid => nextthought
-    provider = urlparse.urlparse(idurl).netloc.split('.')[-2]
+    provider = urllib_parse.urlparse(idurl).netloc.split('.')[-2]
     provider = provider.lower()
 
     empty_role = role_for_providers_content(provider, '')
