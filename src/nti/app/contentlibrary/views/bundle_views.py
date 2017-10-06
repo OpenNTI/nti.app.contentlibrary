@@ -407,7 +407,7 @@ class ContentPackageBundleMixinView(AbstractAuthenticatedView,
                request_method='POST',
                permission=ACT_UPDATE,
                context=IContentPackageBundle)
-class ContentPackageBundleAddPackagesView(AbstractAuthenticatedView):
+class ContentPackageBundleAddPackagesView(ContentPackageBundleMixinView):
 
     def __call__(self):
         ntiids = self.get_ntiids()
@@ -429,7 +429,7 @@ class ContentPackageBundleAddPackagesView(AbstractAuthenticatedView):
                request_method='POST',
                permission=ACT_UPDATE,
                context=IContentPackageBundle)
-class ContentPackageBundleRemovePackagesView(AbstractAuthenticatedView):
+class ContentPackageBundleRemovePackagesView(ContentPackageBundleMixinView):
 
     def __call__(self):
         ntiids = self.get_ntiids()
