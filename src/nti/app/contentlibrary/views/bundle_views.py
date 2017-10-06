@@ -4,11 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
-
+import six
 import uuid
 import shutil
 
@@ -23,6 +23,8 @@ from zope.cachedescriptors.property import Lazy
 from zope.component.hooks import getSite
 from zope.component.hooks import site as current_site
 
+from zope.event import notify
+
 from zope.file.file import File
 
 from zope.intid.interfaces import IIntIds
@@ -30,6 +32,7 @@ from zope.intid.interfaces import IIntIds
 from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
+from pyramid.view import view_defaults
 
 from nti.app.authentication import get_remote_user
 
@@ -48,6 +51,8 @@ from nti.app.contentlibrary.utils.bundle import save_bundle
 from nti.app.contentlibrary.views import ContentBundlesPathAdapter
 
 from nti.app.externalization.error import raise_json_error
+
+from nti.app.externalization.internalization import update_object_from_external_object
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
@@ -68,10 +73,13 @@ from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import IFilesystemContentPackageLibrary
 from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 
+from nti.contentlibrary.interfaces import ContentBundleUpdatedEvent
+
 from nti.contentlibrary.utils import make_content_package_bundle_ntiid
 from nti.contentlibrary.utils import is_valid_presentation_assets_source
 
 from nti.dataserver.authorization import ACT_READ
+from nti.dataserver.authorization import ACT_UPDATE
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
@@ -84,9 +92,13 @@ from nti.externalization.interfaces import StandardExternalFields
 
 from nti.externalization.proxy import removeAllProxies
 
+from nti.ntiids.ntiids import find_object_with_ntiid
+
 from nti.site.interfaces import IHostPolicyFolder
 
 MIMETYPE = StandardExternalFields.MIMETYPE
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @view_config(route_name='objects.generic.traversal',
@@ -361,3 +373,71 @@ class BundleRemoveAccessView(AbstractBundleUpdateAccessView):
         for entity in self._entities:
             self.access_provider.remove_access(entity)
         return hexc.HTTPNoContent()
+
+
+class ContentPackageBundleMixinView(AbstractAuthenticatedView,
+                                    ModeledContentUploadRequestUtilsMixin):
+    
+    def readInput(self, value=None):
+        result = super(ContentPackageBundleMixinView, self).readInput(value)
+        return CaseInsensitiveDict(result)
+
+    def get_ntiids(self):
+        data = self.readInput()
+        ntiids =   data.get('ntiid') \
+                or data.get('ntiids') \
+                or data.get('pacakge') \
+                or data.get('pacakges')
+        if isinstance(ntiids, six.string_types):
+            ntiids = ntiids.split()
+        if not ntiids:
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                 'message': _(u"No content package specified."),
+                             },
+                             None)
+        return set(ntiids)
+
+
+@view_config(name='AddPackage')
+@view_config(name='AddPackages')
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='POST',
+               permission=ACT_UPDATE,
+               context=IContentPackageBundle)
+class ContentPackageBundleAddPackagesView(AbstractAuthenticatedView):
+
+    def __call__(self):
+        ntiids = self.get_ntiids()
+        packages = {x.ntiid for x in self.context.ContentPackages or ()}
+        ntiids.update(packages)
+        added = ntiids.difference(packages)
+        if added:
+            ext_obj = {'ContentPackages': sorted(ntiids)}
+            update_object_from_external_object(self.context, ext_obj, False)
+            added = [find_object_with_ntiid(x) for x in added]
+            notify(ContentBundleUpdatedEvent(self.context, added=added, external=ext_obj))
+        return self.context
+
+
+@view_config(name='RemovePackage')
+@view_config(name='RemovePackages')
+@view_defaults(route_name='objects.generic.traversal',
+               renderer='rest',
+               request_method='POST',
+               permission=ACT_UPDATE,
+               context=IContentPackageBundle)
+class ContentPackageBundleRemovePackagesView(AbstractAuthenticatedView):
+
+    def __call__(self):
+        ntiids = self.get_ntiids()
+        packages = {x.ntiid for x in self.context.ContentPackages or ()}
+        removed = packages.difference(ntiids)
+        if removed:
+            ext_obj = {'ContentPackages': sorted(removed)}
+            update_object_from_external_object(self.context, ext_obj, False)
+            removed = [find_object_with_ntiid(x) for x in removed]
+            notify(ContentBundleUpdatedEvent(self.context, removed=removed, external=ext_obj))
+        return self.context
