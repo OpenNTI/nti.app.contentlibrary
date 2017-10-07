@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -296,8 +297,7 @@ class TestBundleViews(ApplicationLayerTest):
                                                      description=u'Manga bleach',
                                                      RestrictedAccess=True)
             ext_obj = to_external_object(bundle)
-            ext_obj.pop('NTIID', None)
-            ext_obj.pop('ntiid', None)
+            [ext_obj.pop(x, None) for x in ('NTIID', 'ntiid')]
             ext_obj['ContentPackages'] = [self.pkg_ntiid]
 
             res = self.testapp.post_json(href, ext_obj, status=201)
@@ -341,3 +341,28 @@ class TestBundleViews(ApplicationLayerTest):
                                           bundle_path_part)
                 shutil.rmtree(new_bundle, ignore_errors=True)
             shutil.rmtree(tmpdir, ignore_errors=True)
+            
+    @WithSharedApplicationMockDS(users=True, testapp=True)
+    def test_add_remove_packages(self):
+        href = '/dataserver2/ContentBundles'
+        bundle = PublishableContentPackageBundle(title=u'Bleach',
+                                                 description=u'Manga bleach',
+                                                 RestrictedAccess=True)
+        ext_obj = to_external_object(bundle)
+        [ext_obj.pop(x, None) for x in ('NTIID', 'ntiid')]
+        ext_obj['ContentPackages'] = ['tag:nextthought.com,2011-10:NTI-HTML-PackageA']
+
+        res = self.testapp.post_json(href, ext_obj, status=201)
+        assert_that(res.json_body,
+                    has_entry('ContentPackages', has_length(1)))
+        ntiid = res.json_body['NTIID']
+
+        href = '/dataserver2/ContentBundles/%s/@@AddPackage' % ntiid
+        res = self.testapp.post_json(href, {'ntiid':self.pkg_ntiid}, status=200)
+        assert_that(res.json_body,
+                    has_entry('ContentPackages', has_length(2)))
+        
+        href = '/dataserver2/ContentBundles/%s/@@RemovePackage' % ntiid
+        res = self.testapp.post_json(href, {'ntiid':self.pkg_ntiid}, status=200)
+        assert_that(res.json_body,
+                    has_entry('ContentPackages', has_length(1)))
