@@ -4,13 +4,12 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
-
-from six import StringIO
 from collections import Mapping
+from six.moves import cStringIO
 
 import simplejson
 
@@ -46,6 +45,8 @@ INTERNAL_NTIID = StandardInternalFields.NTIID
 
 CONTAINERS = 'Containers'
 
+logger = __import__('logging').getLogger(__name__)
+
 
 def prepare_json_text(s):
     result = s.decode('utf-8') if isinstance(s, bytes) else s
@@ -59,7 +60,7 @@ class AssetExporterMixin(object):
 
     @classmethod
     def dump(cls, ext_obj):
-        source = StringIO()
+        source = cStringIO()
         simplejson.dump(ext_obj, source, indent='\t', sort_keys=True)
         source.seek(0)
         return source
