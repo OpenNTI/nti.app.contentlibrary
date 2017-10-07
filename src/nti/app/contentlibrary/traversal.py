@@ -4,8 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 from zope import interface
@@ -17,6 +18,8 @@ from zope.traversing.interfaces import ITraversable
 from pyramid.interfaces import IRequest
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @interface.implementer(ITraversable)
