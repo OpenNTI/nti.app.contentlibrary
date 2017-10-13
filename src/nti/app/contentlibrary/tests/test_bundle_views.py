@@ -332,6 +332,16 @@ class TestBundleViews(ApplicationLayerTest):
                 bundle_path_part = str(bundle_path_part)
 
             self._test_access(ntiid)
+            
+            # update
+            path = self.presentation_assets_zip(tmpdir)
+            with open(path, "rb") as fp:
+                source = SourceFile(name="assets.zip", data=fp.read())
+            mock_src.is_callable().with_args().returns({"assets.zip":source})
+            href = '/dataserver2/ContentBundles/%s' % ntiid
+            self.testapp.put_json(href, {'description':'Manga Bleach'},
+                                  status=200)
+
         finally:
             if bundle_path_part:
                 new_bundle = os.path.join(self.layer.library_path,

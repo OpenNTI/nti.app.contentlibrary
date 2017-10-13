@@ -54,6 +54,7 @@ from nti.app.externalization.error import raise_json_error
 
 from nti.app.externalization.internalization import update_object_from_external_object
 
+from nti.app.externalization.view_mixins import ModeledContentEditRequestUtilsMixin
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
 from nti.app.publishing import VIEW_PUBLISH
@@ -89,6 +90,7 @@ from nti.dataserver.interfaces import IAccessProvider
 from nti.dataserver.users.entity import Entity
 
 from nti.externalization.interfaces import StandardExternalFields
+from nti.externalization.interfaces import StandardInternalFields
 
 from nti.externalization.proxy import removeAllProxies
 
@@ -96,7 +98,10 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.site.interfaces import IHostPolicyFolder
 
+NTIID = StandardExternalFields.NTIID
 MIMETYPE = StandardExternalFields.MIMETYPE
+
+INTERNAL_NTIID = StandardInternalFields.NTIID
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -162,6 +167,23 @@ class ContentPackageBundleMixin(object):
                              None)
         return library
 
+    def check_presentation_assets(self, assets):
+        if assets is not None:
+            if hasattr(assets, "seek"):
+                assets.seek(0)
+            archive = is_valid_presentation_assets_source(assets)
+            if not archive:
+                raise_json_error(self.request,
+                                 hexc.HTTPUnprocessableEntity,
+                                 {
+                                     'message': _(u"Invalid presentation assets source."),
+                                 },
+                                 None)
+            # save tmp file
+            shutil.rmtree(archive, ignore_errors=True)
+            assets.seek(0)
+        return assets
+
     @classmethod
     def make_bundle_ntiid(cls, bundle, provider=None, base=None, extra=None):
         provider = provider or get_site_provider()
@@ -181,8 +203,7 @@ class ContentBundlePostView(AbstractAuthenticatedView,
 
     def readInput(self, value=None):
         result = super(ContentBundlePostView, self).readInput(value)
-        result.pop('NTIID', None)
-        result.pop('ntiid', None)
+        [result.pop(x, None) for x in (NTIID, INTERNAL_NTIID)]
         if result.get(MIMETYPE) == DEFAULT_BUNDLE_MIME_TYPE:
             result[MIMETYPE] = PUBLISHABLE_BUNDLE_MIME_TYPE
         return result
@@ -206,17 +227,7 @@ class ContentBundlePostView(AbstractAuthenticatedView,
         # handle presentation-assets and save
         assets = self.get_source(self.request)
         if assets is not None:
-            archive = is_valid_presentation_assets_source(assets)
-            if not archive:
-                raise_json_error(self.request,
-                                 hexc.HTTPUnprocessableEntity,
-                                 {
-                                     'message': _(u"Invalid presentation assets source."),
-                                 },
-                                 None)
-            # save tmp file
-            shutil.rmtree(archive, ignore_errors=True)
-            assets.seek(0)
+            assets = self.check_presentation_assets(assets)
             # save assets source in a zope file
             archive = File()
             with archive.open("w") as fp:
@@ -225,6 +236,49 @@ class ContentBundlePostView(AbstractAuthenticatedView,
         self.request.response.status_int = 201
         logger.info('Created new content package bundle (%s)', bundle.ntiid)
         return bundle
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             request_method='PUT',
+             permission=ACT_CONTENT_EDIT,
+             context=IContentPackageBundle)
+class ContentBundleUpdateView(AbstractAuthenticatedView,
+                              ModeledContentEditRequestUtilsMixin,
+                              ModeledContentUploadRequestUtilsMixin,
+                              ContentPackageBundleMixin):
+
+    content_predicate = IContentPackageBundle
+
+    def readInput(self, value=None):
+        if self.request.body:
+            result = super(ContentBundleUpdateView, self).readInput(value)
+            [result.pop(x, None) for x in (NTIID, INTERNAL_NTIID)]
+        else:
+            result = dict()
+        return result
+
+    def __call__(self):
+        externalValue = self.readInput()
+        contentObject = removeAllProxies(self.context)
+        self._check_object_unmodified_since(externalValue)
+        if externalValue:  # check there is something to update
+            self.updateContentObject(contentObject, externalValue, notify=True)
+        intids = component.getUtility(IIntIds)
+        doc_id = intids.getId(contentObject)
+        # get any presentation assets
+        assets = self.get_source(self.request)
+        if assets is not None:
+            assets = self.check_presentation_assets(assets)
+            library = self.validate_content_library(contentObject)
+            # check for transaction retrial
+            jid = getattr(self.request, 'jid', None)
+            if jid is None:
+                save_bundle(contentObject, library.enumeration.root,
+                            assets, name=str(doc_id))
+        # save trx id
+        self.request.jid = doc_id
+        return contentObject
 
 
 @view_config(route_name='objects.generic.traversal',
@@ -240,8 +294,11 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
         intids = component.getUtility(IIntIds)
         doc_id = intids.getId(removeAllProxies(context))
         # get any presentation assets
-        assets = self.get_source(self.request) \
-              or getattr(context, '_presentation_assets', None)
+        assets = self.get_source(self.request)
+        if assets is not None:
+            assets = self.check_presentation_assets(assets)
+        else:
+            assets = getattr(context, '_presentation_assets', None)
         if assets is not None:
             if hasattr(assets, "seek"):
                 assets.seek(0)
@@ -377,17 +434,17 @@ class BundleRemoveAccessView(AbstractBundleUpdateAccessView):
 
 class ContentPackageBundleMixinView(AbstractAuthenticatedView,
                                     ModeledContentUploadRequestUtilsMixin):
-    
+
     def readInput(self, value=None):
         result = super(ContentPackageBundleMixinView, self).readInput(value)
         return CaseInsensitiveDict(result)
 
     def get_ntiids(self):
         data = self.readInput()
-        ntiids =   data.get('ntiid') \
-                or data.get('ntiids') \
-                or data.get('pacakge') \
-                or data.get('pacakges')
+        ntiids = data.get('ntiid') \
+              or data.get('ntiids') \
+              or data.get('pacakge') \
+              or data.get('pacakges')
         if isinstance(ntiids, six.string_types):
             ntiids = ntiids.split()
         if not ntiids:
