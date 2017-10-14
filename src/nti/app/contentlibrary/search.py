@@ -30,7 +30,7 @@ from nti.dataserver.authorization import ACT_READ
 
 from nti.externalization.interfaces import StandardExternalFields
 
-from nti.externalization.singleton import SingletonDecorator
+from nti.externalization.singleton import Singleton
 
 from nti.publishing.interfaces import IPublishable
 
@@ -80,9 +80,7 @@ class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
 
 
 @component.adapter(IContentUnitSearchHit)
-class _SearchHitDecorator(object):
-
-    __metaclass__ = SingletonDecorator
+class _SearchHitDecorator(Singleton):
 
     def decorateExternalObject(self, original, external):
         if CONTAINER_ID not in external:

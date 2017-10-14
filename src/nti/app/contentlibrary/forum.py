@@ -18,29 +18,60 @@ from zope import interface
 
 from zope.cachedescriptors.property import cachedIn
 
-# Board
-
 from nti.app.contentlibrary.interfaces import IContentBoard
+from nti.app.contentlibrary.interfaces import IContentForum
+from nti.app.contentlibrary.interfaces import IContentCommentPost
+from nti.app.contentlibrary.interfaces import IContentHeadlinePost
+from nti.app.contentlibrary.interfaces import IContentHeadlineTopic
 
 from nti.contentlibrary.interfaces import IContentPackageBundle
 
+from nti.dataserver.authorization import ACT_READ
+
+from nti.dataserver.authorization_acl import ace_allowing
+
 from nti.dataserver.contenttypes.forums import MessageFactory as _
+
+from nti.dataserver.contenttypes.forums.acl import CommunityForumACLProvider
+from nti.dataserver.contenttypes.forums.acl import CommunityBoardACLProvider
 
 from nti.dataserver.contenttypes.forums.board import GeneralBoard
 from nti.dataserver.contenttypes.forums.board import AnnotatableBoardAdapter
 
+from nti.dataserver.contenttypes.forums.forum import GeneralForum
+
+from nti.dataserver.contenttypes.forums.post import GeneralHeadlinePost
+from nti.dataserver.contenttypes.forums.post import GeneralForumComment
+
+from nti.dataserver.contenttypes.forums.topic import GeneralHeadlineTopic
+
+from nti.dataserver.interfaces import AUTHENTICATED_GROUP_NAME
+
 from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import system_user
+
+from nti.dataserver.users.entity import Entity
+
+from nti.externalization.interfaces import StandardExternalFields
+from nti.externalization.interfaces import IExternalMappingDecorator
+
+from nti.externalization.singleton import Singleton
+
+from nti.links.links import Link
 
 from nti.ntiids.ntiids import TYPE_OID
 
 from nti.ntiids.oids import to_external_ntiid_oid
+
+from nti.publishing.interfaces import IDefaultPublished
 
 from nti.site.interfaces import IHostPolicyFolder
 
 from nti.site.site import get_component_hierarchy_names
 
 from nti.traversal.traversal import find_interface
+
+LINKS = StandardExternalFields.LINKS
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -86,14 +117,6 @@ def ContentBoardAdapter(context):
     return board
 
 
-# Forum
-
-
-from nti.app.contentlibrary.interfaces import IContentForum
-
-from nti.dataserver.contenttypes.forums.forum import GeneralForum
-
-
 @interface.implementer(IContentForum)
 class ContentForum(GeneralForum):
 
@@ -109,18 +132,6 @@ class ContentForum(GeneralForum):
         # if we get here, we're authenticated
         # See above about the sharing stuff
         return True
-
-
-# Topic
-
-
-from nti.app.contentlibrary.interfaces import IContentHeadlineTopic
-
-from nti.dataserver.users.entity import Entity
-
-from nti.dataserver.contenttypes.forums.topic import GeneralHeadlineTopic
-
-from nti.publishing.interfaces import IDefaultPublished
 
 
 @interface.implementer(IContentHeadlineTopic)
@@ -167,7 +178,8 @@ class ContentHeadlineTopic(GeneralHeadlineTopic):
         folder = find_interface(self, IHostPolicyFolder, strict=False)
         if folder is not None:
             # find a community in site hierarchy
-            names = chain((folder.__name__,), get_component_hierarchy_names())
+            names = chain((folder.__name__,),
+                          get_component_hierarchy_names())
             for name in names:
                 comm = Entity.get_entity(name or '')
                 if ICommunity.providedBy(comm):  # we have community
@@ -185,16 +197,6 @@ class ContentHeadlineTopic(GeneralHeadlineTopic):
         return super(ContentHeadlineTopic, self).unpublish()
 
 
-# Posts
-
-
-from nti.app.contentlibrary.interfaces import IContentCommentPost
-from nti.app.contentlibrary.interfaces import IContentHeadlinePost
-
-from nti.dataserver.contenttypes.forums.post import GeneralHeadlinePost
-from nti.dataserver.contenttypes.forums.post import GeneralForumComment
-
-
 @interface.implementer(IContentHeadlinePost)
 class ContentHeadlinePost(GeneralHeadlinePost):
 
@@ -210,19 +212,6 @@ class ContentCommentPost(GeneralForumComment):
         # if we get here, we're authenticated
         # See above about the sharing stuff
         return True
-
-
-# ACLs
-
-
-from nti.dataserver.authorization import ACT_READ
-
-from nti.dataserver.authorization_acl import ace_allowing
-
-from nti.dataserver.contenttypes.forums.acl import CommunityForumACLProvider
-from nti.dataserver.contenttypes.forums.acl import CommunityBoardACLProvider
-
-from nti.dataserver.interfaces import AUTHENTICATED_GROUP_NAME
 
 
 @component.adapter(IContentBoard)
@@ -249,26 +238,10 @@ class _ContentForumACLProvider(CommunityForumACLProvider):
         return ('Everyone', AUTHENTICATED_GROUP_NAME)
 
 
-# Forum decorators
-
-
-from nti.externalization.interfaces import StandardExternalFields
-from nti.externalization.interfaces import IExternalMappingDecorator
-
-from nti.externalization.singleton import SingletonDecorator
-
-from nti.links.links import Link
-
-# These imports are broken out explicitly for speed (avoid runtime
-# attribute lookup)
-LINKS = StandardExternalFields.LINKS
-
-
 @interface.implementer(IExternalMappingDecorator)
-class ContentBoardLinkDecorator(object):
+class ContentBoardLinkDecorator(Singleton):
     # XXX Very similar to the decorators for Community and PersonalBlog;
     # can we unify these?
-    __metaclass__ = SingletonDecorator
 
     def decorateExternalMapping(self, context, mapping):
         # TODO: This may be slow, if the forum doesn't persistently

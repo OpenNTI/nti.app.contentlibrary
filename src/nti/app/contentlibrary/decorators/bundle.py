@@ -35,7 +35,7 @@ from nti.dataserver.authorization import is_admin
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 
-from nti.externalization.singleton import SingletonDecorator
+from nti.externalization.singleton import Singleton
 
 from nti.links.links import Link
 
@@ -46,12 +46,10 @@ logger = __import__('logging').getLogger(__name__)
 
 @interface.implementer(IExternalMappingDecorator)
 @component.adapter(IContentPackageBundle)
-class _ContentBundlePagesLinkDecorator(object):
+class _ContentBundlePagesLinkDecorator(Singleton):
     """
     Places a link to the pages view of a content bundle.
     """
-
-    __metaclass__ = SingletonDecorator
 
     def decorateExternalMapping(self, context, result):
         _links = result.setdefault(LINKS, [])

@@ -22,7 +22,7 @@ from nti.dataserver.interfaces import IHighlight
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 
-from nti.externalization.singleton import SingletonDecorator
+from nti.externalization.singleton import Singleton
 
 from nti.links.links import Link
 
@@ -37,12 +37,10 @@ logger = __import__('logging').getLogger(__name__)
 
 @component.adapter(IHighlight)
 @interface.implementer(IExternalMappingDecorator)
-class _UGDLibraryPathLinkDecorator(object):
+class _UGDLibraryPathLinkDecorator(Singleton):
     """
     Create a `LibraryPath` link to our container id.
     """
-
-    __metaclass__ = SingletonDecorator
 
     def decorateExternalMapping(self, context, result):
         container_id = context.containerId

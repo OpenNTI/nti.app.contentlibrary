@@ -24,7 +24,7 @@ from nti.dataserver.contenttypes.forums.interfaces import IForum
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 
-from nti.externalization.singleton import SingletonDecorator
+from nti.externalization.singleton import Singleton
 
 from nti.links.links import Link
 
@@ -37,12 +37,10 @@ logger = __import__('logging').getLogger(__name__)
 
 @component.adapter(IPost)
 @interface.implementer(IExternalMappingDecorator)
-class _PostLibraryPathLinkDecorator(object):
+class _PostLibraryPathLinkDecorator(Singleton):
     """
     Create a `LibraryPath` link to our post.
     """
-
-    __metaclass__ = SingletonDecorator
 
     def decorateExternalMapping(self, context, result):
         # Use the OID NTIID rather than the 'physical' path because
@@ -56,7 +54,7 @@ class _PostLibraryPathLinkDecorator(object):
             return
 
         _links = result.setdefault(LINKS, [])
-        link = Link(target_ntiid, 
+        link = Link(target_ntiid,
                     rel=LIBRARY_PATH_GET_VIEW,
                     elements=(LIBRARY_PATH_GET_VIEW,))
         interface.alsoProvides(link, ILocation)

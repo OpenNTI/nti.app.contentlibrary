@@ -18,7 +18,7 @@ from nti.app.contentlibrary import LIBRARY_PATH_GET_VIEW
 
 from nti.externalization.interfaces import StandardExternalFields
 
-from nti.externalization.singleton import SingletonDecorator
+from nti.externalization.singleton import Singleton
 
 from nti.links.links import Link
 
@@ -27,12 +27,10 @@ LINKS = StandardExternalFields.LINKS
 logger = __import__('logging').getLogger(__name__)
 
 
-class AbstractLibraryPathLinkDecorator(object):
+class AbstractLibraryPathLinkDecorator(Singleton):
     """
     Create a `LibraryPath` link to our object.
     """
-
-    __metaclass__ = SingletonDecorator
 
     def decorateExternalMapping(self, context, result):
         _links = result.setdefault(LINKS, [])
