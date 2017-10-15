@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import gc
 import time
@@ -32,6 +31,8 @@ from nti.contentlibrary.synchronize import SynchronizationResults
 
 from nti.site.hostpolicy import run_job_in_all_host_sites
 from nti.site.hostpolicy import synchronize_host_policies
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True):
@@ -73,7 +74,7 @@ def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True):
             return
 
         if sleep:
-            gevent.sleep()
+            gevent.sleep(sleep)
 
         syncer = ISyncableContentPackageLibrary(site_lib, None)
         if syncer is not None:
