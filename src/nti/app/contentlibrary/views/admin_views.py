@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 
@@ -49,6 +48,8 @@ from nti.site.hostpolicy import get_all_host_sites
 ITEMS = StandardExternalFields.ITEMS
 TOTAL = StandardExternalFields.TOTAL
 ITEM_COUNT = StandardExternalFields.ITEM_COUNT
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @view_config(context=LibraryPathAdapter)
@@ -186,13 +187,6 @@ class RebuildContentPackageCatalogView(AbstractAuthenticatedView):
                permission=nauth.ACT_NTI_ADMIN)
 class RebuildContentBundleCatalogView(AbstractAuthenticatedView):
 
-    def _process_meta(self, package):
-        try:
-            from nti.metadata import queue_add
-            queue_add(package)
-        except ImportError:
-            pass
-
     def __call__(self):
         intids = component.getUtility(IIntIds)
         # remove indexes
@@ -211,7 +205,7 @@ class RebuildContentBundleCatalogView(AbstractAuthenticatedView):
                         continue
                     seen.add(doc_id)
                     catalog.index_doc(doc_id, bundle)
-                    self._process_meta(bundle)
+                    queue_add(bundle)
         result = LocatedExternalDict()
         result[ITEM_COUNT] = result[TOTAL] = len(seen)
         return result
