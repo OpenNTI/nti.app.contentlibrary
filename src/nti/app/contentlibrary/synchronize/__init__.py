@@ -15,7 +15,7 @@ import gevent
 
 from zope import component
 
-from zope.event import notify
+from zope.event import notify as zope_notify
 
 from zope.traversing.interfaces import IEtcNamespace
 
@@ -35,13 +35,13 @@ from nti.site.hostpolicy import synchronize_host_policies
 logger = __import__('logging').getLogger(__name__)
 
 
-def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True):
+def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True, notify=True):
     results = SynchronizationResults()
     params = SynchronizationParams(ntiids=ntiids or (),
                                    allowRemoval=allowRemoval)
 
-    # notify
-    notify(AllContentPackageLibrariesWillSyncEvent(params))
+    # send event
+    zope_notify(AllContentPackageLibrariesWillSyncEvent(params))
 
     # First, synchronize the policies, make sure everything is all nice and
     # installed.
@@ -79,7 +79,7 @@ def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True):
         syncer = ISyncableContentPackageLibrary(site_lib, None)
         if syncer is not None:
             logger.info("Sync library %s", site_lib)
-            site_lib.syncContentPackages(params, results)
+            site_lib.syncContentPackages(params, results, notify)
             return True
         return False
 
@@ -93,11 +93,11 @@ def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True):
     # clean up
     gc.collect()
 
-    # notify
-    notify(AllContentPackageLibrariesDidSyncEvent(params, results))
+    # send event
+    zope_notify(AllContentPackageLibrariesDidSyncEvent(params, results))
     return params, results
 
 
-def syncContentPackages(sleep=None, allowRemoval=True, site=None, ntiids=()):
-    return _do_synchronize(sleep, site, ntiids, allowRemoval)
+def syncContentPackages(sleep=None, allowRemoval=True, site=None, ntiids=(), notify=True):
+    return _do_synchronize(sleep, site, ntiids, allowRemoval, notify)
 synchronize = sync_content_packages = syncContentPackages
