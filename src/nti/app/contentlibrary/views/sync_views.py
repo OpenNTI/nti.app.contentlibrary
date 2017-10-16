@@ -301,8 +301,8 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
         values = self.readInput()
         # parse params
         site = values.get('site')
-        allowRemoval = values.get('allowRemoval') or u''
-        allowRemoval = is_true(allowRemoval)
+        notify = is_true(values.get('notify') or u'true')
+        allowRemoval = is_true(values.get('allowRemoval') or u'')
         # things to sync
         for name in ('ntiids', 'ntiid', 'packages', 'package'):
             ntiids = values.get(name)
@@ -314,6 +314,7 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
         # execute
         result = self._do_sync(site=site,
                                ntiids=ntiids,
+                               notify=notify,
                                allowRemoval=allowRemoval)
         return result
 
