@@ -6,12 +6,11 @@ Views for exposing the content library to clients.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
-
-from urllib import quote as UQ
+from six.moves import urllib_parse
 
 from requests.structures import CaseInsensitiveDict
 
@@ -112,6 +111,8 @@ CLASS = StandardExternalFields.CLASS
 ITEMS = StandardExternalFields.ITEMS
 MIMETYPE = StandardExternalFields.MIMETYPE
 LAST_MODIFIED = StandardExternalFields.LAST_MODIFIED
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def _create_page_info(request, href, ntiid, last_modified=0, jsonp_href=None):
@@ -329,7 +330,7 @@ class _LibraryTOCRedirectClassView(object):
             # to know what to invalidate.
             # (Mostly in tests we find we cannot rely on traversal, so HACK it in manually)
             location = '/dataserver2/Objects/' + request.context.ntiid
-            request.response.content_location = UQ(location).encode('utf-8')
+            request.response.content_location = urllib_parse.quote(location).encode('utf-8')
 
             return _create_page_info(request,
                                      href,
@@ -362,7 +363,7 @@ def _RootLibraryTOCRedirectView(request):
 
     ntiid = request.view_name
     location = '/dataserver2/Objects/' + ntiid
-    request.response.content_location = UQ(location).encode('utf-8')
+    request.response.content_location = urllib_parse.quote(location).encode('utf-8')
     return _create_page_info(request, None, ntiid)
 
 

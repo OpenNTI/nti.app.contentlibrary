@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -17,7 +18,7 @@ from hamcrest import has_entries
 from hamcrest import assert_that
 from hamcrest import has_property
 
-from urllib import unquote
+from six.moves import urllib_parse
 
 from zope import component
 from zope import interface
@@ -87,7 +88,8 @@ class TestApplication(ApplicationLayerTest):
 
         assert_that(library_ws, has_entry('Items', has_length(1)))
         main_col = library_ws['Items'][0]
-        assert_that(main_col, has_entry('href',  unquote(href)))
+        assert_that(main_col, 
+                    has_entry('href',  urllib_parse.unquote(href)))
 
         res = self.testapp.get(href)
         assert_that(res.cache_control, has_property('max_age', 0))
@@ -152,7 +154,8 @@ class TestApplicationBundles(ApplicationLayerTest):
 
         assert_that(library_ws, has_entry('Items', has_length(1)))
         main_col = library_ws['Items'][0]
-        assert_that(main_col, has_entry('href', unquote(href)))
+        assert_that(main_col, 
+                    has_entry('href', urllib_parse.unquote(href)))
 
         res = self.testapp.get(href)
         assert_that(res.cache_control, has_property('max_age', 0))
@@ -167,8 +170,8 @@ class TestApplicationBundles(ApplicationLayerTest):
                               contains(has_entry('Class', 'ContentPackage'))))
 
         expected = '/dataserver2/%2B%2Betc%2B%2Bbundles/bundles/tag%3Anextthought.com%2C2011-10%3ANTI-Bundle-ABundle/DiscussionBoard'
-        expected = unquote(expected)
-        assert_that(unquote(self.require_link_href_with_rel(package, 'DiscussionBoard')),
+        expected = urllib_parse.unquote(expected)
+        assert_that(urllib_parse.unquote(self.require_link_href_with_rel(package, 'DiscussionBoard')),
                     is_(expected))
 
     @WithSharedApplicationMockDS(users=True, testapp=True)

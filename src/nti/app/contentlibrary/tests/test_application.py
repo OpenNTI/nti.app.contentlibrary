@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -18,7 +19,7 @@ from hamcrest import greater_than_or_equal_to
 does_not = is_not
 
 import datetime
-from urllib import quote as UQ
+from six.moves.urllib_parse import quote
 
 import simplejson as json
 
@@ -281,7 +282,7 @@ class TestApplicationLibrary(TestApplicationLibraryBase):
         assert_that(res.content_type,
                     is_('application/vnd.nextthought.pageinfo+json'))
         assert_that(res.content_location,
-                    is_(UQ('/dataserver2/Objects/' + self.child_ntiid)))
+                    is_(quote('/dataserver2/Objects/' + self.child_ntiid)))
         assert_that(res.json_body,
                     has_entry('MimeType', 'application/vnd.nextthought.pageinfo'))
         assert_that(res.json_body,

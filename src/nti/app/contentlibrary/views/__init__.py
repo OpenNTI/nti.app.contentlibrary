@@ -4,12 +4,11 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
-
-from urllib import unquote
+from six.moves.urllib_parse import unquote
 
 from zope import component
 from zope import interface
@@ -47,6 +46,8 @@ from nti.dataserver.interfaces import EVERYONE_GROUP_NAME
 from nti.externalization.proxy import removeAllProxies
 
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @interface.implementer(IPathAdapter, IContained)

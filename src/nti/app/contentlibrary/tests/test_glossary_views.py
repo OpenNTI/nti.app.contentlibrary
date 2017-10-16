@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -12,7 +13,7 @@ from hamcrest import contains_string
 
 import os.path
 
-import urllib
+from six.moves import urllib_parse
 
 from zope import component
 
@@ -44,13 +45,12 @@ class TestApplicationGlossary(ApplicationLayerTest):
         try:
             testapp = TestApp(self.app)
             path = '/dataserver2/users/sjohnson@nextthought.com/Pages(tag:NewcontainerResource)/Glossary/demo'
-            # path = urllib.quote( path )
             res = testapp.get(path, extra_environ=self._make_extra_environ())
 
             assert_that(res.body, contains_string(str('xml-stylesheet')))
 
             path = '/dataserver2/users/sjohnson@nextthought.com/Pages(tag:NewcontainerResource)/Glossary/institutional theory'
-            path = urllib.quote(path)
+            path = urllib_parse.quote(path)
             res = testapp.get(path, extra_environ=self._make_extra_environ())
 
             assert_that(res.body, contains_string(str('xml-stylesheet')))
