@@ -28,8 +28,10 @@ logger = __import__('logging').getLogger(__name__)
 
 
 def _process_args(site, ntiids, removal=True, notify=True):
+    logger.info("Loading Library... ")
     library = component.getUtility(IContentPackageLibrary)
     library.syncContentPackages()
+    logger.info("Synchronizing...")
     return synchronize(site=site, ntiids=ntiids,
                        allowRemoval=removal, notify=notify)
 
