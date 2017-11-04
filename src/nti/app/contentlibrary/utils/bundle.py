@@ -96,6 +96,7 @@ def save_presentation_assets_to_disk(assets, target):
 
     path = os.path.join(target, 'presentation-assets')
     shutil.move(assets, path)
+    return path
         
 
 def save_bundle_to_disk(bundle, target, assets=None, name=None):
@@ -137,6 +138,21 @@ def save_bundle(bundle, target, assets=None, name=None):
         bucket.absolute_path = path
         bundle.root = bucket
         return bucket
+
+    raise_json_error(get_current_request(),
+                     hexc.HTTPUnprocessableEntity,
+                     {
+                         'message': _(u"Only saving to file system is supported."),
+                     },
+                     None)
+
+def save_presentation_assets(assets, target):
+    if IFilesystemBucket.providedBy(target):
+        path = save_presentation_assets_to_disk(assets, target)
+        bucket = FilesystemBucket(name=u'presentation-assets')
+        bucket.absolute_path = path
+        return bucket
+
     raise_json_error(get_current_request(),
                      hexc.HTTPUnprocessableEntity,
                      {
