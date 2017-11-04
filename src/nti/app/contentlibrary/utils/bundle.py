@@ -71,6 +71,33 @@ def dc_metadata(bundle):
     return xmldoc.toprettyxml(encoding="UTF-8")
 
 
+def save_presentation_assets_to_disk(assets, target):
+    if     not isinstance(assets, six.string_types) \
+        or not os.path.isdir(assets):
+        assets = is_valid_presentation_assets_source(assets)
+
+    if not assets:
+        raise_json_error(get_current_request(),
+                         hexc.HTTPUnprocessableEntity,
+                         {
+                             'message': _(u"Invalid presentation assets source."),
+                             'code': 'LibraryNotAvailable',
+                         },
+                         None)
+            
+    if not os.path.isdir(assets):
+        raise_json_error(get_current_request(),
+                         hexc.HTTPUnprocessableEntity,
+                         {
+                             'message': _(u"Invalid presentation assets directory."),
+                             'code': 'LibraryNotAvailable',
+                         },
+                         None)
+
+    path = os.path.join(target, 'presentation-assets')
+    shutil.move(assets, path)
+        
+
 def save_bundle_to_disk(bundle, target, assets=None, name=None):
     name = name or safe_filename(bundle.title)
     tmpdir = os.path.join(tempfile.mkdtemp(), name)
@@ -85,27 +112,7 @@ def save_bundle_to_disk(bundle, target, assets=None, name=None):
         fp.write(dc_metadata(bundle))
     # save assets
     if assets is not None:
-        if     not isinstance(assets, six.string_types) \
-            or not os.path.isdir(assets):
-            assets = is_valid_presentation_assets_source(assets)
-            if not assets:
-                raise_json_error(get_current_request(),
-                                 hexc.HTTPUnprocessableEntity,
-                                 {
-                                     'message': _(u"Invalid presentation assets source."),
-                                     'code': 'LibraryNotAvailable',
-                                 },
-                                 None)
-        if not os.path.isdir(assets):
-            raise_json_error(get_current_request(),
-                             hexc.HTTPUnprocessableEntity,
-                             {
-                                 'message': _(u"Invalid presentation assets directory."),
-                                 'code': 'LibraryNotAvailable',
-                             },
-                             None)
-        path = os.path.join(tmpdir, 'presentation-assets')
-        shutil.move(assets, path)
+        save_presentation_assets_to_disk(assets, tmpdir)
     # save to destination
     absolute_path = getattr(target, 'absolute_path', None) or target
     dest_path = os.path.join(absolute_path, CONTENT_PACKAGE_BUNDLES, name)
