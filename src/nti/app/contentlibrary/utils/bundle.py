@@ -148,7 +148,8 @@ def save_bundle(bundle, target, assets=None, name=None):
 
 def save_presentation_assets(assets, target):
     if IFilesystemBucket.providedBy(target):
-        path = save_presentation_assets_to_disk(assets, target)
+        path = target.absolute_path
+        path = save_presentation_assets_to_disk(assets, path)
         bucket = FilesystemBucket(name=u'presentation-assets')
         bucket.absolute_path = path
         return bucket
