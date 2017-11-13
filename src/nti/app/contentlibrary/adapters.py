@@ -222,7 +222,7 @@ def _bundles_from_container_object(obj):
 @interface.implementer(IContentUnit)
 def _unit_from_request(request):
     """
-    We may have our content unit instance stashed in the request if it 
+    We may have our content unit instance stashed in the request if it
     was in our path.
     """
     try:

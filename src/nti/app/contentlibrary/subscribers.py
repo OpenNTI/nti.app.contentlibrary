@@ -109,7 +109,7 @@ def _on_content_bundle_added(bundle, unused_event):
                 ContentBundleCommunity.create_community(username=doc_id)
     except (TypeError, LookupError):  # tests
         pass
-    
+
 
 @component.adapter(IContentPackageBundle, IObjectPublishedEvent)
 def _on_content_bundle_published(bundle, unused_event):

@@ -178,10 +178,10 @@ class _DelimitedHierarchyContentPackageACLProvider(_AbstractDelimitedHierarchyEn
     def __acl__(self):
         acl = super(_DelimitedHierarchyContentPackageACLProvider, self).__acl__
         # Make sure our content admin comes first.
-        admin_ace = ace_allowing(authorization.ROLE_CONTENT_ADMIN,
-                                 authorization.ACT_READ,
-                                 self)
-        acl.insert(0, admin_ace)
+        for prin in (authorization.ROLE_SITE_ADMIN,
+                     authorization.ROLE_CONTENT_ADMIN):
+            admin_ace = ace_allowing(prin, authorization.ACT_READ, self)
+            acl.insert(0, admin_ace)
         return acl
 
     def _acl_from_string(self, context, acl_string, provenance=None):
@@ -271,6 +271,7 @@ class _RenderableContentPackageACLProvider(object):
         # By default, all admins and the creator have all-access to this
         # content package.
         for prin in (authorization.ROLE_CONTENT_ADMIN,
+                     authorization.ROLE_SITE_ADMIN,
                      authorization.ROLE_ADMIN,
                      self.context.creator):
             if prin is None:
@@ -342,6 +343,7 @@ class _ContentPackageBundleACLProvider(object):
         aces = []
         # By default, all admins and the creator have all-access.
         for prin in (authorization.ROLE_CONTENT_ADMIN,
+                     authorization.ROLE_SITE_ADMIN,
                      authorization.ROLE_ADMIN,
                      getattr(self.context, 'creator', None)):
             if prin is None:
