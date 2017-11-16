@@ -23,6 +23,8 @@ from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecora
 
 from nti.app.site.workspaces.workspaces import ISiteAdminWorkspace
 
+from nti.dataserver.authorization import is_admin_or_content_admin
+
 # make sure we use nti.dataserver.traversal to find the root site
 from nti.dataserver.traversal import find_nearest_site as ds_find_nearest_site
 
@@ -82,6 +84,9 @@ class ContentUnitInfoHrefDecorator(Singleton):
 @component.adapter(ISiteAdminWorkspace, IRequest)
 @interface.implementer(IExternalObjectDecorator)
 class AdminSyncLibrariesDecorator(AbstractAuthenticatedRequestAwareDecorator):
+
+    def _predicate(self, unused_context, unused_result):
+        return is_admin_or_content_admin(self.remoteUser)
 
     def _do_decorate_external(self, context, result_map):
         links = result_map.setdefault("Links", [])
