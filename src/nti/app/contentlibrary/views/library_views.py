@@ -402,7 +402,7 @@ class _ContentPackageLibraryCacheController(AbstractReliableLastModifiedCacheCon
 
     @property
     def _context_specific(self):
-        return sorted([x.ntiid for x in self.context.contentPackages])
+        return sorted(x.ntiid for x in self.context.contentPackages)
 
 
 def _get_hierarchy_context_for_context(obj, top_level_context):
@@ -663,8 +663,8 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
                     if hierarchy_context:
                         hierarchy_context = hierarchy_context[0]
                     if      hierarchy_context \
-                            and isinstance(hierarchy_context, (list, tuple)) \
-                            and len(hierarchy_context) > 1:
+                        and isinstance(hierarchy_context, (list, tuple)) \
+                        and len(hierarchy_context) > 1:
                         # Drop returned top level context
                         result_list.extend(hierarchy_context[1:])
                     path_list = self._externalize_children(legacy_path)
