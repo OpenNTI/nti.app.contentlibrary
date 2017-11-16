@@ -10,7 +10,6 @@ from __future__ import absolute_import
 
 import os
 import six
-import time
 import shutil
 import tempfile
 
@@ -96,14 +95,10 @@ def save_presentation_assets_to_disk(assets, target):
                          },
                          None)
 
-    tmp_path = None
+    # TODO: Do in a transaction
     path = os.path.join(target, 'presentation-assets')
-    if os.path.exists(path):
-        tmp_path = os.path.join(path, str(time.time()))
-        shutil.move(path, tmp_path)
+    shutil.rmtree(path, True)
     shutil.move(assets, path)
-    if tmp_path:
-        shutil.rmtree(tmp_path, True)
     return path
 
 
