@@ -110,7 +110,7 @@ class ContentPackageMixin(object):
 
     @Lazy
     def _extra(self):
-        return str(uuid.uuid4().get_time_low()).upper()
+        return str(uuid.uuid4().time_low).upper()
 
     @classmethod
     def _get_contents(cls, ext_obj):

@@ -126,7 +126,7 @@ class ContentPackageBundleMixin(object):
 
     @Lazy
     def extra(self):
-        return str(uuid.uuid4().get_time_low())
+        return str(uuid.uuid4().time_low)
 
     def get_source(self, request=None):
         request = self.request if not request else request
