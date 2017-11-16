@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import six
 import collections
@@ -37,6 +36,9 @@ PAGE_INFO_MT = nti_mimetype_with_class('pageinfo')
 PAGE_INFO_MT_JSON = PAGE_INFO_MT + '+json'
 
 CONTENT_BUNDLE_ROLE_PREFIX = 'content-bundle-role:'
+
+logger = __import__('logging').getLogger(__name__)
+
 
 def _encode(s):
     return s.encode('utf-8') if isinstance(s, six.text_type) else s

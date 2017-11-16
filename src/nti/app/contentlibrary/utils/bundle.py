@@ -4,13 +4,13 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import six
+import time
 import shutil
 import tempfile
 
@@ -37,6 +37,8 @@ from nti.contentlibrary.interfaces import IFilesystemBucket
 from nti.contentlibrary.utils import is_valid_presentation_assets_source
 
 from nti.namedfile.file import safe_filename
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def bundle_meta_info(bundle):
@@ -84,7 +86,7 @@ def save_presentation_assets_to_disk(assets, target):
                              'code': 'LibraryNotAvailable',
                          },
                          None)
-            
+
     if not os.path.isdir(assets):
         raise_json_error(get_current_request(),
                          hexc.HTTPUnprocessableEntity,
@@ -94,10 +96,16 @@ def save_presentation_assets_to_disk(assets, target):
                          },
                          None)
 
+    tmp_path = None
     path = os.path.join(target, 'presentation-assets')
+    if os.path.exists(path):
+        tmp_path = os.path.join(path, str(time.time()))
+        shutil.move(path, tmp_path)
     shutil.move(assets, path)
+    if tmp_path:
+        shutil.rmtree(tmp_path, True)
     return path
-        
+
 
 def save_bundle_to_disk(bundle, target, assets=None, name=None):
     name = name or safe_filename(bundle.title)
@@ -145,6 +153,7 @@ def save_bundle(bundle, target, assets=None, name=None):
                          'message': _(u"Only saving to file system is supported."),
                      },
                      None)
+
 
 def save_presentation_assets(assets, target):
     if IFilesystemBucket.providedBy(target):
