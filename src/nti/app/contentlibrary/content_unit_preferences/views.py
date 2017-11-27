@@ -52,7 +52,7 @@ class _ContentUnitPreferencesPutView(AbstractAuthenticatedView,
         return value
 
     def updateContentObject(self, unit_prefs, externalValue, set_id=False,
-                            notify=True, pre_hook=None, object_hook=None):
+                            notify=True, pre_hook=None):
         # At this time, externalValue must be a dict containing the
         # 'sharedWith' setting
         try:

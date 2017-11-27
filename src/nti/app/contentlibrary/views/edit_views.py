@@ -297,7 +297,7 @@ class LibraryPostView(AbstractAuthenticatedView,
 class ContentUnitPutView(UGDPutView, ContentPackageMixin):
 
     def updateContentObject(self, contentObject, externalValue, set_id=False,
-                            notify=True, pre_hook=None, object_hook=None):
+                            notify=True, pre_hook=None):
         # check for icon association
         icon = externalValue.get('icon')
         if icon:
@@ -307,8 +307,7 @@ class ContentUnitPutView(UGDPutView, ContentPackageMixin):
                                        externalValue,
                                        set_id=set_id,
                                        notify=notify,
-                                       pre_hook=pre_hook,
-                                       object_hook=object_hook)
+                                       pre_hook=pre_hook)
         # associate icon
         if icon:
             self.associate(icon, contentObject)
