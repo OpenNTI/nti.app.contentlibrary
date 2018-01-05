@@ -40,6 +40,7 @@ class LibraryPublishables(object):
                 result.append(unit)
             # assets
             container = IPresentationAssetContainer(unit)
+            # pylint: disable=too-many-function-args
             for asset in container.assets():
                 if IPublishable.providedBy(asset):
                     result.append(asset)

@@ -28,7 +28,7 @@ logger = __import__('logging').getLogger(__name__)
 @component.adapter(IContentUnit)
 @interface.implementer(IContentMetadata)
 def ContentMetadataFromContentUnit(content_unit):
-    # TODO: Is this the right level at which to externalize the hrefs?
+    # Is this the right level at which to externalize the hrefs? TODO:
     mapper = IContentUnitHrefMapper(content_unit, None)
     contentLocation = mapper.href if mapper is not None else None
     result = ContentMetadata(mimeType=u'text/html',

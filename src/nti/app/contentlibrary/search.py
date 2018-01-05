@@ -72,7 +72,7 @@ class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
     def request(self):
         return get_current_request()
 
-    def allow(self, item, unused_score, unused_query):
+    def allow(self, item, unused_score, unused_query):  # pylint: disable=arguments-differ
         if self.principal is None:
             return True
         return is_published(item) \

@@ -57,6 +57,7 @@ logger = __import__('logging').getLogger(__name__)
 class ContentPackageRolePermissionManager(AnnotationRolePermissionManager):
 
     def initialize(self):
+        # pylint: disable=protected-access
         if not self.map or not self.map._byrow:
             # Initialize with perms for our global content admin.
             for perm in (ACT_READ, ACT_CONTENT_EDIT, ACT_UPDATE):
@@ -66,6 +67,7 @@ class ContentPackageRolePermissionManager(AnnotationRolePermissionManager):
 def _initialize_content_package_roles(package):
     package_role_manager = IContentPackageRolePermissionManager(package)
     if package_role_manager is not None:
+        # pylint: disable=too-many-function-args
         package_role_manager.initialize()
 
 

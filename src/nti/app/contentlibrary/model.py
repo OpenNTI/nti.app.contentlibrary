@@ -63,12 +63,14 @@ class ContentTrackingRedisClient(SchemaConfigured):
         SchemaConfigured.__init__(self, *args, **kwargs)
 
     def _mark_as_held(self, user):
+        # pylint: disable=attribute-defined-outside-init
         self.is_locked = True
         self.last_released = None
         self.last_locked = time.time()
         self.holding_user = user.username if user is not None else u''
 
     def _mark_as_released(self):
+        # pylint: disable=attribute-defined-outside-init
         self.holding_user = None
         self.is_locked = False
         self.last_locked = None
@@ -77,6 +79,7 @@ class ContentTrackingRedisClient(SchemaConfigured):
     def acquire_lock(self, user, lock_name, lock_timeout,
                      blocking_timeout=BLOCKING_TIMEOUT):
         redis = component.getUtility(IRedisClient)
+        # pylint: disable=attribute-defined-outside-init
         self.lock = redis.lock(lock_name,
                                lock_timeout,
                                blocking_timeout=blocking_timeout)
@@ -91,7 +94,7 @@ class ContentTrackingRedisClient(SchemaConfigured):
             if self.is_locked and u_name == self.holding_user:
                 self.lock.release()
                 self._mark_as_released()
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             pass
 
     def delete_lock(self, lock_name):
@@ -107,7 +110,7 @@ class ContentPackageSyncMetadata(PersistentCreatedAndModifiedTimeObject):
     __parent__ = None
 
     def __init__(self):
-        super(PersistentCreatedAndModifiedTimeObject, self).__init__()
+        PersistentCreatedAndModifiedTimeObject.__init__(self)
         self.holding_user = ""
         self.is_locked = False
 

@@ -36,6 +36,7 @@ class LibraryRecordables(object):
             if IRecordable.providedBy(unit):
                 result.append(unit)
             container = IPresentationAssetContainer(unit)
+            # pylint: disable=too-many-function-args
             for asset in container.assets():
                 if IRecordable.providedBy(asset):
                     result.append(asset)
