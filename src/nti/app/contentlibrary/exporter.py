@@ -55,7 +55,7 @@ def prepare_json_text(s):
 
 class AssetExporterMixin(object):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # pylint: disable=useless-super-delegation
         super(AssetExporterMixin, self).__init__(*args, **kwargs)
 
     @classmethod
@@ -120,6 +120,7 @@ class AssetExporterMixin(object):
                 ntiid = unit.ntiid
                 unit_ntiid = ntiid if backup else hash_ntiid(ntiid, salt)
                 containers.setdefault(unit_ntiid, [])
+                # pylint: disable=too-many-function-args
                 for item in container.assets():
                     ntiid = item.ntiid
                     item_ntiid = ntiid if backup else hash_ntiid(ntiid, salt)
@@ -157,7 +158,7 @@ class _EditableContentPackageExporterDecorator(AssetExporterMixin):
 
     VIDEO_INDEX = 'video_index.json'
 
-    def __init__(self, *args):
+    def __init__(self, *args):  # pylint: disable=super-init-not-called
         pass
 
     def export_videos(self, package, external, backup=True, salt=None):

@@ -386,8 +386,8 @@ class _BundleAccessProvider(object):
         # point to packages that are also completely visible. We should not
         # interfere in that relationship (e.g. unrestricted bundles that point
         # to restricted packages is an undefined relationship).
-        # XXX: Must pass entity here to get effective principals.
-        # XXX: Must skip cache since bundle access has changed.
+        # Must pass entity here to get effective principals.
+        # Must skip cache since bundle access has changed.
         return  bundle != self.context \
             and bundle.RestrictedAccess \
             and has_permission(ACT_READ, bundle, entity,
@@ -444,6 +444,7 @@ class _BundleAccessProvider(object):
 @interface.implementer(IContentPackageMetadata)
 def content_package_sync_meta_factory(context):
     try:
+        # pylint: disable=protected-access
         result = context._content_package_sync_metadata
     except AttributeError:
         result = context._content_package_sync_metadata = ContentPackageSyncMetadata()

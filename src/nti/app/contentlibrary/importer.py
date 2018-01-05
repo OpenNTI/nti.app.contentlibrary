@@ -57,7 +57,7 @@ class FakeBucket(SourceBucket):
 
 class AssetImporterMixin(object):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # pylint: disable=useless-super-delegation
         super(AssetImporterMixin, self).__init__(*args, **kwargs)
 
     def do_import(self, package, source, index_filename):
@@ -65,7 +65,7 @@ class AssetImporterMixin(object):
             source = prepare_json_text(read_source(source))
             source = simplejson.loads(source)
         buckets = (FakeBucket(index_filename, source),)
-        return update_index_when_content_changes(package, index_filename, 
+        return update_index_when_content_changes(package, index_filename,
                                                  buckets=buckets, force=True)
 
 
@@ -75,7 +75,7 @@ class _EditableContentPackageImporterUpdater(AssetImporterMixin):
 
     VIDEO_INDEX = 'video_index.json'
 
-    def __init__(self, *args):
+    def __init__(self, *args):  # pylint: disable=super-init-not-called
         pass
 
     def import_videos(self, package, external):

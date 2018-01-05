@@ -8,8 +8,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-# disable: too many ancestors
-# pylint: disable=I0011,R0901
+# pylint: disable=inherit-non-class,no-value-for-parameter,inconsistent-mro
 
 from zope import interface
 

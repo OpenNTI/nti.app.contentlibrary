@@ -71,7 +71,7 @@ class _TestingLibraryTOCEntryACLProvider(object):
                              _TestingLibraryTOCEntryACLProvider),)
 
 
-# TODO: This could be (and was) registered for a simple IDelimitedHierarchyEntry.
+# This could be (and was) registered for a simple IDelimitedHierarchyEntry.
 # There is none of that separate from the contentpackage/unit though, so it shouldn't
 # be needed in that capacity.
 
@@ -181,7 +181,7 @@ class _DelimitedHierarchyContentPackageACLProvider(_AbstractDelimitedHierarchyEn
         for prin in (authorization.ROLE_SITE_ADMIN,
                      authorization.ROLE_CONTENT_ADMIN):
             admin_ace = ace_allowing(prin, authorization.ACT_READ, self)
-            acl.insert(0, admin_ace)
+            acl.insert(0, admin_ace)  # pylint: disable=no-member
         return acl
 
     def _acl_from_string(self, context, acl_string, provenance=None):
