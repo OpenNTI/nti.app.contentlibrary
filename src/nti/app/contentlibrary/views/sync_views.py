@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import sys
 import time
@@ -86,6 +85,8 @@ ITEMS = StandardExternalFields.ITEMS
 LINKS = StandardExternalFields.LINKS
 ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 
+logger = __import__('logging').getLogger(__name__)
+
 
 @view_config(permission=ACT_SYNC_LIBRARY)
 @view_defaults(route_name='objects.generic.traversal',
@@ -100,6 +101,7 @@ class RemoveSyncLockView(AbstractAuthenticatedView):
         return component.getUtility(IContentTrackingRedisClient)
 
     def __call__(self):
+        # pylint: disable=no-member
         self.redis.delete_lock(SYNC_LOCK_NAME)
         return hexc.HTTPNoContent()
 
@@ -117,6 +119,7 @@ class IsSyncInProgressView(AbstractAuthenticatedView):
         return component.getUtility(IContentTrackingRedisClient)
 
     def __call__(self):
+        # pylint: disable=no-member
         return self.redis.is_locked
 
 
@@ -133,6 +136,7 @@ class SetSyncLockView(AbstractAuthenticatedView):
         return component.getUtility(IContentTrackingRedisClient)
 
     def acquire(self):
+        # pylint: disable=no-member
         # Fail fast if we cannot acquire the lock.
         acquired = self.redis.acquire_lock(self.remoteUser,
                                            SYNC_LOCK_NAME,
@@ -172,7 +176,7 @@ class LastSyncTimeView(AbstractAuthenticatedView):
 class _AbstractSyncAllLibrariesView(SetSyncLockView,
                                     ModeledContentUploadRequestUtilsMixin):
 
-    def readInput(self, value=None, case_insensitive=True):
+    def readInput(self, value=None, case_insensitive=True):  # pylint: disable=arguments-differ
         result = CaseInsensitiveDict() if case_insensitive else {}
         if self.request:
             if self.request.body:
@@ -184,13 +188,15 @@ class _AbstractSyncAllLibrariesView(SetSyncLockView,
 
     def release(self):
         try:
+            # pylint: disable=no-member
             self.redis.release_lock(self.remoteUser)
-        except Exception:
+        except Exception:  # pylint:disable=broad-except
             logger.exception("Error while releasing Sync lock")
 
     def _mark_sync_data(self):
         metadata = IContentPackageMetadata(self.context)
         metadata.updateLastMod()
+        # pylint: disable=no-member
         metadata.holding_user = self.remoteUser.username
         metadata.is_locked = self.redis.is_locked
 
@@ -222,7 +228,7 @@ class _AbstractSyncAllLibrariesView(SetSyncLockView,
         try:
             logger.info('Starting sync %s', self._txn_id())
             return self._do_call()
-        except Exception as e:  # FIXME: Way too broad an exception
+        except Exception as e:  # pylint: disable=broad-except
             logger.exception("Failed to Sync %s", self._txn_id())
             exc_type, exc_value, exc_traceback = sys.exc_info()
             result = LocatedExternalDict()
@@ -252,17 +258,14 @@ class _SyncContentPackagesMixin(_AbstractSyncAllLibrariesView):
     # disabling it.
     _SLEEP = True
 
-    def _executable(self, sleep, site=None, *args, **kwargs):
+    def _executable(self, *args, **kwargs):
         raise NotImplementedError
 
-    def _do_sync(self, site=None, *args, **kwargs):
+    def _do_sync(self, site=None, **kwargs):
         now = time.time()
         result = LocatedExternalDict()
         result['Transaction'] = self._txn_id()
-        params, results = self._executable(sleep=self._SLEEP,
-                                           site=site,
-                                           *args,
-                                           **kwargs)
+        params, results = self._executable(sleep=self._SLEEP, site=site, **kwargs)
         result['Params'] = params
         result['Results'] = results
         result['SyncTime'] = time.time() - now
@@ -294,8 +297,8 @@ class _SyncAllLibrariesView(_SyncContentPackagesMixin):
             from there.
     """
 
-    def _executable(self, sleep, site, *args, **kwargs):
-        return syncContentPackages(sleep=sleep, site=site, *args, **kwargs)
+    def _executable(self, sleep, site, **kwargs):  # pylint: disable=arguments-differ
+        return syncContentPackages(sleep=sleep, site=site, **kwargs)
 
     def _do_call(self):
         values = self.readInput()
@@ -368,7 +371,7 @@ class SyncContentPackageView(_AbstractSyncAllLibrariesView):
     def _do_call(self):
         package = self.context
         if      IRenderableContentPackage.providedBy(package) \
-            and not package.is_published():
+            and not package.is_published():  # pylint: disable=no-member
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
                              {
@@ -392,6 +395,7 @@ class SyncPresentationAssetsView(SyncContentPackageView):
 
     def _do_call(self):
         package = self.context
+        # pylint: disable=no-member
         if IPublishable.providedBy(package) and not package.is_published():
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
