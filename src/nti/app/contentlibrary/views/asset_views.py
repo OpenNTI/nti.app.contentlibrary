@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 
@@ -48,6 +47,8 @@ ITEMS = StandardExternalFields.ITEMS
 TOTAL = StandardExternalFields.TOTAL
 ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 
+logger = __import__('logging').getLogger(__name__)
+
 
 @view_config(name='assets')
 @view_config(name='GetPresentationAssets')
@@ -83,14 +84,14 @@ class GetPackagePresentationAssetsView(AbstractAuthenticatedView):
                name='ResetPresentationAssets')
 class ResetPackagePresentationAssetsView(_AbstractSyncAllLibrariesView):
 
-    def _unit_assets(self, package):
+    def _unit_assets(self, package, force):
         result = []
         def recur(unit):
             for child in unit.children or ():
                 recur(child)
             container = IPresentationAssetContainer(unit)
             for key, value in container.items():
-                if IContentBackedPresentationAsset.providedBy(value):
+                if force or IContentBackedPresentationAsset.providedBy(value):
                     result.append((key, value, container))
         recur(package)
         return result
@@ -111,16 +112,14 @@ class ResetPackagePresentationAssetsView(_AbstractSyncAllLibrariesView):
                 clear_content_package_assets(package, force=force)
             )
             # remove anything left in containters
-            for ntiid, item, container in self._unit_assets(package):
+            for ntiid, item, container in self._unit_assets(package, force):
                 if can_be_removed(item, force=force):
                     container.pop(ntiid, None)
                 if ntiid not in seen:
                     seen.add(ntiid)
                     provided = iface_of_thing(item)
-                    if removed_registered(provided,
-                                          ntiid,
-                                          force=force,
-                                          registry=registry) is not None:
+                    if removed_registered(provided, ntiid, 
+                                          force=force, registry=registry) is not None:
                         items.append(item)
                         remove_transaction_history(item)
         result[TOTAL] = result[ITEM_COUNT] = len(items)
