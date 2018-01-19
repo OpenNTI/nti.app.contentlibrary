@@ -22,6 +22,8 @@ from zope.cachedescriptors.property import Lazy
 
 from zope.component.hooks import site as current_site
 
+from zope.event import notify as event_notify
+
 from zope.file.download import getHeaders
 
 from pyramid import httpexceptions as hexc
@@ -57,6 +59,8 @@ from nti.app.externalization.internalization import read_body_as_external_object
 
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
+from nti.appserver.pyramid_authorization import has_permission
+
 from nti.appserver.ugd_edit_views import UGDPutView
 
 from nti.base._compat import bytes_
@@ -67,10 +71,13 @@ from nti.contentfile.interfaces import IContentBaseFile
 
 from nti.contentlibrary import RST_MIMETYPE
 
+from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IEditableContentUnit
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEditableContentPackage
 from nti.contentlibrary.interfaces import resolve_content_unit_associations
+
+from nti.contentlibrary.interfaces import ContentPackageDeletedEvent
 
 from nti.contentlibrary.library import register_content_units
 
@@ -224,19 +231,17 @@ class ContentPackageMixin(object):
         return get_file_from_oid_external_link(uri)
 
     def associate(self, uri, context):
-        if      isinstance(uri, six.string_types) \
-            and self.is_dataserver_asset(uri):
+        if isinstance(uri, six.string_types) and self.is_dataserver_asset(uri):
             asset = self.get_dataserver_asset(uri)
             if IContentBaseFile.providedBy(asset):
                 asset.add_association(context)
-        
+
     def disassociate(self, uri, context):
-        if      isinstance(uri, six.string_types) \
-            and self.is_dataserver_asset(uri):
+        if isinstance(uri, six.string_types) and self.is_dataserver_asset(uri):
             asset = self.get_dataserver_asset(uri)
             if IContentBaseFile.providedBy(asset):
                 asset.remove_association(context)
-                        
+
     @classmethod
     def make_package_ntiid(cls, context, provider=None, base=None, extra=None):
         provider = provider or get_site_provider()
@@ -436,33 +441,40 @@ class PackagePublishedContentsGetView(ContentPackageContentsGetView):
         return result
 
 
-@view_config(context=IEditableContentPackage)
+@view_config(context=IContentPackage)
 @view_defaults(route_name='objects.generic.traversal',
                renderer='rest',
                request_method='DELETE',
-               permission=nauth.ACT_CONTENT_EDIT)
+               permission=nauth.ACT_READ)
 class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
-    LESSON_CONFIRM_CODE = 'EditableContentPackageInLessonDelete'
+    LEGACY_LESSON_CONFIRM_CODE = 'LegacyContentPackageInLessonDelete'
+    EDITABLE_LESSON_CONFIRM_CODE = 'EditableContentPackageInLessonDelete'
     LESSON_CONFIRM_MSG = _(u'This content is available in lessons. Are you sure you want to delete?')
 
-    CONFIRM_CODE = 'EditableContentPackageDelete'
+    LEGACY_CONFIRM_CODE = 'LegacyContentPackageDelete'
+    EDITABLE_CONFIRM_CODE = 'EditableContentPackageDelete'
     CONFIRM_MSG = _(u'Are you sure you want to delete?')
+
+    def _check_perms(self, theObject):
+        if IEditableContentPackage.providedBy(theObject):
+            result = has_permission(nauth.ACT_CONTENT_EDIT, theObject, self.request)
+        else:
+            result = has_permission(nauth.ACT_NTI_ADMIN, theObject, self.request)
+        if not result:
+            raise_json_error(self.request,
+                             hexc.HTTPForbidden,
+                             {
+                                 'message': _(u'Cannot delete content package.'),
+                             },
+                             None)
 
     def _do_delete_object(self, theObject, event=True):
         library = self.get_library(context=self.context)
         library.remove(theObject, event=event)
         return theObject
 
-    def _ntiids(self, associations):
-        for x in associations or ():
-            try:
-                yield x.ntiid
-            except AttributeError:
-                pass
-
-    def _raise_conflict_error(self, code, message, associations):
-        ntiids = [x for x in self._ntiids(associations)]
+    def _raise_conflict_error(self, code, message, ntiids):
         # pylint: disable=no-member
         logger.warn('Attempting to delete content package (%s) (%s)',
                     self.context.ntiid,
@@ -484,25 +496,47 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
                          },
                          None)
 
+    def _ntiids(self, associations):
+        for x in associations or ():
+            try:
+                yield x.ntiid
+            except AttributeError:
+                pass
+
     def _get_lesson_associations(self):
         associations = resolve_content_unit_associations(self.context)
         return [x for x in associations or () if IPresentationAsset.providedBy(x)]
+    
+    def _get_lesson_associations_ntiids(self):
+        associations = self._get_lesson_associations()
+        return set(x for x in self._ntiids(associations))
 
     def __call__(self):
+        self._check_perms(self.context)
         params = CaseInsensitiveDict(self.request.params)
         force = is_true(params.get('force'))
         if force:
             self._do_delete_object(self.context)
+            if not IEditableContentPackage.providedBy(self.context):
+                event_notify(ContentPackageDeletedEvent(self.context))
         else:
-            associations = self._get_lesson_associations()
-            if associations:
-                self._raise_conflict_error(self.LESSON_CONFIRM_CODE,
+            ntiids = self._get_lesson_associations_ntiids()
+            if ntiids:
+                if IEditableContentPackage.providedBy(self.context):
+                    code = self.EDITABLE_LESSON_CONFIRM_CODE
+                else:
+                    code = self.LEGACY_LESSON_CONFIRM_CODE
+                self._raise_conflict_error(code,
                                            self.LESSON_CONFIRM_MSG,
-                                           associations)
+                                           ntiids)
             else:
-                self._raise_conflict_error(self.CONFIRM_CODE,
+                if IEditableContentPackage.providedBy(self.context):
+                    code = self.EDITABLE_CONFIRM_CODE
+                else:
+                    code = self.LEGACY_CONFIRM_CODE
+                self._raise_conflict_error(code,
                                            self.CONFIRM_MSG,
-                                           associations)
+                                           ntiids)
         result = hexc.HTTPNoContent()
         result.last_modified = time.time()
         return result
