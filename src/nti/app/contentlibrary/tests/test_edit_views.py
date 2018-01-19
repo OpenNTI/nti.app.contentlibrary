@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-# disable: accessing protected members, too many methods
-# pylint: disable=W0212,R0904
+# pylint: disable=protected-access,too-many-public-methods
 
 from hamcrest import is_
 from hamcrest import none
@@ -102,7 +102,7 @@ class TestEditViews(ApplicationLayerTest):
         href = '/dataserver2/Library/%s' % ntiid
         res = self.testapp.get(href, status=200)
         self.require_link_href_with_rel(res.json_body, 'contents')
-        
+
         href = '/dataserver2/Library/%s/@@contents?attachment=True' % ntiid
         res = self.testapp.get(href, status=200)
         assert_that(res.body, has_length(0))
@@ -121,6 +121,7 @@ class TestEditViews(ApplicationLayerTest):
             assert_that(package,
                         has_property('contentType', is_(b'text/x-rst')))
             history = ITransactionRecordHistory(package)
+            # pylint: disable=too-many-function-args
             assert_that(history.records(), has_length(1))
 
         href = '/dataserver2/Library/%s/@@contents' % ntiid
@@ -138,7 +139,6 @@ class TestEditViews(ApplicationLayerTest):
             assert_that(res,
                         has_entry('contents', is_(u'eJzLTM7ITM8HAAiDAnQ=')))
 
-
     @WithSharedApplicationMockDS(users=True, testapp=True)
     @fudge.patch('nti.app.contentlibrary.views.edit_views.resolve_content_unit_associations')
     def test_delete(self, mock_rca):
@@ -151,17 +151,18 @@ class TestEditViews(ApplicationLayerTest):
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
             library = component.getUtility(IContentPackageLibrary)
             library.add(package, event=False)
-            
-        ext_obj = {'description' : 'Ichigo and Rukia'}
+
+        ext_obj = {'description': 'Ichigo and Rukia'}
         href = '/dataserver2/Library/%s' % ntiid
         self.testapp.put_json(href, ext_obj, status=200)
         with mock_dataserver.mock_db_trans(self.ds, site_name=u'platform.ou.edu'):
             intids = component.getUtility(IIntIds)
             package = find_object_with_ntiid(ntiid)
             history = ITransactionRecordHistory(package)
+            # pylint: disable=too-many-function-args
             pkg_trxs = {intids.queryId(x) for x in history.records()}
             pkg_trxs.discard(None)
-            
+
         href = '/dataserver2/Library/%s' % ntiid
         self.testapp.delete(href, status=409)
 
@@ -170,10 +171,10 @@ class TestEditViews(ApplicationLayerTest):
 
         href = '/dataserver2/Library/%s' % ntiid
         self.testapp.get(href, status=404)
-        
+
         with mock_dataserver.mock_db_trans(self.ds, site_name=u'platform.ou.edu'):
             all_trxs = {intids.queryId(x) for x in get_transactions()}
             all_trxs.discard(None)
-        
+
         assert_that(all_trxs.intersection(pkg_trxs),
                     is_empty())
