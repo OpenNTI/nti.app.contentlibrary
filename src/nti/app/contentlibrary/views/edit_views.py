@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import six
 import time
@@ -104,6 +103,8 @@ from nti.traversal.traversal import find_interface
 CLASS = StandardExternalFields.CLASS
 LINKS = StandardExternalFields.LINKS
 MIME_TYPE = StandardExternalFields.MIMETYPE
+
+logger = __import__('logging').getLogger(__name__)
 
 
 class ContentPackageMixin(object):
@@ -275,6 +276,7 @@ class LibraryPostView(AbstractAuthenticatedView,
             if contentType is not None:
                 package.contentType = contentType
         # set creator
+        # pylint: disable=no-member
         package.creator = self.remoteUser.username
         self.associate(package.icon, package)
         # add to library
@@ -341,6 +343,7 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
         data = self.readInput()
         contents, contentType = self._check_content(data)
         if contents is not None and contentType:
+            # pylint: disable=no-member
             version = self._get_version(data) or self.context.version
             self.context.write_contents(contents, contentType)
             notify_modified(self.context,
@@ -365,10 +368,12 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
 class ContentPackageContentsGetView(AbstractAuthenticatedView,
                                     ContentPackageMixin):
 
-    def _get_contents(self):
+    def _get_contents(self):  # pylint: disable=arguments-differ
+        # pylint: disable=no-member
         return self.context.contents or b''
 
     def as_attachment(self):
+        # pylint: disable=no-member
         response = self.request.response
         contents = self._get_contents()
         contentType = bytes_(self.context.contentType or RST_MIMETYPE)
@@ -458,6 +463,7 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
     def _raise_conflict_error(self, code, message, associations):
         ntiids = [x for x in self._ntiids(associations)]
+        # pylint: disable=no-member
         logger.warn('Attempting to delete content package (%s) (%s)',
                     self.context.ntiid,
                     ntiids)
@@ -483,21 +489,20 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
         return [x for x in associations or () if IPresentationAsset.providedBy(x)]
 
     def __call__(self):
-        associations = resolve_content_unit_associations(self.context)
-        lesson_associations = [x for x in associations or ()
-                               if IPresentationAsset.providedBy(x)]
         params = CaseInsensitiveDict(self.request.params)
         force = is_true(params.get('force'))
         if force:
             self._do_delete_object(self.context)
-        elif lesson_associations:
-            self._raise_conflict_error(self.LESSON_CONFIRM_CODE,
-                                       self.LESSON_CONFIRM_MSG,
-                                       associations)
         else:
-            self._raise_conflict_error(self.CONFIRM_CODE,
-                                       self.CONFIRM_MSG,
-                                       associations)
+            associations = self._get_lesson_associations()
+            if associations:
+                self._raise_conflict_error(self.LESSON_CONFIRM_CODE,
+                                           self.LESSON_CONFIRM_MSG,
+                                           associations)
+            else:
+                self._raise_conflict_error(self.CONFIRM_CODE,
+                                           self.CONFIRM_MSG,
+                                           associations)
         result = hexc.HTTPNoContent()
         result.last_modified = time.time()
         return result
