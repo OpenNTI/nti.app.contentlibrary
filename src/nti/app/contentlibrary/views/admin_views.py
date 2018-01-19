@@ -67,6 +67,7 @@ class RemoveInvalidPackagesView(AbstractAuthenticatedView):
 
     def _do_delete_object(self, theObject, event=True):
         library = self._library
+        # pylint: disable=no-member
         library.remove(theObject, event=event)
         return theObject
 
@@ -76,6 +77,7 @@ class RemoveInvalidPackagesView(AbstractAuthenticatedView):
         result[ITEMS] = items = {}
         packages = get_content_packages(mime_types=ALL_CONTENT_MIMETYPES)
         for package in packages:
+            # pylint: disable=no-member
             stored = library.get(package.ntiid)
             if stored is None:
                 logger.info('Removing package (%s)', package.ntiid)
