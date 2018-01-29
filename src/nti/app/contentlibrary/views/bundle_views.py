@@ -11,6 +11,7 @@ from __future__ import absolute_import
 import six
 import uuid
 import shutil
+import zipfile
 
 from requests.structures import CaseInsensitiveDict
 
@@ -76,6 +77,7 @@ from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 
 from nti.contentlibrary.interfaces import ContentBundleUpdatedEvent
 
+from nti.contentlibrary.utils import make_presentation_asset_dir
 from nti.contentlibrary.utils import make_content_package_bundle_ntiid
 from nti.contentlibrary.utils import is_valid_presentation_assets_source
 
@@ -124,18 +126,61 @@ class ContentBundlePagesView(ContainerContextUGDPostView):
 
 class ContentPackageBundleMixin(object):
 
+    ASSET_MULTIPART_KEYS = ('catalog-background',
+                            'catalog-promo-large',
+                            'catalog-entry-cover',
+                            'catalog-entry-thumbnail')
+
     @Lazy
     def extra(self):
         return str(uuid.uuid4().time_low)
 
+    @Lazy
+    def _source_dict(self):
+        """
+        A dictionary of multipart inputs: name -> file.
+        """
+        return get_all_sources(self.request)
+
+    def _make_asset_tmpdir(self, source_dict):
+        """
+        Make a tmp directory holding the presentation asset files to be moved
+        to the appropriate destination.
+        """
+        if not source_dict:
+            return
+        if set(self.ASSET_MULTIPART_KEYS) - set(source_dict):
+            # Do not have all of our multipart keys
+            raise_json_error(self.request,
+                             hexc.HTTPUnprocessableEntity,
+                             {
+                                 'message': _(u"Missing presentation asset files."),
+                                 'code': 'InvalidPresenationAssetFiles',
+                             },
+                             None)
+        catalog_promo = source_dict.get('catalog-promo-large')
+        catalog_cover = source_dict.get('catalog-entry-cover')
+        catalog_background = source_dict.get('catalog-background')
+        catalog_thumbnail = source_dict.get('catalog-entry-thumbnail')
+        return make_presentation_asset_dir(catalog_background,
+                                           catalog_promo,
+                                           catalog_cover,
+                                           catalog_thumbnail)
+
+
     def get_source(self, request=None):
+        """
+        Return the validated presentation asset source.
+        """
         request = self.request if not request else request
-        sources = get_all_sources(request)
-        if sources:
-            source = iter(sources.values()).next()
-            source.seek(0)
-            return source
-        return None
+        source_files = self._source_dict.values()
+        for source_file in source_files or ():
+            source_file.seek(0)
+            if zipfile.is_zipfile(source_file):
+                # Ok, return our zip file once validated
+                return self._validate_asset_zip(source_file)
+        # Otherwise, we have asset files we need to process
+        return self._make_asset_tmpdir(self._source_dict)
 
     def get_library(self, context=None, provided=IContentPackageBundleLibrary):
         if context is None:
@@ -167,7 +212,10 @@ class ContentPackageBundleMixin(object):
                              None)
         return library
 
-    def check_presentation_assets(self, assets):
+    def _validate_asset_zip(self, assets):
+        """
+        Validate and return the given presentation asset zip.
+        """
         if assets is not None:
             if hasattr(assets, "seek"):
                 assets.seek(0)
@@ -227,7 +275,6 @@ class ContentBundlePostView(AbstractAuthenticatedView,
         # handle presentation-assets and save
         assets = self.get_source(self.request)
         if assets is not None:
-            assets = self.check_presentation_assets(assets)
             # save assets source in a zope file
             archive = File()
             with archive.open("w") as fp:
@@ -269,7 +316,6 @@ class ContentBundleUpdateView(AbstractAuthenticatedView,
         # get any presentation assets
         assets = self.get_source(self.request)
         if assets is not None:
-            assets = self.check_presentation_assets(assets)
             library = self.validate_content_library(contentObject)
             # check for transaction retrial
             jid = getattr(self.request, 'jid', None)
@@ -295,9 +341,7 @@ class ContentBundlePublishView(PublishView, ContentPackageBundleMixin):
         doc_id = intids.getId(removeAllProxies(context))
         # get any presentation assets
         assets = self.get_source(self.request)
-        if assets is not None:
-            assets = self.check_presentation_assets(assets)
-        else:
+        if assets is None:
             assets = getattr(context, '_presentation_assets', None)
         if assets is not None:
             if hasattr(assets, "seek"):
