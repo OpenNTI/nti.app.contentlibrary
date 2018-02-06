@@ -126,7 +126,8 @@ class ContentBundlePagesView(ContainerContextUGDPostView):
 
 class ContentPackageBundleMixin(object):
 
-    ASSET_MULTIPART_KEYS = ('catalog-background',
+    ASSET_MULTIPART_KEYS = ('catalog-source',
+                            'catalog-background',
                             'catalog-promo-large',
                             'catalog-entry-cover',
                             'catalog-entry-thumbnail')
@@ -158,11 +159,13 @@ class ContentPackageBundleMixin(object):
                                  'code': 'InvalidPresenationAssetFiles',
                              },
                              None)
+        catalog_source = source_dict.get('catalog-source')
         catalog_promo = source_dict.get('catalog-promo-large')
         catalog_cover = source_dict.get('catalog-entry-cover')
         catalog_background = source_dict.get('catalog-background')
         catalog_thumbnail = source_dict.get('catalog-entry-thumbnail')
-        return make_presentation_asset_dir(catalog_background,
+        return make_presentation_asset_dir(catalog_source,
+                                           catalog_background,
                                            catalog_promo,
                                            catalog_cover,
                                            catalog_thumbnail)
