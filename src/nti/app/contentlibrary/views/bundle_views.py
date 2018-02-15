@@ -170,7 +170,6 @@ class ContentPackageBundleMixin(object):
                                            catalog_cover,
                                            catalog_thumbnail)
 
-
     def get_source(self, request=None):
         """
         Return the validated presentation asset source.

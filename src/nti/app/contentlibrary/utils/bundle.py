@@ -95,10 +95,30 @@ def save_presentation_assets_to_disk(assets, target):
                          },
                          None)
 
-    # TODO: Do in a transaction
     path = os.path.join(target, 'presentation-assets')
-    shutil.rmtree(path, True)
-    shutil.move(assets, path)
+    # With NFS, we need to be careful we do os operations that ensure we will
+    # not have random issues. Thus, we walk and copy files over as needed.
+    # Make sure we touch the dirs so lastModified times are updated correctly
+    # (as if we are in new directories). It may be better to write paths in a
+    # GUID path to ensure uniqueness.
+    if not os.path.exists(path):
+        shutil.move(assets, path)
+    else:
+        # Recursively iterate until we find our images. Then copy them over.
+        for current_dir, unused_dirs, files in os.walk(assets):
+            for filename in files:
+                if filename.endswith('.png'):
+                    # Makedirs and copy file
+                    rel_path = os.path.relpath(current_dir, assets)
+                    source_path = os.path.join(current_dir, filename)
+                    target_dir = os.path.join(path, rel_path)
+                    target_path = os.path.join(target_dir, filename)
+                    if not os.path.exists:
+                        os.makedirs(target_dir)
+                    shutil.copy2(source_path, target_path)
+                    shutil.copystat(current_dir, target_dir)
+        # Update mod time
+        shutil.copystat(assets, path)
     return path
 
 
