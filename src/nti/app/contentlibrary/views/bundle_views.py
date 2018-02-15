@@ -15,6 +15,11 @@ import zipfile
 
 from requests.structures import CaseInsensitiveDict
 
+from pyramid import httpexceptions as hexc
+
+from pyramid.view import view_config
+from pyramid.view import view_defaults
+
 from zope import component
 
 from zope import lifecycleevent
@@ -29,11 +34,6 @@ from zope.event import notify
 from zope.file.file import File
 
 from zope.intid.interfaces import IIntIds
-
-from pyramid import httpexceptions as hexc
-
-from pyramid.view import view_config
-from pyramid.view import view_defaults
 
 from nti.app.authentication import get_remote_user
 
@@ -176,6 +176,7 @@ class ContentPackageBundleMixin(object):
         Return the validated presentation asset source.
         """
         request = self.request if not request else request
+        # pylint: disable=no-member
         source_files = self._source_dict.values()
         for source_file in source_files or ():
             source_file.seek(0)
@@ -254,6 +255,7 @@ class ContentBundlePostView(AbstractAuthenticatedView,
 
     def readInput(self, value=None):
         result = super(ContentBundlePostView, self).readInput(value)
+        # pylint: disable=expression-not-assigned
         [result.pop(x, None) for x in (NTIID, INTERNAL_NTIID)]
         if result.get(MIMETYPE) == DEFAULT_BUNDLE_MIME_TYPE:
             result[MIMETYPE] = PUBLISHABLE_BUNDLE_MIME_TYPE
@@ -266,6 +268,7 @@ class ContentBundlePostView(AbstractAuthenticatedView,
         # read incoming object
         bundle = self.readCreateUpdateContentObject(self.remoteUser,
                                                     search_owner=False)
+        # pylint: disable=no-member
         bundle.creator = self.remoteUser.username
         # register and set ntiid
         intids = component.getUtility(IIntIds)
@@ -282,6 +285,7 @@ class ContentBundlePostView(AbstractAuthenticatedView,
             archive = File()
             with archive.open("w") as fp:
                 fp.write(assets.read())
+            # pylint: disable=protected-access
             bundle._presentation_assets = archive
         self.request.response.status_int = 201
         logger.info('Created new content package bundle (%s)', bundle.ntiid)
@@ -303,6 +307,7 @@ class ContentBundleUpdateView(AbstractAuthenticatedView,
     def readInput(self, value=None):
         if self.request.body:
             result = super(ContentBundleUpdateView, self).readInput(value)
+            # pylint: disable=expression-not-assigned
             [result.pop(x, None) for x in (NTIID, INTERNAL_NTIID)]
         else:
             result = dict()
@@ -457,6 +462,7 @@ class BundleGrantAccessView(AbstractBundleUpdateAccessView):
     """
 
     def __call__(self):
+        # pylint: disable=no-member,not-an-iterable
         for entity in self._entities:
             self.access_provider.grant_access(entity)
         return hexc.HTTPNoContent()
@@ -474,6 +480,7 @@ class BundleRemoveAccessView(AbstractBundleUpdateAccessView):
     """
 
     def __call__(self):
+        # pylint: disable=no-member,not-an-iterable
         for entity in self._entities:
             self.access_provider.remove_access(entity)
         return hexc.HTTPNoContent()
@@ -515,6 +522,7 @@ class ContentPackageBundleAddPackagesView(ContentPackageBundleMixinView):
 
     def __call__(self):
         ntiids = self.get_ntiids()
+        # pylint: disable=no-member
         packages = {x.ntiid for x in self.context.ContentPackages or ()}
         ntiids.update(packages)
         added = ntiids.difference(packages)
@@ -537,6 +545,7 @@ class ContentPackageBundleRemovePackagesView(ContentPackageBundleMixinView):
 
     def __call__(self):
         ntiids = self.get_ntiids()
+        # pylint: disable=no-member
         packages = {x.ntiid for x in self.context.ContentPackages or ()}
         removed = packages.difference(ntiids)
         if removed:
