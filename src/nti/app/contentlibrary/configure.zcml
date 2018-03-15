@@ -108,7 +108,7 @@
 	<include package="nti.externalization" />
 
 	<ext:registerMimeFactories module=".forum" />
-		
+
 	<utility factory=".model.ContentTrackingRedisClient"
 			 provides=".interfaces.IContentTrackingRedisClient" />
 
@@ -136,6 +136,16 @@
     <adapter factory=".adapters.content_package_sync_meta_factory"
              for="nti.contentlibrary.interfaces.IContentPackage"
              provides="nti.app.contentlibrary.interfaces.IContentPackageMetadata" />
+
+    <!-- Completion -->
+    <adapter factory=".completion._content_completion_policy"
+             provides="nti.contenttypes.completion.interfaces.ICompletableItemCompletionPolicy"
+             for="nti.contentlibrary.interfaces.IContentUnit
+                  nti.contenttypes.completion.interfaces.ICompletionContext" />
+
+    <adapter factory=".completion.DefaultContentUnitCompletionPolicy"
+             provides="nti.contenttypes.completion.interfaces.ICompletableItemCompletionPolicy"
+             for="nti.contentlibrary.interfaces.IContentUnit" />
 
 	<!-- Top-level/hierarchy -->
 	<adapter factory=".adapters._content_unit_to_bundle" />
@@ -220,9 +230,9 @@
 
 	<!-- Publishables -->
 	<utility factory=".publishables.LibraryPublishables" name="library" />
-			 
+
 	<subscriber handler=".subscribers.unit_traversal_context_subscriber" />
-		
+
 	<!-- Metadata -->
 	<subscriber	factory=".predicates._SystemContentPackages"
 				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
