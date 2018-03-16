@@ -35,6 +35,10 @@ from nti.contentlibrary.interfaces import IContentPackageReplacedEvent
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.interfaces import IContentPackageLibraryDidSyncEvent
 
+from nti.contenttypes.completion.interfaces import IUserProgressUpdatedEvent
+
+from nti.contenttypes.completion.utils import update_completion
+
 from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import ACT_UPDATE
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
@@ -132,3 +136,14 @@ def unit_traversal_context_subscriber(unit, _):
     request = get_current_request()
     if request is not None:
         request.unit_traversal_context = unit
+
+
+@component.adapter(IContentUnit, IUserProgressUpdatedEvent)
+def _content_unit_progress(content_unit, event):
+    """
+    On reading progress update, update completion.
+    """
+    update_completion(content_unit,
+                      content_unit.ntiid,
+                      event.user,
+                      event.context)
