@@ -113,7 +113,7 @@ def save_presentation_assets_to_disk(assets, target):
                     source_path = os.path.join(current_dir, filename)
                     target_dir = os.path.join(path, rel_path)
                     target_path = os.path.join(target_dir, filename)
-                    if not os.path.exists:
+                    if not os.path.exists(target_dir):
                         os.makedirs(target_dir)
                     shutil.copy2(source_path, target_path)
                     shutil.copystat(current_dir, target_dir)
