@@ -15,6 +15,8 @@ from zope import interface
 
 from nti.contentlibrary.interfaces import IContentUnit
 
+from nti.contenttypes.completion.completion import CompletedItem
+
 from nti.contenttypes.completion.interfaces import ICompletionContext
 from nti.contenttypes.completion.interfaces import ICompletableItemCompletionPolicy
 from nti.contenttypes.completion.interfaces import ICompletionContextCompletionPolicyContainer
@@ -33,7 +35,12 @@ class DefaultContentUnitCompletionPolicy(object):
         self.content_unit = obj
 
     def is_complete(self, progress):
-        return progress is not None and progress.HasProgress
+        result = None
+        if progress is not None and progress.HasProgress:
+            result = CompletedItem(Item=progress.Item,
+                                   Principal=progress.User,
+                                   CompletedDate=progress.LastModified)
+        return result
 
 
 @component.adapter(IContentUnit, ICompletionContext)
