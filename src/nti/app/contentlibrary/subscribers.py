@@ -96,6 +96,7 @@ def _on_content_pacakge_library_synced(library, unused_event):
         for bundle in bundle_library.values():
             board = IContentBoard(bundle, None)
             if board is not None:
+                # pylint: disable=too-many-function-args
                 board.createDefaultForum()
 
 
@@ -121,6 +122,7 @@ def _on_content_bundle_added(bundle, unused_event):
 def _on_content_bundle_published(bundle, unused_event):
     board = IContentBoard(bundle, None)
     if board is not None:
+        # pylint: disable=too-many-function-args
         board.createDefaultForum()
 
 
