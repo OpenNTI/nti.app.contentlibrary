@@ -229,6 +229,6 @@ class DeleteContentPackageBundleView(AbstractAuthenticatedView):
         library = component.queryUtility(IContentPackageBundleLibrary)
         try:
             del library[bundle.ntiid]
-        except AttributeError:
+        except (AttributeError, KeyError):
             logger.info("Bundle not in library (%s)", bundle.ntiid)
         return hexc.HTTPNoContent()
