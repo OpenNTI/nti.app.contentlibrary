@@ -357,6 +357,8 @@ class TestBundleViews(ApplicationLayerTest):
             assert_that(res['NTIID'], not_none())
             assert_that(res['title'], is_('ifsta book'))
             assert_that(res['creators'], has_item('IFSTA'))
+            self.require_link_href_with_rel(res, 'AddPackage')
+            self.require_link_href_with_rel(res, 'RemovePackage')
         finally:
             if bundle_path_part:
                 new_bundle = os.path.join(self.layer.library_path,

@@ -30,7 +30,8 @@ from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
-from nti.dataserver.authorization import is_admin
+from nti.dataserver.authorization import is_admin_or_site_admin
+from nti.dataserver.authorization import is_admin_or_content_admin_or_site_admin
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
@@ -62,10 +63,28 @@ class _ContentBundlePagesLinkDecorator(Singleton):
 
 @interface.implementer(IExternalMappingDecorator)
 @component.adapter(IContentPackageBundle, IRequest)
+class _ContentBundleAdminDecorator(AbstractAuthenticatedRequestAwareDecorator):
+
+    def _predicate(self, unused_context, unused_result):
+        return is_admin_or_content_admin_or_site_admin(self.remoteUser)
+
+    def _do_decorate_external(self, context, result):
+        _links = result.setdefault(LINKS, [])
+        for rel in ('AddPackage', 'RemovePackage'):
+            link = Link(context,
+                        rel=rel,
+                        elements=('@@%s' % rel,))
+            link.__name__ = ''
+            link.__parent__ = context
+            _links.append(link)
+
+
+@interface.implementer(IExternalMappingDecorator)
+@component.adapter(IContentPackageBundle, IRequest)
 class _ContentBundleDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _predicate(self, unused_context, unused_result):
-        return is_admin(self.remoteUser)
+        return is_admin_or_site_admin(self.remoteUser)
 
     def _do_decorate_external(self, context, result):
         _links = result.setdefault(LINKS, [])
