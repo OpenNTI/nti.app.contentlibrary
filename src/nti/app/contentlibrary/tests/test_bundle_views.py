@@ -347,6 +347,16 @@ class TestBundleViews(ApplicationLayerTest):
             self.testapp.delete(bundle_href)
             self.testapp.get(bundle_href, status=404)
 
+            # Dublin fields
+            href = '/dataserver2/ContentBundles'
+            res = self.testapp.post_json(href, {'MimeType': ext_obj['MimeType'],
+                                                'creators': ['IFSTA'],
+                                                'title': 'ifsta book'},
+                                         status=201)
+            res = res.json_body
+            assert_that(res['NTIID'], not_none())
+            assert_that(res['title'], is_('ifsta book'))
+            assert_that(res['creators'], has_item('IFSTA'))
         finally:
             if bundle_path_part:
                 new_bundle = os.path.join(self.layer.library_path,
