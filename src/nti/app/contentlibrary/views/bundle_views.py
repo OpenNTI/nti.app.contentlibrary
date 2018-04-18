@@ -86,6 +86,8 @@ from nti.dataserver.authorization import ACT_UPDATE
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
+from nti.dataserver.authorization import is_admin_or_content_admin_or_site_admin
+
 from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IAccessProvider
 
@@ -332,6 +334,25 @@ class ContentBundleUpdateView(AbstractAuthenticatedView,
         # save trx id
         self.request.jid = doc_id
         return contentObject
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             request_method='DELETE',
+             context=IContentPackageBundle)
+class DeleteContentPackageBundleView(AbstractAuthenticatedView):
+
+    def __call__(self):
+        if not is_admin_or_content_admin_or_site_admin(self.remoteUser):
+            raise hexc.HTTPForbidden()
+        bundle = self.context
+        logger.info('Deleting bundle (%s)', bundle.ntiid)
+        library = component.queryUtility(IContentPackageBundleLibrary)
+        try:
+            del library[bundle.ntiid]
+        except (AttributeError, KeyError):
+            logger.info("Bundle not in library (%s)", bundle.ntiid)
+        return hexc.HTTPNoContent()
 
 
 @view_config(route_name='objects.generic.traversal',

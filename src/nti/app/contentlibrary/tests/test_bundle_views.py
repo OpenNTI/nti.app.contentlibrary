@@ -332,7 +332,7 @@ class TestBundleViews(ApplicationLayerTest):
                 bundle_path_part = str(bundle_path_part)
 
             self._test_access(ntiid)
-            
+
             # update
             path = self.presentation_assets_zip(tmpdir)
             with open(path, "rb") as fp:
@@ -341,6 +341,11 @@ class TestBundleViews(ApplicationLayerTest):
             href = '/dataserver2/ContentBundles/%s' % ntiid
             self.testapp.put_json(href, {'description':'Manga Bleach'},
                                   status=200)
+
+            # delete
+            bundle_href = '/dataserver2/ContentBundles/%s' % ntiid
+            self.testapp.delete(bundle_href)
+            self.testapp.get(bundle_href, status=404)
 
         finally:
             if bundle_path_part:
@@ -351,7 +356,7 @@ class TestBundleViews(ApplicationLayerTest):
                                           bundle_path_part)
                 shutil.rmtree(new_bundle, ignore_errors=True)
             shutil.rmtree(tmpdir, ignore_errors=True)
-            
+
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_add_remove_packages(self):
         href = '/dataserver2/ContentBundles'
@@ -371,7 +376,7 @@ class TestBundleViews(ApplicationLayerTest):
         res = self.testapp.post_json(href, {'ntiid':self.pkg_ntiid}, status=200)
         assert_that(res.json_body,
                     has_entry('ContentPackages', has_length(2)))
-        
+
         href = '/dataserver2/ContentBundles/%s/@@RemovePackage' % ntiid
         res = self.testapp.post_json(href, {'ntiid':self.pkg_ntiid}, status=200)
         assert_that(res.json_body,

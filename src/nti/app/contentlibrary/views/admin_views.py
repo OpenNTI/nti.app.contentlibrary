@@ -8,8 +8,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-from pyramid import httpexceptions as hexc
-
 from zope import component
 
 from zope.cachedescriptors.property import Lazy
@@ -32,7 +30,6 @@ from nti.contentlibrary import ALL_CONTENT_MIMETYPES
 from nti.contentlibrary.index import get_contentbundle_catalog
 from nti.contentlibrary.index import get_contentlibrary_catalog
 
-from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
@@ -214,21 +211,3 @@ class RebuildContentBundleCatalogView(AbstractAuthenticatedView):
         result = LocatedExternalDict()
         result[ITEM_COUNT] = result[TOTAL] = len(seen)
         return result
-
-
-@view_config(route_name='objects.generic.traversal',
-             renderer='rest',
-             request_method='DELETE',
-             permission=nauth.ACT_NTI_ADMIN,
-             context=IContentPackageBundle)
-class DeleteContentPackageBundleView(AbstractAuthenticatedView):
-
-    def __call__(self):
-        bundle = self.context
-        logger.info('Deleting bundle (%s)', bundle.ntiid)
-        library = component.queryUtility(IContentPackageBundleLibrary)
-        try:
-            del library[bundle.ntiid]
-        except (AttributeError, KeyError):
-            logger.info("Bundle not in library (%s)", bundle.ntiid)
-        return hexc.HTTPNoContent()
