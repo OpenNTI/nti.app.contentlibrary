@@ -332,6 +332,11 @@ class _ContentPackageBundleACLProvider(object):
     def __init__(self, context):
         self.context = context
 
+    @property
+    def __parent__(self):
+        # See comments in nti.dataserver.authorization_acl:has_permission
+        return self.context.__parent__
+
     def _bundle_ace(self, aces):
         bundle_role = role_for_content_bundle(self.context)
         aces.append(ace_allowing(bundle_role,
