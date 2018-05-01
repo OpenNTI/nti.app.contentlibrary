@@ -345,6 +345,7 @@ class DeleteContentPackageBundleView(AbstractAuthenticatedView):
     def __call__(self):
         if not is_admin_or_content_admin_or_site_admin(self.remoteUser):
             raise hexc.HTTPForbidden()
+        # pylint: disable=no-member
         bundle = self.context
         logger.info('Deleting bundle (%s)', bundle.ntiid)
         library = component.queryUtility(IContentPackageBundleLibrary)
@@ -408,8 +409,6 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView,
     package is added/removed from a bundle, this may have to be called again.
 
     :params user The comma-separated usernames of the entities to grant/deny access.
-
-    TODO: Event
     """
 
     def readInput(self, value=None):
