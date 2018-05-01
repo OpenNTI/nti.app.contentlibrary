@@ -8,12 +8,12 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from pyramid.view import view_config
+from pyramid.view import view_defaults
+
 from zope import component
 
 from zope.component.hooks import site as current_site
-
-from pyramid.view import view_config
-from pyramid.view import view_defaults
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
@@ -90,6 +90,7 @@ class ResetPackagePresentationAssetsView(_AbstractSyncAllLibrariesView):
             for child in unit.children or ():
                 recur(child)
             container = IPresentationAssetContainer(unit)
+            # pylint: disable=too-many-function-args
             for key, value in container.items():
                 if force or IContentBackedPresentationAsset.providedBy(value):
                     result.append((key, value, container))
