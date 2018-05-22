@@ -393,3 +393,8 @@ class TestBundleViews(ApplicationLayerTest):
         res = self.testapp.post_json(href, {'ntiid':self.pkg_ntiid}, status=200)
         assert_that(res.json_body,
                     has_entry('ContentPackages', has_length(1)))
+
+        href = '/dataserver2/ContentBundles/%s/@@RemovePackage' % ntiid
+        res = self.testapp.post_json(href, {'ntiid': 'tag:nextthought.com,2011-10:NTI-HTML-PackageA'})
+        assert_that(res.json_body,
+                    has_entry('ContentPackages', has_length(0)))

@@ -516,8 +516,8 @@ class ContentPackageBundleMixinView(AbstractAuthenticatedView,
         data = self.readInput()
         ntiids = data.get('ntiid') \
               or data.get('ntiids') \
-              or data.get('pacakge') \
-              or data.get('pacakges')
+              or data.get('package') \
+              or data.get('packages')
         if isinstance(ntiids, six.string_types):
             ntiids = ntiids.split()
         if not ntiids:
@@ -566,10 +566,10 @@ class ContentPackageBundleRemovePackagesView(ContentPackageBundleMixinView):
         ntiids = self.get_ntiids()
         # pylint: disable=no-member
         packages = {x.ntiid for x in self.context.ContentPackages or ()}
-        removed = packages.difference(ntiids)
-        if removed:
-            ext_obj = {'ContentPackages': sorted(removed)}
+        remaining = packages.difference(ntiids)
+        if len(remaining) != len(packages):
+            ext_obj = {'ContentPackages': sorted(remaining)}
             update_object_from_external_object(self.context, ext_obj, False)
-            removed = [find_object_with_ntiid(x) for x in removed]
+            removed = [find_object_with_ntiid(x) for x in ntiids]
             notify(ContentBundleUpdatedEvent(self.context, removed=removed, external=ext_obj))
         return self.context
