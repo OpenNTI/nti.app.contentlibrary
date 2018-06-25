@@ -223,3 +223,46 @@ class IContentPackageMetadata(ILockTrackingComponent):
 
     package_description = ValidTextLine(title=u"Package Description",
                                         description=u"Description of the package for this metadata object")
+
+
+class IUsageStats(interface.Interface):
+
+    def get_stats(self):
+        """
+        Return stats for users.
+        """
+
+    def get_top_stats(self, top_count=None):
+        """
+        Return top usage stats for users.
+        """
+
+
+class IResourceUsageStats(IUsageStats):
+    """
+    Returns resource usage stats for a book.
+    """
+
+    def get_usernames_with_stats(self):
+        """
+        Return an iterable of usernames with stats.
+        """
+
+    def get_stats_for_user(self, user):
+        """
+        Return the stats for a given user or None.
+        """
+
+
+class IUserUsageStats(interface.Interface):
+
+    def get_stats(self):
+        """
+        Return stats for users.
+        """
+
+
+class IUserResourceUsageStats(IUserUsageStats):
+    """
+    Returns resource usage stats for a course and user.
+    """
