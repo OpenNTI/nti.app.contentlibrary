@@ -19,6 +19,7 @@ from zope.location.interfaces import IContained
 
 from nti.app.contentlibrary import BLOCKING_TIMEOUT
 
+from nti.app.contentlibrary.interfaces import IUserBundleRecord
 from nti.app.contentlibrary.interfaces import IContentUnitContents
 from nti.app.contentlibrary.interfaces import IContentBundleCommunity
 from nti.app.contentlibrary.interfaces import IContentPackageMetadata
@@ -37,6 +38,13 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 from nti.schema.schema import SchemaConfigured
 
 logger = __import__('logging').getLogger(__name__)
+
+
+@interface.implementer(IUserBundleRecord)
+class UserBundleRecord(SchemaConfigured):
+    createDirectFieldProperties(IUserBundleRecord)
+
+    mime_type = mimeType = 'application/vnd.nextthought.userbundlerecord'
 
 
 @interface.implementer(IContentUnitContents)

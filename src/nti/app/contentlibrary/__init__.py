@@ -23,6 +23,9 @@ VIEW_PUBLISH_CONTENTS = 'PublishContents'
 #: A view to fetch the published contentx
 VIEW_PACKAGE_WITH_CONTENTS = 'PackageWithContents'
 
+#: A view to get user bundle records.
+VIEW_USER_BUNDLE_RECORDS = 'UserBundleRecords'
+
 #: A view to grant access to a bundle.
 VIEW_BUNDLE_GRANT_ACCESS = 'GrantBundleAccess'
 
@@ -34,6 +37,9 @@ LIBRARY_ADAPTER = 'Library'
 
 #: Content bundles path adapter
 CONTENT_BUNDLES_ADAPTER = 'ContentBundles'
+
+#: Bundle users path adapter
+BUNDLE_USERS_PATH_ADAPTER = 'users'
 
 #: Library Path (GET) View
 LIBRARY_PATH_GET_VIEW = 'LibraryPath'

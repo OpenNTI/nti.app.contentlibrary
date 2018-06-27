@@ -68,7 +68,8 @@
 
 	<!-- Traversal to the forum objects -->
 	<adapter factory="nti.traversal.traversal.DefaultAdapterTraversable"
-			 for="nti.contentlibrary.interfaces.IContentPackageBundle pyramid.interfaces.IRequest" />
+			 for="nti.contentlibrary.interfaces.IContentPackageBundle
+			      pyramid.interfaces.IRequest" />
 
 	<adapter factory="nti.traversal.traversal.DefaultAdapterTraversable"
 			 for="nti.contentlibrary.interfaces.IContentPackageBundle" />
@@ -88,7 +89,8 @@
 
 	<!-- Traversal -->
 	<adapter factory="nti.traversal.traversal.DefaultAdapterTraversable"
-			 for="nti.contentlibrary.interfaces.IEditableContentPackage pyramid.interfaces.IRequest" />
+			 for="nti.contentlibrary.interfaces.IEditableContentPackage
+			      pyramid.interfaces.IRequest" />
 
 	<adapter factory="nti.traversal.traversal.DefaultAdapterTraversable"
 			 for="nti.contentlibrary.interfaces.IEditableContentPackage" />
@@ -213,7 +215,8 @@
 
 	<!-- Externalization -->
 	<ext:registerAutoPackageIO
-		root_interfaces=".interfaces.IContentUnitContents
+		root_interfaces=".interfaces.IUserBundleRecord
+		                 .interfaces.IContentUnitContents
 						 .interfaces.IContentPackageMetadata
 						 .interfaces.IContentTrackingRedisClient"
 		modules=".model" />

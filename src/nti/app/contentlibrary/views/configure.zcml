@@ -18,31 +18,37 @@
 			 factory=".ContentBundlesPathAdapter"
 			 provides="zope.traversing.interfaces.IPathAdapter" />
 
+    <adapter name="users"
+             for="nti.contentlibrary.interfaces.IContentPackageBundle
+                  pyramid.interfaces.IRequest"
+             factory=".ContentPackageBundleUsersPathAdapter"
+             provides="zope.traversing.interfaces.IPathAdapter" />
+
 	<!-- Content card resolution -->
 	<utility factory=".card_views._ContentCardResolver" name="NTICard" />
 	<utility factory=".card_views._ContentCardResolver" name="nticard" />
-			
+
 	<adapter factory=".library_views._ContentPackageLibraryCacheController" />
-		
+
 	<!-- Glossary -->
 	<subscriber handler=".glossary_views.add_main_glossary_from_new_content" />
 
 	<adapter name="Glossary"
 			 factory=".glossary_views._GlossaryPathAdapter"
 			 provides="nti.appserver.interfaces.INamedLinkPathAdapter"
-			 for="nti.appserver.interfaces.IPageContainerResource 
+			 for="nti.appserver.interfaces.IPageContainerResource
 			 	  pyramid.interfaces.IRequest" />
 
 	<adapter name="Glossary"
 			 factory=".glossary_views._GlossaryPathAdapter"
 			 provides="nti.appserver.interfaces.INamedLinkPathAdapter"
-			 for="nti.appserver.interfaces.IRootPageContainerResource 
+			 for="nti.appserver.interfaces.IRootPageContainerResource
 			 	  pyramid.interfaces.IRequest" />
 
 	<adapter name="Glossary"
 			 factory=".glossary_views._GlossaryPathAdapter"
 			 provides="nti.appserver.interfaces.INamedLinkPathAdapter"
-			 for="nti.appserver.interfaces.INewPageContainerResource 
+			 for="nti.appserver.interfaces.INewPageContainerResource
 			 	  pyramid.interfaces.IRequest" />
 
 </configure>

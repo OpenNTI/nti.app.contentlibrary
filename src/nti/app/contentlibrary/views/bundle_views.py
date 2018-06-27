@@ -42,10 +42,17 @@ from nti.app.base.abstract_views import AbstractAuthenticatedView
 
 from nti.app.contentlibrary import MessageFactory as _
 
+from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 
 from nti.app.contentlibrary.hostpolicy import get_site_provider
+
+from nti.app.contentlibrary.interfaces import IUserBundleRecord
+
+from nti.app.contentlibrary.model import UserBundleRecord
+
+from nti.app.contentlibrary.utils import get_visible_bundles_for_user
 
 from nti.app.contentlibrary.utils.bundle import save_bundle
 
@@ -55,6 +62,7 @@ from nti.app.externalization.error import raise_json_error
 
 from nti.app.externalization.internalization import update_object_from_external_object
 
+from nti.app.externalization.view_mixins import BatchingUtilsMixin
 from nti.app.externalization.view_mixins import ModeledContentEditRequestUtilsMixin
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
@@ -86,13 +94,19 @@ from nti.dataserver.authorization import ACT_UPDATE
 from nti.dataserver.authorization import ACT_NTI_ADMIN
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
+from nti.dataserver.authorization import is_site_admin
+from nti.dataserver.authorization import is_admin_or_site_admin
+
 from nti.dataserver.authorization import is_admin_or_content_admin_or_site_admin
 
+from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IAccessProvider
+from nti.dataserver.interfaces import ISiteAdminUtility
 
 from nti.dataserver.users.entity import Entity
 
+from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import StandardInternalFields
 
@@ -103,6 +117,7 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 from nti.site.interfaces import IHostPolicyFolder
 
 NTIID = StandardExternalFields.NTIID
+TOTAL = StandardExternalFields.TOTAL
 MIMETYPE = StandardExternalFields.MIMETYPE
 
 INTERNAL_NTIID = StandardInternalFields.NTIID
@@ -573,3 +588,76 @@ class ContentPackageBundleRemovePackagesView(ContentPackageBundleMixinView):
             removed = [find_object_with_ntiid(x) for x in ntiids]
             notify(ContentBundleUpdatedEvent(self.context, removed=removed, external=ext_obj))
         return self.context
+
+
+class AbstractBundleRecordView(AbstractAuthenticatedView):
+
+    @Lazy
+    def _is_admin(self):
+        return is_admin_or_site_admin(self.remoteUser)
+
+    def _can_admin_user(self, user):
+        # Verify a site admin is administering a user in their site.
+        result = True
+        if is_site_admin(self.remoteUser):
+            admin_utility = component.getUtility(ISiteAdminUtility)
+            result = admin_utility.can_administer_user(self.remoteUser, user)
+        return result
+
+    def _check_access(self, user):
+        # 403 if not admin or instructor or self
+        return (   self._is_admin \
+                or self.remoteUser == user) \
+            and self._can_admin_user(user)
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             context=IUserBundleRecord,
+             request_method='GET')
+class UserBundleRecordView(AbstractBundleRecordView):
+    """
+    A view that returns the :class:`IUserBundleRecord`.
+    """
+
+    def __call__(self):
+        if not self._check_access(self.context.User):
+            raise_json_error(
+                {'message': _(u"Cannot view user bundle record."),
+                 'code': 'CannotAccessUserBundleRecordsError',},
+                factory=hexc.HTTPForbidden)
+        return self.context
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             context=IUser,
+             name=VIEW_USER_BUNDLE_RECORDS,
+             request_method='GET')
+class UserBundleRecordsView(AbstractBundleRecordView,
+                            BatchingUtilsMixin):
+    """
+    A view that returns the user book records.
+    """
+
+    _DEFAULT_BATCH_START = 0
+    _DEFAULT_BATCH_SIZE = None
+
+    def __call__(self):
+        if not self._check_access(self.context):
+            raise_json_error(
+                {'message': _(u"Cannot view user bundle records."),
+                 'code': 'CannotAccessUserBundleRecordsError',},
+                factory=hexc.HTTPForbidden)
+        bundles = get_visible_bundles_for_user(self.context)
+        if not bundles:
+            raise_json_error(
+                {'message': _(u"User bundle records not found."),
+                 'code': 'UserBundleRecordsNotFound',},
+                factory=hexc.HTTPNotFound)
+        result = LocatedExternalDict()
+        bundles = sorted(bundles, key=lambda x:x.title)
+        records = [UserBundleRecord(User=self.context, Bundle=x) for x in bundles]
+        result[TOTAL] = len(records)
+        self._batch_items_iterable(result, records)
+        return result

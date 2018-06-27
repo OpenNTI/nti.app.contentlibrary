@@ -31,8 +31,10 @@ from zope import component
 
 from zope.intid.interfaces import IIntIds
 
+from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
+from nti.app.contentlibrary import BUNDLE_USERS_PATH_ADAPTER
 
 from nti.app.contentlibrary.interfaces import IContentBoard
 
@@ -281,6 +283,56 @@ class TestBundleViews(ApplicationLayerTest):
             community = Community.get_community('ou.nextthought.com')
             groups = self._get_entity_groups(community)
             assert_that(groups, does_not(has_item(package_role)))
+
+    @WithSharedApplicationMockDS(users=True, testapp=True)
+    def test_bundle_records(self):
+        """
+        TODO: finish this out
+        """
+        # Create a regular user and add him to the site community.
+        basic_username = 'GeorgeBluth'
+        admin_username = 'sjohnson@nextthought.com'
+        with mock_dataserver.mock_db_trans(self.ds):
+            self._create_user(basic_username)
+        user_environ = self._make_extra_environ(basic_username)
+
+        # A,B in Visible; B,C in Restricted, C in Restricted2
+        visible_ntiid = "tag:nextthought.com,2011-10:NTI-Bundle-VisibleBundle"
+        restricted_ntiid = "tag:nextthought.com,2011-10:NTI-Bundle-RestrictedBundle"
+
+        with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
+            library = component.getUtility(IContentPackageBundleLibrary)
+            bundles = tuple(library.getBundles())
+            assert_that(bundles, has_length(3))
+
+        href = '/dataserver2/ResolveUser/%s?filter_by_site_community=False' % basic_username
+        res = self.testapp.get(href)
+        res = res.json_body
+        assert_that(res.get('Items'), has_length(1))
+        user = res['Items'][0]
+        user_bundles_rel = self.require_link_href_with_rel(user, VIEW_USER_BUNDLE_RECORDS)
+
+        # Get a user's visible bundle records
+        bundle_records_res = self.testapp.get(user_bundles_rel).json_body
+        bundle_records = bundle_records_res.get('Items')
+        assert_that(bundle_records, has_length(1))
+        bundle_record = bundle_records[0]
+        assert_that(bundle_record['Bundle'], has_entry('NTIID', is_(visible_ntiid)))
+        assert_that(bundle_record['User'], has_entry('Username', is_(basic_username)))
+
+        # Drill down into a user context within a bundle
+        users_bundle_href = self.require_link_href_with_rel(bundle_record['Bundle'],
+                                                            BUNDLE_USERS_PATH_ADAPTER)
+        basic_users_bundle_href = '%s/%s' % (users_bundle_href, basic_username)
+        bundle_record_res = self.testapp.get(basic_users_bundle_href)
+        bundle_record_res = bundle_record_res.json_body
+        assert_that(bundle_record['Bundle'], has_entry('NTIID', is_(visible_ntiid)))
+
+        visible_bundle_url = '/dataserver2/ContentBundles/%s' % visible_ntiid
+        bundle_res = self.testapp.get(visible_bundle_url)
+        bundle_res = bundle_res.json_body
+        assert_that(bundle_record['Bundle'], has_entry('NTIID', is_(visible_ntiid)))
+        assert_that(bundle_record['User'], has_entry('Username', is_(basic_username)))
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
     @fudge.patch('nti.app.contentlibrary.views.bundle_views.get_all_sources')

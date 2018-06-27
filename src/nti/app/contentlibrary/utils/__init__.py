@@ -18,9 +18,14 @@ from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IGlobalContentPackage
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.dataserver.authorization import CONTENT_ROLE_PREFIX
 from nti.dataserver.authorization import role_for_providers_content
+
+from nti.dataserver.authorization import ACT_READ
+
+from nti.dataserver.authorization_acl import has_permission
 
 from nti.dataserver.interfaces import IRole
 from nti.dataserver.interfaces import IMutableGroupMember
@@ -205,3 +210,24 @@ def role_for_content_bundle(bundle):
     val = '%s%s:%s' % (CONTENT_BUNDLE_ROLE_PREFIX,
                        provider.lower(), specific.lower())
     return IRole(val)
+
+
+def is_bundle_visible_to_user(user, bundle):
+    """
+    Return whether the user has permission to view the given bundle.
+    """
+    return has_permission(ACT_READ, bundle, user.username)
+
+
+def get_visible_bundles_for_user(user):
+    """
+    For the given user, return all visible content package bundles.
+    """
+    library = component.queryUtility(IContentPackageBundleLibrary)
+    if library is None:
+        return None
+    result = []
+    for bundle in library.getBundles():
+        if is_bundle_visible_to_user(user, bundle):
+            result.append(bundle)
+    return result

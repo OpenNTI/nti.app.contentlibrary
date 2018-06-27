@@ -21,7 +21,9 @@ from zope.schema import BytesLine as ValidBytesLine
 from zope.securitypolicy.interfaces import IRolePermissionManager
 
 from nti.contentlibrary.interfaces import IContentUnit
+from nti.contentlibrary.interfaces import IContentPackageBundle
 
+from nti.coremetadata.interfaces import IUser
 from nti.coremetadata.interfaces import IRedisClient
 # Content-specific boards and forums
 # We define these as a distinct set of classes/interfaces/mimetypes/ntiids
@@ -223,6 +225,16 @@ class IContentPackageMetadata(ILockTrackingComponent):
 
     package_description = ValidTextLine(title=u"Package Description",
                                         description=u"Description of the package for this metadata object")
+
+
+class IUserBundleRecord(interface.Interface):
+    """
+    A context for a user with access to a bundle.
+    """
+
+    User = Object(IUser, title=u'The user')
+
+    Bundle = Object(IContentPackageBundle, title=u'The bundle')
 
 
 class IUsageStats(interface.Interface):

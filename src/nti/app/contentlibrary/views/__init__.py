@@ -23,6 +23,7 @@ from pyramid import httpexceptions as hexc
 
 from nti.app.contentlibrary import LIBRARY_ADAPTER
 from nti.app.contentlibrary import CONTENT_BUNDLES_ADAPTER
+from nti.app.contentlibrary import BUNDLE_USERS_PATH_ADAPTER
 
 from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
@@ -43,9 +44,12 @@ from nti.dataserver.authorization_acl import acl_from_aces
 from nti.dataserver.interfaces import ALL_PERMISSIONS
 from nti.dataserver.interfaces import EVERYONE_GROUP_NAME
 
+from nti.dataserver.users import User
+
 from nti.externalization.proxy import removeAllProxies
 
 from nti.ntiids.ntiids import find_object_with_ntiid
+from nti.app.contentlibrary.model import UserBundleRecord
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -94,3 +98,26 @@ class ContentBundlesPathAdapter(PathAdapterMixin):
         if IContentPackageBundle.providedBy(result):
             return removeAllProxies(result)
         raise KeyError(ntiid)
+
+
+@interface.implementer(IPathAdapter, IContained)
+class ContentPackageBundleUsersPathAdapter(object):
+
+    __name__ = BUNDLE_USERS_PATH_ADAPTER
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+        self.__parent__ = context
+
+    def __getitem__(self, username):
+        if not username:
+            raise hexc.HTTPNotFound()
+        username = unquote(username)
+        user = User.get_user(username)
+        if not username:
+            raise hexc.HTTPNotFound()
+        result = UserBundleRecord(User=user, Bundle=self.context)
+        # Gives us the bundle ACL
+        result.__parent__ = self.context
+        return result

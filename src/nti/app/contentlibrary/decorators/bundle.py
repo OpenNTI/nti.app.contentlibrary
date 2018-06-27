@@ -16,7 +16,9 @@ from zope.location.interfaces import ILocation
 from pyramid.interfaces import IRequest
 
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
+from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
+from nti.app.contentlibrary import BUNDLE_USERS_PATH_ADAPTER
 
 from nti.app.publishing import VIEW_PUBLISH
 from nti.app.publishing import VIEW_UNPUBLISH
@@ -28,10 +30,16 @@ from nti.appserver.pyramid_authorization import has_permission
 from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 
+from nti.coremetadata.interfaces import IUser
+
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
+from nti.dataserver.authorization import is_admin
+from nti.dataserver.authorization import is_site_admin
 from nti.dataserver.authorization import is_admin_or_site_admin
 from nti.dataserver.authorization import is_admin_or_content_admin_or_site_admin
+
+from nti.dataserver.interfaces import ISiteAdminUtility
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
@@ -39,6 +47,7 @@ from nti.externalization.interfaces import IExternalMappingDecorator
 from nti.externalization.singleton import Singleton
 
 from nti.links.links import Link
+from nti.app.contentlibrary.utils import get_visible_bundles_for_user
 
 LINKS = StandardExternalFields.LINKS
 
@@ -88,10 +97,16 @@ class _ContentBundleDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _do_decorate_external(self, context, result):
         _links = result.setdefault(LINKS, [])
-        for rel in (VIEW_BUNDLE_GRANT_ACCESS, VIEW_BUNDLE_REMOVE_ACCESS):
+        for rel in (VIEW_BUNDLE_GRANT_ACCESS,
+                    VIEW_BUNDLE_REMOVE_ACCESS,
+                    BUNDLE_USERS_PATH_ADAPTER):
+            if BUNDLE_USERS_PATH_ADAPTER:
+                elements = (rel,)
+            else:
+                elements = ('@@%s' % rel,)
             link = Link(context,
                         rel=rel,
-                        elements=('@@%s' % rel,))
+                        elements=elements)
             link.__name__ = ''
             link.__parent__ = context
             _links.append(link)
@@ -125,3 +140,33 @@ class _PublishableContentPackageBundleDecorator(AbstractAuthenticatedRequestAwar
             link.__name__ = ''
             link.__parent__ = context
             _links.append(link)
+
+
+@component.adapter(IUser)
+@interface.implementer(IExternalMappingDecorator)
+class _UserBundleRecordsDecorator(AbstractAuthenticatedRequestAwareDecorator):
+    """
+    Decorate the :class:``IUser`` with a rel to fetch bundle records.
+    """
+
+    def _can_admin_user(self, context):
+        # Verify a site admin is administering a user in their site.
+        result = True
+        if is_site_admin(self.remoteUser):
+            admin_utility = component.getUtility(ISiteAdminUtility)
+            result = admin_utility.can_administer_user(self.remoteUser, context)
+        return result
+
+    def _predicate(self, context, unused_result):
+        bundles = get_visible_bundles_for_user(context)
+        return  bundles \
+            and (   self.remoteUser == context \
+                 or is_admin(self.remoteUser) \
+                 or self._can_admin_user(context))
+
+    def _do_decorate_external(self, context, result):
+        _links = result.setdefault(LINKS, [])
+        link = Link(context,
+                    rel=VIEW_USER_BUNDLE_RECORDS,
+                    elements=('@@%s' % VIEW_USER_BUNDLE_RECORDS,))
+        _links.append(link)
