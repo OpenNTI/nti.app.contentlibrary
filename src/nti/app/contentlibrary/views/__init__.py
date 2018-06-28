@@ -115,7 +115,7 @@ class ContentPackageBundleUsersPathAdapter(object):
             raise hexc.HTTPNotFound()
         username = unquote(username)
         user = User.get_user(username)
-        if not username:
+        if user is None:
             raise hexc.HTTPNotFound()
         result = UserBundleRecord(User=user, Bundle=self.context)
         # Gives us the bundle ACL
