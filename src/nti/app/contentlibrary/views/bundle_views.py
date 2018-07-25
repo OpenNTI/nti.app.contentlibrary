@@ -622,10 +622,13 @@ class UserBundleRecordView(AbstractBundleRecordView):
 
     def __call__(self):
         if not self._check_access(self.context.User):
-            raise_json_error(
-                {'message': _(u"Cannot view user bundle record."),
-                 'code': 'CannotAccessUserBundleRecordsError',},
-                factory=hexc.HTTPForbidden)
+            raise_json_error(self.request,
+                             hexc.HTTPForbidden,
+                             {
+                                 'message': _(u"Cannot view user bundle record."),
+                                 'code': 'CannotAccessUserBundleRecordsError'
+                             },
+                             None)
         return self.context
 
 
@@ -645,16 +648,22 @@ class UserBundleRecordsView(AbstractBundleRecordView,
 
     def __call__(self):
         if not self._check_access(self.context):
-            raise_json_error(
-                {'message': _(u"Cannot view user bundle records."),
-                 'code': 'CannotAccessUserBundleRecordsError',},
-                factory=hexc.HTTPForbidden)
+            raise_json_error(self.request,
+                             hexc.HTTPForbidden,
+                             {
+                                 'message': _(u"Cannot view user bundle record."),
+                                 'code': 'CannotAccessUserBundleRecordsError'
+                             },
+                             None)
         bundles = get_visible_bundles_for_user(self.context)
         if not bundles:
-            raise_json_error(
-                {'message': _(u"User bundle records not found."),
-                 'code': 'UserBundleRecordsNotFound',},
-                factory=hexc.HTTPNotFound)
+            raise_json_error(self.request,
+                             hexc.HTTPNotFound,
+                             {
+                                 'message': _(u"User bundle records not found."),
+                                 'code': 'UserBundleRecordsNotFound'
+                             },
+                             None)
         result = LocatedExternalDict()
         bundles = sorted(bundles, key=lambda x:x.title)
         records = [UserBundleRecord(User=self.context, Bundle=x) for x in bundles]
