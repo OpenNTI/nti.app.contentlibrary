@@ -15,6 +15,11 @@ import mimetypes
 
 from requests.structures import CaseInsensitiveDict
 
+from pyramid import httpexceptions as hexc
+
+from pyramid.view import view_config
+from pyramid.view import view_defaults
+
 from zope import component
 from zope import lifecycleevent
 
@@ -25,11 +30,6 @@ from zope.component.hooks import site as current_site
 from zope.event import notify as event_notify
 
 from zope.file.download import getHeaders
-
-from pyramid import httpexceptions as hexc
-
-from pyramid.view import view_config
-from pyramid.view import view_defaults
 
 from nti.app.base.abstract_views import get_all_sources
 
@@ -436,7 +436,7 @@ class PackagePublishedContentsGetView(ContentPackageContentsGetView):
     def _get_contents(self):
         result = get_published_contents(self.context)
         if result is None:
-            logger.warn('No publish contents found (%s)', self.context)
+            logger.warning('No publish contents found (%s)', self.context)
             raise hexc.HTTPNotFound(_(u'No publish contents found'))
         return result
 
@@ -476,9 +476,9 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
 
     def _raise_conflict_error(self, code, message, ntiids):
         # pylint: disable=no-member
-        logger.warn('Attempting to delete content package (%s) (%s)',
-                    self.context.ntiid,
-                    ntiids)
+        logger.warning('Attempting to delete content package (%s) (%s)',
+                       self.context.ntiid,
+                       ntiids)
         params = dict(self.request.params)
         params['force'] = True
         links = (
