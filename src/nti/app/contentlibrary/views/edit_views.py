@@ -88,7 +88,7 @@ from nti.contenttypes.presentation.interfaces import IPresentationAsset
 
 from nti.dataserver import authorization as nauth
 
-from nti.externalization.internalization import notify_modified
+from nti.externalization.internalization import notifyModified as notify_modified
 
 from nti.externalization.externalization import to_external_object
 from nti.externalization.externalization import StandardExternalFields
@@ -506,7 +506,7 @@ class ContentPackageDeleteView(AbstractAuthenticatedView, ContentPackageMixin):
     def _get_lesson_associations(self):
         associations = resolve_content_unit_associations(self.context)
         return [x for x in associations or () if IPresentationAsset.providedBy(x)]
-    
+
     def _get_lesson_associations_ntiids(self):
         associations = self._get_lesson_associations()
         return set(x for x in self._ntiids(associations))
