@@ -18,6 +18,7 @@ from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_property
+from hamcrest import contains_string
 from hamcrest import contains_inanyorder
 does_not = is_not
 
@@ -348,15 +349,24 @@ class TestBundleViews(ApplicationLayerTest):
             bundle = PublishableContentPackageBundle(title=u'Bleach',
                                                      description=u'Manga bleach',
                                                      RestrictedAccess=True)
+            # Validate we can update dublin fields.
             ext_obj = to_external_object(bundle)
             [ext_obj.pop(x, None) for x in ('NTIID', 'ntiid')]
             ext_obj['ContentPackages'] = [self.pkg_ntiid]
+            ext_obj['creators'] = ['IFSTA']
+            ext_obj['title'] = 'ifsta book'
 
             res = self.testapp.post_json(href, ext_obj, status=201)
-            assert_that(res.json_body, has_entry('OID', is_not(none())))
-            assert_that(res.json_body, has_entry('NTIID', is_not(none())))
-            assert_that(res.json_body, has_entry('title', is_('Bleach')))
-            ntiid = res.json_body['NTIID']
+            res = res.json_body
+            assert_that(res, has_entry('OID', is_not(none())))
+            assert_that(res, has_entry('NTIID', is_not(none())))
+            assert_that(res, has_entry('title', is_('ifsta book')))
+            assert_that(res['title'], is_('ifsta book'))
+            assert_that(res['creators'], has_item('IFSTA'))
+            assert_that(res.get('root'), none())
+            self.require_link_href_with_rel(res, 'AddPackage')
+            self.require_link_href_with_rel(res, 'RemovePackage')
+            ntiid = res['NTIID']
 
             with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
                 bundle = find_object_with_ntiid(ntiid)
@@ -364,7 +374,6 @@ class TestBundleViews(ApplicationLayerTest):
                             has_property('root', is_(none())))
                 assert_that(bundle,
                             has_property('_presentation_assets', is_not(none())))
-
                 community = ICommunity(bundle, None)
                 assert_that(community, is_not(none()))
 
@@ -391,26 +400,13 @@ class TestBundleViews(ApplicationLayerTest):
                 source = SourceFile(name="assets.zip", data=fp.read())
             mock_src.is_callable().with_args().returns({"assets.zip":source})
             href = '/dataserver2/ContentBundles/%s' % ntiid
-            self.testapp.put_json(href, {'description':'Manga Bleach'},
-                                  status=200)
+            res = self.testapp.put_json(href, {'description':'Manga Bleach'})
+            assert_that(res.json_body['root'], contains_string('/sites/platform.ou.edu/ContentPackageBundles'))
 
             # delete
             bundle_href = '/dataserver2/ContentBundles/%s' % ntiid
             self.testapp.delete(bundle_href)
             self.testapp.get(bundle_href, status=404)
-
-            # Dublin fields
-            href = '/dataserver2/ContentBundles'
-            res = self.testapp.post_json(href, {'MimeType': ext_obj['MimeType'],
-                                                'creators': ['IFSTA'],
-                                                'title': 'ifsta book'},
-                                         status=201)
-            res = res.json_body
-            assert_that(res['NTIID'], not_none())
-            assert_that(res['title'], is_('ifsta book'))
-            assert_that(res['creators'], has_item('IFSTA'))
-            self.require_link_href_with_rel(res, 'AddPackage')
-            self.require_link_href_with_rel(res, 'RemovePackage')
         finally:
             if bundle_path_part:
                 new_bundle = os.path.join(self.layer.library_path,

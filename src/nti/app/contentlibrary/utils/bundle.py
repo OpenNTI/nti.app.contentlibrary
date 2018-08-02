@@ -156,9 +156,9 @@ def save_bundle_to_disk(bundle, target, assets=None, name=None):
 def save_bundle(bundle, target, assets=None, name=None):
     if IFilesystemBucket.providedBy(target):
         name = text_(name or safe_filename(bundle.title))
-        path = save_bundle_to_disk(bundle, target, assets, name)
-        bucket = FilesystemBucket(name=name)
-        bucket.absolute_path = path
+        save_bundle_to_disk(bundle, target, assets, name)
+        bundles = target.getChildNamed(CONTENT_PACKAGE_BUNDLES)
+        bucket = bundles.getChildNamed(name)
         bundle.root = bucket
         return bucket
 
