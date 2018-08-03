@@ -355,6 +355,7 @@ class TestBundleViews(ApplicationLayerTest):
             ext_obj['ContentPackages'] = [self.pkg_ntiid]
             ext_obj['creators'] = ['IFSTA']
             ext_obj['title'] = 'ifsta book'
+            ext_obj['byline'] = 'ifsta byline'
 
             res = self.testapp.post_json(href, ext_obj, status=201)
             res = res.json_body
@@ -362,6 +363,7 @@ class TestBundleViews(ApplicationLayerTest):
             assert_that(res, has_entry('NTIID', is_not(none())))
             assert_that(res, has_entry('title', is_('ifsta book')))
             assert_that(res['title'], is_('ifsta book'))
+            assert_that(res['byline'], is_('ifsta byline'))
             assert_that(res['creators'], has_item('IFSTA'))
             assert_that(res.get('root'), none())
             self.require_link_href_with_rel(res, 'AddPackage')
