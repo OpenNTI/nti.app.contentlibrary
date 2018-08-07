@@ -45,13 +45,13 @@ class DefaultContentUnitCompletionPolicy(object):
 
 @component.adapter(IContentUnit, ICompletionContext)
 @interface.implementer(ICompletableItemCompletionPolicy)
-def _content_completion_policy(content_unit, course):
+def _content_completion_policy(content_unit, context):
     """
     Fetch the :class:`ICompletableItemCompletionPolicy` for this
     :class:`IContentUnit` and :class:`ICompletionContext`.
     """
     # First see if we have a specific policy set on our context.
-    context_policies = ICompletionContextCompletionPolicyContainer(course)
+    context_policies = ICompletionContextCompletionPolicyContainer(context)
     try:
         result = context_policies[content_unit.ntiid]
     except KeyError:
