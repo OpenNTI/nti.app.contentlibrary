@@ -53,7 +53,8 @@ from nti.appserver.interfaces import ForbiddenContextException
 from nti.appserver.interfaces import IHierarchicalContextProvider
 from nti.appserver.interfaces import ILibraryPathLastModifiedProvider
 
-from nti.appserver.pyramid_authorization import is_readable, has_permission
+from nti.appserver.pyramid_authorization import is_readable
+from nti.appserver.pyramid_authorization import has_permission
 
 from nti.appserver.workspaces.interfaces import IService
 
@@ -81,6 +82,7 @@ from nti.dataserver.contenttypes.forums.interfaces import IForum
 from nti.dataserver.contenttypes.forums.interfaces import IBoard
 from nti.dataserver.contenttypes.forums.interfaces import IPersonalBlog
 
+from nti.dataserver.interfaces import IBookmark
 from nti.dataserver.interfaces import IHighlight
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IDataserverFolder
@@ -764,7 +766,8 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
 
         obj = find_object_with_ntiid(obj_ntiid)
         # If we get a contained object, we need the path to the container.
-        if IHighlight.providedBy(obj):
+        if     IHighlight.providedBy(obj) \
+            or IBookmark.providedBy(obj):
             obj_ntiid = obj.containerId
             obj = find_object_with_ntiid(obj_ntiid)
         if obj is None:

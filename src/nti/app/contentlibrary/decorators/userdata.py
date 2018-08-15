@@ -8,7 +8,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-from zope import component
 from zope import interface
 
 from zope.location.interfaces import ILocation
@@ -16,8 +15,6 @@ from zope.location.interfaces import ILocation
 from nti.app.contentlibrary import LIBRARY_PATH_GET_VIEW
 
 from nti.app.contentlibrary.decorators import get_ds2
-
-from nti.dataserver.interfaces import IHighlight
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
@@ -35,7 +32,6 @@ LINKS = StandardExternalFields.LINKS
 logger = __import__('logging').getLogger(__name__)
 
 
-@component.adapter(IHighlight)
 @interface.implementer(IExternalMappingDecorator)
 class _UGDLibraryPathLinkDecorator(Singleton):
     """
