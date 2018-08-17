@@ -10,6 +10,10 @@ from __future__ import absolute_import
 
 import time
 
+from BTrees.OOBTree import OOBTree
+
+from pyramid.interfaces import IRequest
+
 from zope import component
 from zope import interface
 
@@ -22,10 +26,6 @@ from zope.intid.interfaces import IIntIds
 from zope.location.interfaces import IContained
 
 from zope.security.interfaces import IPrincipal
-
-from BTrees.OOBTree import OOBTree
-
-from pyramid.interfaces import IRequest
 
 from nti.app.contentlibrary.acl import role_for_content_bundle
 
@@ -139,7 +139,7 @@ def _get_bundles_from_container(obj):
 
 @component.adapter(interface.Interface, IUser)
 @interface.implementer(IHierarchicalContextProvider)
-def _hierarchy_from_obj(obj, _):
+def _hierarchy_from_obj(obj, unused_user):
     container_bundles = _get_bundles_from_container(obj)
     results = [(bundle,) for bundle in container_bundles]
     results = (results,) if results else results
@@ -148,7 +148,7 @@ def _hierarchy_from_obj(obj, _):
 
 @component.adapter(IContentUnit, IUser)
 @interface.implementer(ITopLevelContainerContextProvider)
-def _bundles_from_unit(obj, _):
+def _bundles_from_unit(obj, unused_user):
     # We could tweak the adapter above to return
     # all possible bundles, or use the container index.
     bundle = IContentPackageBundle(obj, None)
@@ -157,7 +157,7 @@ def _bundles_from_unit(obj, _):
         result = (bundle,)
     else:
         # Content package
-        # TODO same in hierarchy
+        # same in hierarchy
         package = IContentPackage(obj, None)
         result = (package,)
     return result
@@ -276,6 +276,7 @@ class _PresentationAssetOOBTree(OOBTree, PersistentCreatedAndModifiedTimeObject)
 @interface.implementer(IPresentationAssetContainer)
 def presentation_asset_items_factory(context):
     try:
+        # pylint: disable=protected-access
         result = context._presentation_asset_item_container
         return result
     except AttributeError:
@@ -355,6 +356,7 @@ class _BundleAccessProvider(object):
     @Lazy
     def _package_context_roles(self):
         result = set()
+        # pylint: disable=not-an-iterable
         for package in self._packages:
             package_role = role_for_content_package(package)
             result.add(package_role)

@@ -65,7 +65,8 @@ class GetPackagePresentationAssetsView(AbstractAuthenticatedView):
             for child in unit.children or ():
                 recur(child)
             container = IPresentationAssetContainer(unit)
-            result.update(container)
+            # pylint: disable=too-many-function-args
+            result.update(container.assets())
         recur(package)
         return result
 
