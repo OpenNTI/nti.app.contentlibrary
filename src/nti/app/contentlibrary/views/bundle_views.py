@@ -40,11 +40,11 @@ from nti.app.authentication import get_remote_user
 from nti.app.base.abstract_views import get_all_sources
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
-from nti.app.contentlibrary import MessageFactory as _
-
 from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
+
+from nti.app.contentlibrary import MessageFactory as _
 
 from nti.app.contentlibrary.hostpolicy import get_site_provider
 
@@ -57,6 +57,7 @@ from nti.app.contentlibrary.utils import get_visible_bundles_for_user
 from nti.app.contentlibrary.utils.bundle import save_bundle
 
 from nti.app.contentlibrary.views import ContentBundlesPathAdapter
+from nti.app.contentlibrary.views import ContentPackageBundleUsersPathAdapter
 
 from nti.app.externalization.error import raise_json_error
 
@@ -71,6 +72,8 @@ from nti.app.publishing import VIEW_UNPUBLISH
 
 from nti.app.publishing.views import PublishView
 from nti.app.publishing.views import UnpublishView
+
+from nti.app.users.views.list_views import SiteUsersView
 
 from nti.appserver.ugd_edit_views import ContainerContextUGDPostView
 
@@ -98,6 +101,8 @@ from nti.dataserver.authorization import is_site_admin
 from nti.dataserver.authorization import is_admin_or_site_admin
 
 from nti.dataserver.authorization import is_admin_or_content_admin_or_site_admin
+
+from nti.dataserver.authorization_acl import has_permission
 
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import ICommunity
@@ -669,4 +674,31 @@ class UserBundleRecordsView(AbstractBundleRecordView,
         records = [UserBundleRecord(User=self.context, Bundle=x) for x in bundles]
         result[TOTAL] = len(records)
         self._batch_items_iterable(result, records)
+        return result
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             context=ContentPackageBundleUsersPathAdapter,
+             permission=ACT_NTI_ADMIN,
+             request_method='GET')
+class BundleMembersView(SiteUsersView):
+    """
+    A view that returns the members of this :class:`IContentPackageBundle`.
+    This will be either the full site membership, or, if a bundle is
+    restricted, the members which have access.
+    """
+
+    @Lazy
+    def bundle(self):
+        return self.context.context
+
+    def _transformer(self, user):
+        # We do not want to externalize the bundle `n` times.
+        return UserBundleRecord(User=user, Bundle=None)
+
+    def get_users(self, site):
+        result = super(BundleMembersView, self).get_users(site)
+        if self.bundle.RestrictedAccess:
+            result = [x for x in result if has_permission(ACT_READ, self.bundle, x)]
         return result

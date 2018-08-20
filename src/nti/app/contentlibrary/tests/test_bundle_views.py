@@ -41,6 +41,8 @@ from nti.app.contentlibrary.interfaces import IContentBoard
 
 from nti.app.contentlibrary.utils import role_for_content_package
 
+from nti.app.users.utils import set_user_creation_site
+
 from nti.cabinet.mixins import SourceFile
 
 from nti.contentlibrary.bundle import PublishableContentPackageBundle
@@ -54,6 +56,8 @@ from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IGroupMember
 
 from nti.dataserver.users.communities import Community
+
+from nti.dataserver.users.index import get_entity_catalog
 
 from nti.externalization.externalization import to_external_object
 
@@ -288,14 +292,19 @@ class TestBundleViews(ApplicationLayerTest):
     @WithSharedApplicationMockDS(users=True, testapp=True)
     def test_bundle_records(self):
         """
-        TODO: finish this out
+        Validate we can fetch a user's bundle records. This also validates
+        we can get the users for a book.
         """
         # Create a regular user and add him to the site community.
         basic_username = 'GeorgeBluth'
-        admin_username = 'sjohnson@nextthought.com'
-        with mock_dataserver.mock_db_trans(self.ds):
-            self._create_user(basic_username)
-        user_environ = self._make_extra_environ(basic_username)
+        for username in (basic_username,):
+            with mock_dataserver.mock_db_trans(self.ds):
+                user = self._create_user(username)
+                set_user_creation_site(user, 'platform.ou.edu')
+                catalog = get_entity_catalog()
+                intids = component.getUtility(IIntIds)
+                doc_id = intids.getId(user)
+                catalog.index_doc(doc_id, user)
 
         # A,B in Visible; B,C in Restricted, C in Restricted2
         visible_ntiid = "tag:nextthought.com,2011-10:NTI-Bundle-VisibleBundle"
@@ -321,9 +330,42 @@ class TestBundleViews(ApplicationLayerTest):
         assert_that(bundle_record['Bundle'], has_entry('NTIID', is_(visible_ntiid)))
         assert_that(bundle_record['User'], has_entry('Username', is_(basic_username)))
 
-        # Drill down into a user context within a bundle
+        # Bundle users
         users_bundle_href = self.require_link_href_with_rel(bundle_record['Bundle'],
                                                             BUNDLE_USERS_PATH_ADAPTER)
+        members = self.testapp.get(users_bundle_href)
+        members = members.json_body
+        members = members['Items']
+        assert_that(members, has_length(1))
+        assert_that(members, contains(has_entry('User',
+                                        has_entry('Username', basic_username))))
+
+        # Restricted bundle users
+        restricted_users_bundle_href = '/dataserver2/Objects/%s/%s' % \
+                                    (restricted_ntiid, BUNDLE_USERS_PATH_ADAPTER)
+        members = self.testapp.get(restricted_users_bundle_href)
+        members = members.json_body
+        members = members['Items']
+        assert_that(members, has_length(0))
+
+        # Grant and check
+        grant_href = '/dataserver2/ContentBundles/%s/@@%s?user=%s' \
+                        % (restricted_ntiid,
+                           VIEW_BUNDLE_GRANT_ACCESS,
+                           basic_username)
+        self.testapp.post(grant_href)
+        members = self.testapp.get(restricted_users_bundle_href)
+        members = members.json_body
+        members = members['Items']
+        assert_that(members, has_length(1))
+        assert_that(members, contains(has_entry('User',
+                                        has_entry('Username', basic_username))))
+
+        bundle_records_res = self.testapp.get(user_bundles_rel).json_body
+        bundle_records = bundle_records_res.get('Items')
+        assert_that(bundle_records, has_length(2))
+
+        # Drill down into a user context within a bundle
         basic_users_bundle_href = '%s/%s' % (users_bundle_href, basic_username)
         bundle_record_res = self.testapp.get(basic_users_bundle_href)
         bundle_record_res = bundle_record_res.json_body

@@ -234,7 +234,8 @@ class IUserBundleRecord(interface.Interface):
 
     User = Object(IUser, title=u'The user')
 
-    Bundle = Object(IContentPackageBundle, title=u'The bundle')
+    Bundle = Object(IContentPackageBundle, title=u'The bundle',
+                    required=False)
 
 
 class IUsageStats(interface.Interface):
