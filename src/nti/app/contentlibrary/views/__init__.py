@@ -8,6 +8,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from pyramid import httpexceptions as hexc
+
 from six.moves.urllib_parse import unquote
 
 from zope import component
@@ -19,8 +21,6 @@ from zope.location.interfaces import IContained
 
 from zope.traversing.interfaces import IPathAdapter
 
-from pyramid import httpexceptions as hexc
-
 from nti.app.contentlibrary import LIBRARY_ADAPTER
 from nti.app.contentlibrary import CONTENT_BUNDLES_ADAPTER
 from nti.app.contentlibrary import BUNDLE_USERS_PATH_ADAPTER
@@ -30,6 +30,8 @@ from nti.app.contentlibrary import VIEW_PUBLISH_CONTENTS
 from nti.app.contentlibrary import VIEW_PACKAGE_WITH_CONTENTS
 
 from nti.app.contentlibrary import MessageFactory
+
+from nti.app.contentlibrary.model import UserBundleRecord
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackageBundle
@@ -44,12 +46,11 @@ from nti.dataserver.authorization_acl import acl_from_aces
 from nti.dataserver.interfaces import ALL_PERMISSIONS
 from nti.dataserver.interfaces import EVERYONE_GROUP_NAME
 
-from nti.dataserver.users import User
+from nti.dataserver.users.users import User
 
 from nti.externalization.proxy import removeAllProxies
 
 from nti.ntiids.ntiids import find_object_with_ntiid
-from nti.app.contentlibrary.model import UserBundleRecord
 
 logger = __import__('logging').getLogger(__name__)
 
