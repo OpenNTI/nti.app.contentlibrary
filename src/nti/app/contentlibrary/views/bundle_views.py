@@ -8,7 +8,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import six
 import uuid
 import shutil
 import zipfile
@@ -19,6 +18,8 @@ from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 from pyramid.view import view_defaults
+
+import six
 
 from zope import component
 
@@ -72,6 +73,8 @@ from nti.app.publishing import VIEW_UNPUBLISH
 
 from nti.app.publishing.views import PublishView
 from nti.app.publishing.views import UnpublishView
+
+from nti.app.users.utils import get_community_or_site_members
 
 from nti.app.users.views.list_views import SiteUsersView
 
@@ -471,9 +474,10 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView,
         if result:
             entities = result.split(',')
             result = self._get_entities(entities)
+        elif self._site_community is not None:
+            result = (self._site_community,)
         else:
-            if self._site_community is not None:
-                result = (self._site_community,)
+            result = get_community_or_site_members(True)
         if not result:
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
@@ -626,6 +630,7 @@ class UserBundleRecordView(AbstractBundleRecordView):
     """
 
     def __call__(self):
+        # pylint: disable=no-member
         if not self._check_access(self.context.User):
             raise_json_error(self.request,
                              hexc.HTTPForbidden,
@@ -691,14 +696,16 @@ class BundleMembersView(SiteUsersView):
 
     @Lazy
     def bundle(self):
+        # pylint: disable=no-member
         return self.context.context
 
-    def _transformer(self, user):
+    def _transformer(self, user):  # pylint: disable=arguments-differ
         # We do not want to externalize the bundle `n` times.
         return UserBundleRecord(User=user, Bundle=None)
 
     def get_users(self, site):
         result = super(BundleMembersView, self).get_users(site)
+        # pylint: disable=no-member
         if self.bundle.RestrictedAccess:
             result = [x for x in result if has_permission(ACT_READ, self.bundle, x)]
         return result
