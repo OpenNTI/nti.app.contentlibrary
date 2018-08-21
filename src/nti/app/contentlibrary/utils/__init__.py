@@ -8,8 +8,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import six
 import collections
+
+import six
 from six.moves import urllib_parse
 
 from zope import component
@@ -53,8 +54,7 @@ def find_page_info_view_helper(request, page_ntiid_or_content_unit):
     """
     Helper function to resolve a NTIID to PageInfo.
     """
-
-    # XXX Assuming one location in the hierarchy, plus assuming things
+    # Assuming one location in the hierarchy, plus assuming things
     # about the filename For the sake of the application (trello #932
     # https://trello.com/c/5cxwEgVH), if the question is nested in a
     # sub-section of a content library, we want to return the PageInfo

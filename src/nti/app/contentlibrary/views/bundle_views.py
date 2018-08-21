@@ -53,6 +53,7 @@ from nti.app.contentlibrary.interfaces import IUserBundleRecord
 
 from nti.app.contentlibrary.model import UserBundleRecord
 
+from nti.app.contentlibrary.utils import is_bundle_visible_to_user
 from nti.app.contentlibrary.utils import get_visible_bundles_for_user
 
 from nti.app.contentlibrary.utils.bundle import save_bundle
@@ -104,8 +105,6 @@ from nti.dataserver.authorization import is_site_admin
 from nti.dataserver.authorization import is_admin_or_site_admin
 
 from nti.dataserver.authorization import is_admin_or_content_admin_or_site_admin
-
-from nti.dataserver.authorization_acl import has_permission
 
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import ICommunity
@@ -707,5 +706,5 @@ class BundleMembersView(SiteUsersView):
         result = super(BundleMembersView, self).get_users(site)
         # pylint: disable=no-member
         if self.bundle.RestrictedAccess:
-            result = [x for x in result if has_permission(ACT_READ, self.bundle, x)]
+            result = [x for x in result if is_bundle_visible_to_user(x, self.bundle)]
         return result
