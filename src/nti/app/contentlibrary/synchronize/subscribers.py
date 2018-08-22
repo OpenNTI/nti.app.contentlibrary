@@ -4,14 +4,15 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
+import simplejson
 
 import six
 
-import simplejson
+from ZODB.interfaces import IConnection
 
 from zope import component
 from zope import interface
@@ -21,8 +22,6 @@ from zope.component.hooks import getSite
 from zope.intid.interfaces import IIntIds
 
 from zope.lifecycleevent.interfaces import IObjectRemovedEvent
-
-from ZODB.interfaces import IConnection
 
 from nti.contentlibrary.indexed_data import get_site_registry
 from nti.contentlibrary.indexed_data import get_library_catalog
@@ -87,6 +86,8 @@ INDICES = {
     'timeline_index.json': (INTITimeline, create_ntitimeline_from_external),
     'related_content_index.json': (INTIRelatedWorkRef, create_relatedworkref_from_external)
 }
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def prepare_json_text(s):
@@ -277,8 +278,8 @@ def removed_registered(provided, name, intids=None, registry=None,
         removeIntId(registered)
         registered.__parent__ = None  # ground
     elif registered is not None:
-        logger.warn("Object (%s,%s) is locked cannot be removed during sync",
-                    provided.__name__, name)
+        logger.warning("Object (%s,%s) is locked cannot be removed during sync",
+                       provided.__name__, name)
         registered = None  # set to None since it was not removed
     return registered
 _removed_registered = removed_registered
@@ -436,6 +437,7 @@ def clear_assets_by_interface(content_package, iface, registry=None,
         for child in unit.children or ():
             _recur(child)
         container = IPresentationAssetContainer(unit)
+        # pylint: disable=too-many-function-args
         for key, value in tuple(container.items()):  # mutating
             registered = None
             provided = interface_of_asset(value)
@@ -579,6 +581,7 @@ def clear_package_assets(content_package, force=False):
     result = []
 
     def _recur(unit):
+        # pylint: disable=too-many-function-args
         for child in unit.children or ():
             _recur(child)
         container = IPresentationAssetContainer(unit)
@@ -656,6 +659,7 @@ def _update_container(old_unit, new_unit, new_children_dict, new_package=None):
     """
     Move all locked objects from our old container to our new updating lineage as we go.
     """
+    # pylint: disable=too-many-function-args
     new_package = new_package if new_package is not None else new_unit
     old_container = IPresentationAssetContainer(old_unit)
     new_container = IPresentationAssetContainer(new_unit)
@@ -714,7 +718,7 @@ def clear_content_package_assets(content_package, force=True, process_global=Fal
     if not process_global and IGlobalContentPackage.providedBy(content_package):
         return result
     clear_namespace_last_modified(content_package, catalog)
-
+    # pylint: disable=too-many-function-args
     folder = IHostPolicyFolder(content_package, None)
     registry = folder.getSiteManager() if folder is not None else None
 
