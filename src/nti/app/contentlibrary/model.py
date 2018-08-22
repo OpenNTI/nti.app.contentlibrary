@@ -15,6 +15,8 @@ from zope import interface
 
 from zope.cachedescriptors.property import readproperty
 
+from zope.deprecation import deprecated
+
 from zope.location.interfaces import IContained
 
 from nti.app.contentlibrary import BLOCKING_TIMEOUT
@@ -54,13 +56,6 @@ class ContentUnitContents(SchemaConfigured):
     mime_type = mimeType = 'application/vnd.nextthought.contentunit.contents'
 
     contents = alias('data')
-
-
-@interface.implementer(IContentBundleCommunity)
-class ContentBundleCommunity(Community):
-    __external_can_create__ = False
-    __external_class_name__ = 'Community'
-    mime_type = mimeType = 'application/vnd.nextthought.contentbundlecommunity'
 
 
 @interface.implementer(IContentTrackingRedisClient)
@@ -129,3 +124,11 @@ class ContentPackageSyncMetadata(PersistentCreatedAndModifiedTimeObject):
     @readproperty
     def package_description(self):
         return self.__parent__.description
+
+
+deprecated("ContentBundleCommunity", "no longer used")
+@interface.implementer(IContentBundleCommunity)
+class ContentBundleCommunity(Community):
+    __external_can_create__ = False
+    __external_class_name__ = 'Community'
+    mime_type = mimeType = 'application/vnd.nextthought.contentbundlecommunity'

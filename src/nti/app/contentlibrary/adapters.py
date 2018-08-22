@@ -63,12 +63,9 @@ from nti.dataserver.contenttypes.forums.interfaces import ITopic
 from nti.dataserver.contenttypes.forums.interfaces import IForum
 
 from nti.dataserver.interfaces import IUser
-from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import system_user
 from nti.dataserver.interfaces import IAccessProvider
 from nti.dataserver.interfaces import IMutableGroupMember
-
-from nti.dataserver.users.communities import Community
 
 from nti.dublincore.time_mixins import PersistentCreatedAndModifiedTimeObject
 
@@ -101,17 +98,6 @@ def _content_unit_to_bundles(unit):
         if package in bundle.ContentPackages or ():
             result.append(bundle)
     return result
-
-
-@interface.implementer(ICommunity)
-@component.adapter(IContentPackageBundle)
-def bundle_to_community(bundle):
-    bundle = removeAllProxies(bundle)
-    intids = component.getUtility(IIntIds)
-    doc_id = intids.queryId(bundle)
-    if doc_id is not None:
-        return Community.get_community(username=str(doc_id))
-    return None
 
 
 @component.adapter(IContentUnit)

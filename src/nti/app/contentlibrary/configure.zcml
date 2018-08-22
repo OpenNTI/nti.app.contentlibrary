@@ -83,10 +83,6 @@
 			 for="nti.contentlibrary.interfaces.IContentPackageBundle"
 			 provides="zope.security.interfaces.IPrincipal" />
 
-	<adapter factory=".adapters.bundle_to_community"
-			 for="nti.contentlibrary.interfaces.IContentPackageBundle"
-			 provides="nti.dataserver.interfaces.ICommunity" />
-
 	<!-- Traversal -->
 	<adapter factory="nti.traversal.traversal.DefaultAdapterTraversable"
 			 for="nti.contentlibrary.interfaces.IEditableContentPackage

@@ -15,6 +15,8 @@ from zope import interface
 from zope.container.constraints import contains
 from zope.container.constraints import containers
 
+from zope.deprecation import deprecated
+
 from zope.schema import Bytes as ValidBytes
 from zope.schema import BytesLine as ValidBytesLine
 
@@ -49,6 +51,7 @@ from nti.schema.field import Object
 from nti.schema.field import TextLine as ValidTextLine
 
 
+deprecated("IContentBundleCommunity", "no longer used")
 class IContentBundleCommunity(ICommunity):
     """
     A content bundle communiy
