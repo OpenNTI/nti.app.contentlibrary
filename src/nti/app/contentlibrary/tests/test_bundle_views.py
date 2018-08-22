@@ -418,8 +418,6 @@ class TestBundleViews(ApplicationLayerTest):
                             has_property('root', is_(none())))
                 assert_that(bundle,
                             has_property('_presentation_assets', is_not(none())))
-                community = ICommunity(bundle, None)
-                assert_that(community, is_not(none()))
 
             href = '/dataserver2/ContentBundles/%s/@@publish' % ntiid
             self.testapp.post(href, status=200)
