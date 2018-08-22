@@ -11,10 +11,6 @@ from __future__ import absolute_import
 from zope import component
 from zope import interface
 
-from zope.intid.interfaces import IIntIds
-
-from zope.lifecycleevent.interfaces import IObjectAddedEvent
-
 from zope.securitypolicy.rolepermission import AnnotationRolePermissionManager
 
 from zope.traversing.interfaces import IBeforeTraverseEvent
@@ -23,8 +19,6 @@ from pyramid.threadlocal import get_current_request
 
 from nti.app.contentlibrary.interfaces import IContentBoard
 from nti.app.contentlibrary.interfaces import IContentPackageRolePermissionManager
-
-from nti.app.contentlibrary.model import ContentBundleCommunity
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
@@ -101,21 +95,6 @@ def _on_content_pacakge_library_synced(library, unused_event):
 
 
 # bundle events
-
-
-@component.adapter(IContentPackageBundle, IObjectAddedEvent)
-def _on_content_bundle_added(bundle, unused_event):
-    # create a bundle community
-    try:
-        intids = component.getUtility(IIntIds)
-        doc_id = intids.queryId(bundle)
-        if doc_id is not None:
-            doc_id = str(doc_id)
-            community = ContentBundleCommunity.get_community(doc_id)
-            if community is None:
-                ContentBundleCommunity.create_community(username=doc_id)
-    except (TypeError, LookupError):  # tests
-        pass
 
 
 @component.adapter(IContentPackageBundle, IObjectPublishedEvent)

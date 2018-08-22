@@ -207,7 +207,6 @@
 	<adapter factory=".resolvers.ContentMetadataFromContentUnit" />
 
 	<!-- Bundles -->
-	<subscriber handler=".subscribers._on_content_bundle_added" />
 	<subscriber handler=".subscribers._on_content_bundle_published" />
 
     <!-- Completion -->
