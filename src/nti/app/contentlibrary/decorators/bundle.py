@@ -8,17 +8,19 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from pyramid.interfaces import IRequest
+
 from zope import component
 from zope import interface
 
 from zope.location.interfaces import ILocation
 
-from pyramid.interfaces import IRequest
-
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 from nti.app.contentlibrary import BUNDLE_USERS_PATH_ADAPTER
+
+from nti.app.contentlibrary.utils import get_visible_bundles_for_user
 
 from nti.app.publishing import VIEW_PUBLISH
 from nti.app.publishing import VIEW_UNPUBLISH
@@ -47,7 +49,6 @@ from nti.externalization.interfaces import IExternalMappingDecorator
 from nti.externalization.singleton import Singleton
 
 from nti.links.links import Link
-from nti.app.contentlibrary.utils import get_visible_bundles_for_user
 
 LINKS = StandardExternalFields.LINKS
 

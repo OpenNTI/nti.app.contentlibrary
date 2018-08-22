@@ -8,10 +8,10 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from pyramid.interfaces import IRequest
+
 from zope import component
 from zope import interface
-
-from pyramid.interfaces import IRequest
 
 from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import LIBRARY_ADAPTER

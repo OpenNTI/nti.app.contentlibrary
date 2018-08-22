@@ -8,11 +8,11 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from pyramid.threadlocal import get_current_request
+
 from zope import interface
 
 from zope.location.interfaces import ILocation
-
-from pyramid.threadlocal import get_current_request
 
 from nti.app.contentlibrary import LIBRARY_PATH_GET_VIEW
 
