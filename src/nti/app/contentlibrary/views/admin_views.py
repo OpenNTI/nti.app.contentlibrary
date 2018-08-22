@@ -8,6 +8,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from pyramid.view import view_config
+from pyramid.view import view_defaults
+
 from zope import component
 
 from zope.cachedescriptors.property import Lazy
@@ -15,9 +18,6 @@ from zope.cachedescriptors.property import Lazy
 from zope.component.hooks import site as current_site
 
 from zope.intid.interfaces import IIntIds
-
-from pyramid.view import view_config
-from pyramid.view import view_defaults
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
@@ -37,9 +37,8 @@ from nti.contentlibrary.utils import get_content_packages
 
 from nti.dataserver import authorization as nauth
 
-from nti.externalization.externalization import StandardExternalFields
-
 from nti.externalization.interfaces import LocatedExternalDict
+from nti.externalization.interfaces import StandardExternalFields
 
 from nti.metadata import queue_add
 
@@ -115,7 +114,7 @@ class AllContentPackagesView(AbstractAuthenticatedView,
             packages.sort(key=lambda p: p.ntiid)
         else:
             packages = ()
-        result['TotalItemCount'] = len(packages)
+        result[TOTAL] = result['TotalItemCount'] = len(packages)
         self._batch_items_iterable(result, packages)
         result[ITEM_COUNT] = len(result[ITEMS])
         return result
@@ -143,7 +142,7 @@ class AllContentPackageBundlesView(AbstractAuthenticatedView,
             bundles.sort(key=lambda p: p.ntiid)
         else:
             bundles = ()
-        result['TotalItemCount'] = len(bundles)
+        result[TOTAL] = result['TotalItemCount'] = len(bundles)
         self._batch_items_iterable(result, bundles)
         result[ITEM_COUNT] = len(result[ITEMS])
         return result
