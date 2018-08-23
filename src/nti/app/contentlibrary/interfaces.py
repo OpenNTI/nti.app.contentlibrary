@@ -25,6 +25,8 @@ from zope.securitypolicy.interfaces import IRolePermissionManager
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackageBundle
 
+from nti.contenttypes.reports.interfaces import IReportContext
+
 from nti.coremetadata.interfaces import IUser
 from nti.coremetadata.interfaces import IRedisClient
 # Content-specific boards and forums
@@ -230,7 +232,7 @@ class IContentPackageMetadata(ILockTrackingComponent):
                                         description=u"Description of the package for this metadata object")
 
 
-class IUserBundleRecord(interface.Interface):
+class IUserBundleRecord(IReportContext):
     """
     A context for a user with access to a bundle.
     """
