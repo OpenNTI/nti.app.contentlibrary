@@ -12,6 +12,8 @@ from zope import interface
 
 from zope.cachedescriptors.property import Lazy
 
+from nti.app.contentlibrary.interfaces import IUserBundleRecord
+
 from nti.app.contentlibrary.utils import role_for_content_bundle
 from nti.app.contentlibrary.utils import role_for_content_package
 
@@ -288,6 +290,24 @@ class _RenderableContentPackageACLProvider(object):
         aces.append(ACE_DENY_ALL)
         acl = acl_from_aces(aces)
         return acl
+
+
+@interface.implementer(IACLProvider)
+@component.adapter(IUserBundleRecord)
+class _UserBundleRecordACLProvider(object):
+    """
+    Grant the bundle record user all access.
+    """
+
+    def __init__(self, context):
+        self.context = context
+
+    @Lazy
+    def __acl__(self):
+        aces = []
+        aces.append(ace_allowing(self.context.User, ALL_PERMISSIONS, type(self)))
+        result = acl_from_aces(aces)
+        return result
 
 
 @interface.implementer(IACLProvider)
