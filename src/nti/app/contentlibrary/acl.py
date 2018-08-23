@@ -302,6 +302,11 @@ class _UserBundleRecordACLProvider(object):
     def __init__(self, context):
         self.context = context
 
+    @property
+    def __parent__(self):
+        # See comments in nti.dataserver.authorization_acl:has_permission
+        return self.context.__parent__
+
     @Lazy
     def __acl__(self):
         aces = []
