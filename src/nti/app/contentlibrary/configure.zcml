@@ -235,6 +235,9 @@
 
 	<subscriber handler=".subscribers.unit_traversal_context_subscriber" />
 
+	<!-- Completables -->
+	<utility factory=".completables.LibraryCompletables" name="library" />
+
 	<!-- Metadata -->
 	<subscriber	factory=".predicates._SystemContentPackages"
 				provides="nti.dataserver.metadata.interfaces.IPrincipalMetadataObjects" />
