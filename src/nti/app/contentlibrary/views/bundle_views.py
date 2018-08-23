@@ -675,7 +675,11 @@ class UserBundleRecordsView(AbstractBundleRecordView,
                              None)
         result = LocatedExternalDict()
         bundles = sorted(bundles, key=lambda x:x.title)
-        records = [UserBundleRecord(User=self.context, Bundle=x) for x in bundles]
+        records = []
+        for bundle in bundles:
+            bundle_record = UserBundleRecord(User=self.context, Bundle=bundle)
+            bundle_record.__parent__  = bundle
+            records.append(bundle_record)
         result[TOTAL] = len(records)
         self._batch_items_iterable(result, records)
         return result
@@ -700,7 +704,9 @@ class BundleMembersView(SiteUsersView):
 
     def _transformer(self, user):  # pylint: disable=arguments-differ
         # We do not want to externalize the bundle `n` times.
-        return UserBundleRecord(User=user, Bundle=None)
+        result = UserBundleRecord(User=user, Bundle=None)
+        result.__parent__ = self.bundle
+        return result
 
     def get_users(self, site):
         result = super(BundleMembersView, self).get_users(site)
