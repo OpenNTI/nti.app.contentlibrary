@@ -48,6 +48,12 @@ class UserBundleRecord(SchemaConfigured):
 
     mime_type = mimeType = 'application/vnd.nextthought.userbundlerecord'
 
+    __parent__ = None
+
+    @property
+    def __name__(self):
+        return self.User.username
+
 
 @interface.implementer(IContentUnitContents)
 class ContentUnitContents(SchemaConfigured):

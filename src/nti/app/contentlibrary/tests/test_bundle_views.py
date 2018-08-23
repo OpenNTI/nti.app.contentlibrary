@@ -52,7 +52,6 @@ from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.contentlibrary.subscribers import sync_bundles_when_library_synched
 
-from nti.dataserver.interfaces import ICommunity
 from nti.dataserver.interfaces import IGroupMember
 
 from nti.dataserver.users.communities import Community

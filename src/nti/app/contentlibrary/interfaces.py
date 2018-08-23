@@ -17,6 +17,8 @@ from zope.container.constraints import containers
 
 from zope.deprecation import deprecated
 
+from zope.location.interfaces import IContained
+
 from zope.schema import Bytes as ValidBytes
 from zope.schema import BytesLine as ValidBytesLine
 
@@ -232,7 +234,7 @@ class IContentPackageMetadata(ILockTrackingComponent):
                                         description=u"Description of the package for this metadata object")
 
 
-class IUserBundleRecord(IReportContext):
+class IUserBundleRecord(IReportContext, IContained):
     """
     A context for a user with access to a bundle.
     """
