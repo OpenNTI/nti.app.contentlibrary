@@ -8,6 +8,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import datetime
 import time
 
 from BTrees.OOBTree import OOBTree
@@ -52,6 +53,9 @@ from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 from nti.contentlibrary.indexed_data import get_library_catalog
 
 from nti.contenttypes.presentation.interfaces import IPresentationAssetContainer
+
+from nti.coremetadata.interfaces import IContextLastSeenContainer
+from nti.coremetadata.interfaces import ILastSeenProvider
 
 from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import CONTENT_ROLE_PREFIX
@@ -440,3 +444,21 @@ def content_package_sync_meta_factory(context):
         result.__parent__ = context
         result.__name__ = '_content_package_sync_metadata'
     return result
+
+
+@component.adapter(IUser, IContentPackageBundle)
+@interface.implementer(ILastSeenProvider)
+class _BundleLastSeenProvider(object):
+
+    def __init__(self, user, context):
+        self.user = user
+        self.context = context
+
+    @Lazy
+    def lastSeenTime(self):
+        _container = IContextLastSeenContainer(self.user, None)
+        if _container:
+            ntiid = getattr(self.context, 'ntiid', None)
+            _dt = _container.get(ntiid) if ntiid else None
+            return datetime.datetime.utcfromtimestamp(_dt) if _dt else None
+        return None

@@ -20,6 +20,8 @@ from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 from nti.app.contentlibrary import BUNDLE_USERS_PATH_ADAPTER
 
+from nti.app.contentlibrary.interfaces import IUserBundleRecord
+
 from nti.app.contentlibrary.utils import get_visible_bundles_for_user
 
 from nti.app.publishing import VIEW_PUBLISH
@@ -33,6 +35,7 @@ from nti.contentlibrary.interfaces import IContentPackageBundle
 from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 
 from nti.coremetadata.interfaces import IUser
+from nti.coremetadata.interfaces import ILastSeenProvider
 
 from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
@@ -171,3 +174,12 @@ class _UserBundleRecordsDecorator(AbstractAuthenticatedRequestAwareDecorator):
                     rel=VIEW_USER_BUNDLE_RECORDS,
                     elements=('@@%s' % VIEW_USER_BUNDLE_RECORDS,))
         _links.append(link)
+
+@component.adapter(IUserBundleRecord)
+@interface.implementer(IExternalMappingDecorator)
+class _LastSeenTimeForUserBundleRecordDecorator(AbstractAuthenticatedRequestAwareDecorator):
+
+    def _do_decorate_external(self, context, result):
+        if 'LastSeenTime' not in result:
+            provider = component.queryMultiAdapter((context.User, context.Bundle or context.__parent__), ILastSeenProvider)
+            result['LastSeenTime'] = provider.lastSeenTime if provider else None

@@ -136,6 +136,11 @@
              for="nti.contentlibrary.interfaces.IContentPackage"
              provides="nti.app.contentlibrary.interfaces.IContentPackageMetadata" />
 
+    <adapter factory=".adapters._BundleLastSeenProvider"
+             for="nti.dataserver.interfaces.IUser
+                  nti.contentlibrary.interfaces.IContentPackageBundle"
+             provides="nti.coremetadata.interfaces.ILastSeenProvider" />
+
     <!-- Completion -->
     <adapter factory=".completion._content_completion_policy"
              provides="nti.contenttypes.completion.interfaces.ICompletableItemCompletionPolicy"
