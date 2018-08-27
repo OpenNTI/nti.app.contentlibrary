@@ -175,11 +175,13 @@ class _UserBundleRecordsDecorator(AbstractAuthenticatedRequestAwareDecorator):
                     elements=('@@%s' % VIEW_USER_BUNDLE_RECORDS,))
         _links.append(link)
 
+
 @component.adapter(IUserBundleRecord)
 @interface.implementer(IExternalMappingDecorator)
 class _LastSeenTimeForUserBundleRecordDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _do_decorate_external(self, context, result):
         if 'LastSeenTime' not in result:
-            provider = component.queryMultiAdapter((context.User, context.Bundle or context.__parent__), ILastSeenProvider)
+            provider = component.queryMultiAdapter((context.User, context.Bundle or context.__parent__),
+                                                   ILastSeenProvider)
             result['LastSeenTime'] = provider.lastSeenTime if provider else None
