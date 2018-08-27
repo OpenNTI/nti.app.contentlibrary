@@ -8,8 +8,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import datetime
 import time
+import datetime
 
 from BTrees.OOBTree import OOBTree
 
@@ -21,8 +21,6 @@ from zope import interface
 from zope.cachedescriptors.property import Lazy
 
 from zope.deprecation import deprecated
-
-from zope.intid.interfaces import IIntIds
 
 from zope.location.interfaces import IContained
 
