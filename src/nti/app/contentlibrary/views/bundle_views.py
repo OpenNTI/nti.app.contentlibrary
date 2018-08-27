@@ -688,13 +688,14 @@ class UserBundleRecordsView(AbstractBundleRecordView,
 @view_config(route_name='objects.generic.traversal',
              renderer='rest',
              context=ContentPackageBundleUsersPathAdapter,
-             permission=ACT_NTI_ADMIN,
              request_method='GET')
 class BundleMembersView(SiteUsersView):
     """
     A view that returns the members of this :class:`IContentPackageBundle`.
     This will be either the full site membership, or, if a bundle is
     restricted, the members which have access.
+
+    SiteUsers restricts this `call` to only admins and site admins.
     """
 
     @Lazy
