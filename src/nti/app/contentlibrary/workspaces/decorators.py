@@ -8,12 +8,12 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-from zope import component
-from zope import interface
-
 from pyramid.interfaces import IRequest
 
 from pyramid.traversal import find_interface
+
+from zope import component
+from zope import interface
 
 from zope.location.interfaces import ILocation
 
@@ -88,7 +88,7 @@ class AdminSyncLibrariesDecorator(AbstractAuthenticatedRequestAwareDecorator):
     def _predicate(self, unused_context, unused_result):
         return is_admin_or_content_admin(self.remoteUser)
 
-    def _do_decorate_external(self, context, result_map):
+    def _do_decorate_external(self, context, result_map):  # pylint: disable=arguments-differ
         links = result_map.setdefault("Links", [])
         rels = [SYNC_LIBRARIES, REMOVE_LOCK, SYNC_META, SYNCABLE_PACKAGES]
         ds2 = find_interface(context, IDataserverFolder)
