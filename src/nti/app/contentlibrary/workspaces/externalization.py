@@ -25,6 +25,9 @@ from nti.externalization.externalization import to_external_object
 
 from nti.externalization.interfaces import IExternalObject
 from nti.externalization.interfaces import LocatedExternalDict
+from nti.externalization.interfaces import StandardExternalFields
+
+TOTAL = StandardExternalFields.TOTAL
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -80,6 +83,7 @@ class LibraryCollectionDetailExternalizer(object):
                     to_external_object(x, **kwargs) for x in items if self.search_include(x)
                 ]
             })
+        result[TOTAL] = len(result['titles'])
         result.__name__ = self._collection.__name__
         result.__parent__ = self._collection.__parent__
         return result
