@@ -50,14 +50,16 @@ class LibraryPublishables(object):
         _recur(package)
 
     def _process_packages(self, result):
+        result = [] if result is None else result
         library = component.queryUtility(IContentPackageLibrary)
         if library is not None:
-            for package in library.contentPackages:
+            for package in library.contentPackages or ():
                 if not IGlobalContentPackage.providedBy(package):
                     self._process_package(package, result)
         return result
 
     def _process_bundle(self, bundle, result):
+        result = [] if result is None else result
         if IPublishable.providedBy(bundle):
             result.append(bundle)
         board = IContentBoard(bundle, None)
@@ -69,6 +71,7 @@ class LibraryPublishables(object):
         return result
 
     def _process_bundles(self, result):
+        result = [] if result is None else result
         library = component.queryUtility(IContentPackageBundleLibrary)
         if library is not None:
             for bundle in library.values():
