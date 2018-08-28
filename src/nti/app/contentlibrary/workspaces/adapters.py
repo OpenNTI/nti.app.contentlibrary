@@ -8,21 +8,25 @@ This also handles external permissioning of entries in the library.
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-logger = __import__('logging').getLogger(__name__)
+from pyramid.threadlocal import get_current_request
+
+from requests.structures import CaseInsensitiveDict
+
+from six.moves.urllib_parse import unquote
 
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import Lazy
 from zope.cachedescriptors.property import CachedProperty
 
 from zope.container.interfaces import IContained
 
 from zope.proxy.decorator import ProxyBase
-
-from pyramid.threadlocal import get_current_request
 
 from nti.app.contentlibrary.workspaces.interfaces import ILibraryCollection
 
@@ -38,6 +42,8 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.property.property import alias
+
+logger = __import__('logging').getLogger(__name__)
 
 
 class _PermissionedContentPackageLibrary(ProxyBase):
@@ -56,6 +62,7 @@ class _PermissionedContentPackageLibrary(ProxyBase):
         return ProxyBase.__new__(cls, base)
 
     def __init__(self, base, request):
+        # pylint: disable=non-parent-init-called
         ProxyBase.__init__(self, base)
         self.library = base
         self._v_request = request
@@ -67,7 +74,7 @@ class _PermissionedContentPackageLibrary(ProxyBase):
         result = is_readable(content_package, request)
         if not result:
             # Nope. What about a top-level child?
-            # TODO: Why we check children?
+            # Why we check children?
             result = any(is_readable(x, request)
                          for x in content_package.children or ())
         return result
@@ -161,6 +168,7 @@ class LibraryWorkspace(object):
         # Yes, we traverse to our actual library,
         # not the collection wrapper. It will get
         # converted back to the collection for externalization.
+        # pylint: disable=not-an-iterable
         for i in self.collections:
             if key == i.__name__:
                 return i.library
@@ -191,11 +199,42 @@ class LibraryCollection(object):
 
     @property
     def library_items(self):
-        return self.context.contentPackages
+        for package in self.context.contentPackages or ():
+            if self.search_include(package):
+                yield package
 
     @property
     def accepts(self):
         return ALL_CONTENT_MIMETYPES
+
+    @property
+    def request(self):
+        return get_current_request()
+
+    @Lazy
+    def params(self):
+        params = self.request.params if self.request else {}
+        return CaseInsensitiveDict(**params)
+
+    @Lazy
+    def searchTerm(self):
+        # pylint: disable=no-member
+        result = self.params.get('searchTerm') or self.params.get('filter')
+        return unquote(result).lower() if result else None
+
+    def search_prefix_match(self, compare, search_term):
+        compare = compare.lower() if compare else ''
+        for k in compare.split():
+            if k.startswith(search_term):
+                return True
+        return compare.startswith(search_term)
+
+    def search_include(self, obj):
+        result = True
+        if self.searchTerm:
+            op = self.search_prefix_match
+            result = op(obj.title, self.searchTerm)
+        return result
 
 
 # bundles
@@ -210,7 +249,7 @@ class BundleLibraryCollection(LibraryCollection):
     @property
     def library_items(self):
         for bundle in self.library.getBundles() or ():
-            if is_readable(bundle):
+            if is_readable(bundle) and self.search_include(bundle):
                 yield bundle
 
     def getBundles(self):
