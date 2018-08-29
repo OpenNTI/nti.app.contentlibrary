@@ -7,7 +7,10 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
+import fudge
+
 from hamcrest import is_not
+from hamcrest import contains
 from hamcrest import has_entry
 from hamcrest import has_length
 from hamcrest import assert_that
@@ -23,9 +26,14 @@ from zope import interface
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.interfaces import IAuthenticationPolicy
 
+from nti.app.contentlibrary.workspaces.adapters import BundleLibraryCollection
+from nti.app.contentlibrary.workspaces.adapters import LibraryCollection
+
 from nti.appserver.workspaces.interfaces import IWorkspace
 
 from nti.appserver.pyramid_authorization import ZopeACLAuthorizationPolicy
+
+from nti.contentlibrary.bundle import PublishableContentPackageBundle
 
 from nti.contentlibrary.filesystem import DynamicFilesystemLibrary as DynamicLibrary
 
@@ -135,3 +143,102 @@ class TestLibraryCollectionDetailExternalizer(NewRequestLayerTest):
 
         external = toExternalObject(self.library_collection)
         assert_that(external, has_entry('titles', has_length(1)))
+
+class TestAdapters(NewRequestLayerTest):
+
+    @fudge.patch("nti.app.contentlibrary.workspaces.adapters.get_current_request")
+    def testBundleLibraryCollection(self, mock_current_request):
+        mock_current_request.is_callable().returns(self.request)
+
+        bundles = []
+        for title, createdTime in ( (u'tiger', 20),
+                                    (u'banana', 30),
+                                    (u'bound ok', 40)):
+            bundles.append(PublishableContentPackageBundle(title=title, createdTime=createdTime))
+
+        lib = fudge.Fake('library').provides('getBundles').is_callable().returns([])
+        col = BundleLibraryCollection(lib)
+        assert_that(col.library_items, has_length(0))
+
+        lib = fudge.Fake('library').provides('getBundles').is_callable().returns(bundles)
+        col = BundleLibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('tiger', 'banana', 'bound ok'))
+
+        # Sorting
+        params = self.request.params
+        params['sortOn'] = 'title'
+        params['sortOrder'] = 'ascending'
+
+        col = BundleLibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('banana', 'bound ok', 'tiger'))
+
+        params['sortOn'] = 'title'
+        params['sortOrder'] = 'descending'
+
+        col = BundleLibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('tiger', 'bound ok', 'banana'))
+
+        params['sortOn'] = 'createdTime'
+        params['sortOrder'] = 'ascending'
+
+        col = BundleLibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('tiger', 'banana', 'bound ok'))
+
+        params['sortOn'] = 'createdTime'
+        params['sortOrder'] = 'descending'
+
+        col = BundleLibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('bound ok', 'banana', 'tiger'))
+
+        # Unknown sortOn
+        params['sortOn'] = 'xxx_'
+        col = BundleLibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('tiger', 'banana', 'bound ok'))
+
+        # Filter by prefix
+        params['filter'] = 'ok'
+        params['sortOn'] = 'createdTime'
+        params['sortOrder'] = 'ascending'
+
+        col = BundleLibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('bound ok'))
+
+        params['filter'] = 'b'
+        col = BundleLibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('banana', 'bound ok'))
+
+        params['filter'] = 'an'
+        col = BundleLibraryCollection(lib)
+        assert_that(col.library_items, has_length(0))
+
+    @fudge.patch("nti.app.contentlibrary.workspaces.adapters.get_current_request")
+    def testLibraryCollection(self, mock_current_request):
+        mock_current_request.is_callable().returns(self.request)
+        bundles = []
+        for title, createdTime in ( (u'tiger', 20),
+                                    (u'banana', 30),
+                                    (u'bound ok', 40)):
+            bundles.append(PublishableContentPackageBundle(title=title, createdTime=createdTime))
+
+        lib = fudge.Fake('library').has_attr(contentPackages=[])
+        col = LibraryCollection(lib)
+        assert_that(col.library_items, has_length(0))
+
+        lib = fudge.Fake('library').has_attr(contentPackages=bundles)
+        col = LibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('tiger', 'banana', 'bound ok'))
+
+        params = self.request.params
+        params['sortOn'] = 'title'
+        params['sortOrder'] = 'descending'
+
+        col = LibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('tiger', 'bound ok', 'banana'))
+
+        params['filter'] = 'b'
+        col = LibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('bound ok', 'banana'))
+
+        params['searchTerm'] = 't'
+        col = LibraryCollection(lib)
+        assert_that([x.title for x in col.library_items], contains('tiger'))

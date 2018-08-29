@@ -199,9 +199,11 @@ class LibraryCollection(object):
 
     @property
     def library_items(self):
+        result = []
         for package in self.context.contentPackages or ():
             if self.search_include(package):
-                yield package
+                result.append(package)
+        return self._sort_library_items(result)
 
     @property
     def accepts(self):
@@ -236,6 +238,25 @@ class LibraryCollection(object):
             result = op(obj.title, self.searchTerm)
         return result
 
+    def _sort_library_items(self, items):
+        sortOn = self.params.get('sortOn')
+        sortOn = sortOn.lower() if sortOn else sortOn
+
+        sortOrder = self.params.get('sortOrder', 'ascending')
+        sort_reverse = sortOrder == 'descending'
+
+        if sortOn:
+            if sortOn == 'title':
+                items = sorted(items,
+                               key=lambda x: x.title,
+                               reverse=sort_reverse)
+
+            elif sortOn == 'createdtime':
+                items = sorted(items,
+                               key=lambda x: x.createdTime,
+                               reverse=sort_reverse)
+
+        return items
 
 # bundles
 
@@ -248,9 +269,11 @@ class BundleLibraryCollection(LibraryCollection):
 
     @property
     def library_items(self):
+        result = []
         for bundle in self.library.getBundles() or ():
             if is_readable(bundle) and self.search_include(bundle):
-                yield bundle
+                result.append(bundle)
+        return self._sort_library_items(result)
 
     def getBundles(self):
         return self.library_items
