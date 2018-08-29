@@ -678,7 +678,8 @@ class UserBundleRecordsView(AbstractBundleRecordView,
         records = []
         for bundle in bundles:
             bundle_record = UserBundleRecord(User=self.context, Bundle=bundle)
-            bundle_record.__parent__  = bundle
+            # We want this so we have a traversable path to this record.
+            bundle_record.__parent__  = ContentPackageBundleUsersPathAdapter(bundle, self.request)
             records.append(bundle_record)
         result[TOTAL] = len(records)
         self._batch_items_iterable(result, records)
@@ -706,7 +707,7 @@ class BundleMembersView(SiteUsersView):
     def _transformer(self, user):  # pylint: disable=arguments-differ
         # We do not want to externalize the bundle `n` times.
         result = UserBundleRecord(User=user, Bundle=None)
-        result.__parent__ = self.bundle
+        result.__parent__ = self.context
         return result
 
     def get_users(self, site):
