@@ -52,6 +52,7 @@ class UserBundleRecord(SchemaConfigured):
 
     @property
     def __name__(self):
+        # pylint: disable=no-member
         return self.User.username
 
 
