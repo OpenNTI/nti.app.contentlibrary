@@ -52,8 +52,8 @@ from nti.contentlibrary.indexed_data import get_library_catalog
 
 from nti.contenttypes.presentation.interfaces import IPresentationAssetContainer
 
-from nti.coremetadata.interfaces import IContextLastSeenContainer
 from nti.coremetadata.interfaces import ILastSeenProvider
+from nti.coremetadata.interfaces import IContextLastSeenContainer
 
 from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.authorization import CONTENT_ROLE_PREFIX
@@ -460,4 +460,3 @@ class _BundleLastSeenProvider(object):
             ntiid = getattr(self.context, 'ntiid', None)
             _dt = container.get_timestamp(ntiid) if ntiid else None
             return datetime.datetime.utcfromtimestamp(_dt) if _dt else None
-        return None
