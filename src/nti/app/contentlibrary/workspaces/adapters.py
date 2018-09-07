@@ -239,6 +239,7 @@ class LibraryCollection(object):
         return result
 
     def _sort_library_items(self, items):
+        # pylint: disable=no-member
         sortOn = self.params.get('sortOn')
         sortOn = sortOn.lower() if sortOn else sortOn
 
