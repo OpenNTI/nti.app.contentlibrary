@@ -704,7 +704,7 @@ class BundleMembersView(SiteUsersView):
         # pylint: disable=no-member
         return self.context.context
 
-    def _transformer(self, user):  # pylint: disable=arguments-differ
+    def transformer(self, user):  # pylint: disable=arguments-differ
         # We do not want to externalize the bundle `n` times.
         result = UserBundleRecord(User=user, Bundle=None)
         result.__parent__ = self.context
