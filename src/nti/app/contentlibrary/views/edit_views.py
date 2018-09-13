@@ -8,7 +8,6 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import six
 import time
 import uuid
 import mimetypes
@@ -19,6 +18,8 @@ from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 from pyramid.view import view_defaults
+
+import six
 
 from zope import component
 from zope import lifecycleevent
@@ -88,10 +89,11 @@ from nti.contenttypes.presentation.interfaces import IPresentationAsset
 
 from nti.dataserver import authorization as nauth
 
-from nti.externalization.internalization import notifyModified as notify_modified
-
 from nti.externalization.externalization import to_external_object
-from nti.externalization.externalization import StandardExternalFields
+
+from nti.externalization.interfaces import StandardExternalFields
+
+from nti.externalization.internalization.events import notifyModified
 
 from nti.links.links import Link
 
@@ -140,7 +142,7 @@ class ContentPackageMixin(object):
         sources = get_all_sources(request, RST_MIMETYPE)
         if sources:
             if len(sources) == 1:
-                return iter(sources.values()).next()
+                return next(iter(sources.values()))
             return self._get_contents(sources)
         return None
 
@@ -351,12 +353,12 @@ class ContentUnitContentsPutView(AbstractAuthenticatedView,
             # pylint: disable=no-member
             version = self._get_version(data) or self.context.version
             self.context.write_contents(contents, contentType)
-            notify_modified(self.context,
-                            {
+            notifyModified(self.context,
+                           {
                                 u'version': version,
                                 u'contents': contents,
                                 u'contentType': contentType,
-                            })
+                           })
         result = self.context
         if contents is not None:
             result = to_external_object(self.context)
