@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-.. $Id: recordables.py 125307 2018-01-05 22:09:53Z carlos.sanchez $
+.. $Id$
 """
 
 from __future__ import division

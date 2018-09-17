@@ -8,12 +8,12 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from pyramid.threadlocal import get_current_request
+
 from zope import component
 from zope import interface
 
 from zope.cachedescriptors.property import Lazy
-
-from pyramid.threadlocal import get_current_request
 
 from nti.appserver.pyramid_authorization import has_permission
 

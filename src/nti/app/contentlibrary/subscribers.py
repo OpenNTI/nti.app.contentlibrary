@@ -8,14 +8,14 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from pyramid.threadlocal import get_current_request
+
 from zope import component
 from zope import interface
 
 from zope.securitypolicy.rolepermission import AnnotationRolePermissionManager
 
 from zope.traversing.interfaces import IBeforeTraverseEvent
-
-from pyramid.threadlocal import get_current_request
 
 from nti.app.contentlibrary.interfaces import IContentBoard
 from nti.app.contentlibrary.interfaces import IContentPackageRolePermissionManager

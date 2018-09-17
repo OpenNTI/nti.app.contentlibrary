@@ -10,20 +10,20 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-from six.moves import urllib_parse
-
-from requests.structures import CaseInsensitiveDict
-
-from zope import component
-from zope import interface
-
-from zope.location.interfaces import ILocationInfo
-
 from pyramid import traversal
 from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 from pyramid.view import view_defaults
+
+from requests.structures import CaseInsensitiveDict
+
+from six.moves import urllib_parse
+
+from zope import component
+from zope import interface
+
+from zope.location.interfaces import ILocationInfo
 
 from nti.app.authentication import get_remote_user
 

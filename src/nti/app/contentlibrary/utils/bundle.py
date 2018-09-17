@@ -13,13 +13,13 @@ import six
 import shutil
 import tempfile
 
-import simplejson
-
 from xml.dom import minidom
 
 from pyramid import httpexceptions as hexc
 
 from pyramid.threadlocal import get_current_request
+
+import simplejson
 
 from nti.app.contentlibrary import MessageFactory as _
 

@@ -12,12 +12,12 @@ import uuid
 import shutil
 import zipfile
 
-from requests.structures import CaseInsensitiveDict
-
 from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 from pyramid.view import view_defaults
+
+from requests.structures import CaseInsensitiveDict
 
 import six
 
@@ -711,8 +711,8 @@ class BundleMembersView(SiteUsersView):
         return result
 
     def get_users(self, site):
-        result = super(BundleMembersView, self).get_users(site)
         # pylint: disable=no-member
+        result = super(BundleMembersView, self).get_users(site)
         if self.bundle.RestrictedAccess:
             result = [x for x in result if is_bundle_visible_to_user(x, self.bundle)]
         return result

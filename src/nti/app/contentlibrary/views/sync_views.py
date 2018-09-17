@@ -10,9 +10,15 @@ from __future__ import absolute_import
 
 import sys
 import time
-from six import string_types
+
+from pyramid import httpexceptions as hexc
+
+from pyramid.view import view_config
+from pyramid.view import view_defaults
 
 from requests.structures import CaseInsensitiveDict
+
+from six import string_types
 
 import transaction
 try:
@@ -32,11 +38,6 @@ from zope.security.management import endInteraction
 from zope.security.management import restoreInteraction
 
 from zope.traversing.interfaces import IEtcNamespace
-
-from pyramid import httpexceptions as hexc
-
-from pyramid.view import view_config
-from pyramid.view import view_defaults
 
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
@@ -71,9 +72,9 @@ from nti.dataserver.authorization import ACT_SYNC_LIBRARY
 from nti.dataserver.interfaces import IDataserverFolder
 
 from nti.externalization.interfaces import LocatedExternalDict
+from nti.externalization.interfaces import StandardExternalFields
 
 from nti.externalization.externalization import to_external_object
-from nti.externalization.externalization import StandardExternalFields
 
 from nti.links.links import Link
 

@@ -9,9 +9,10 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 from collections import Mapping
-from six.moves import cStringIO
 
 import simplejson
+
+from six.moves import cStringIO
 
 from zope import component
 from zope import interface
