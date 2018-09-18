@@ -710,9 +710,9 @@ class BundleMembersView(SiteUsersView):
         result.__parent__ = self.context
         return result
 
-    def get_users(self, site):
-        # pylint: disable=no-member
-        result = super(BundleMembersView, self).get_users(site)
-        if self.bundle.RestrictedAccess:
-            result = [x for x in result if is_bundle_visible_to_user(x, self.bundle)]
+    def search_include(self, doc_id):
+        result = super(BundleMembersView, self).search_include(doc_id)
+        if result and self.bundle.RestrictedAccess:
+            username = self.username(doc_id)
+            result = is_bundle_visible_to_user(username, self.bundle)
         return result

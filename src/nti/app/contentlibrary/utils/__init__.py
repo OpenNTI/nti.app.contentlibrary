@@ -216,7 +216,8 @@ def is_bundle_visible_to_user(user, bundle):
     """
     Return whether the user has permission to view the given bundle.
     """
-    return has_permission(ACT_READ, bundle, user.username)
+    username = getattr(user, 'username', user)
+    return has_permission(ACT_READ, bundle, username)
 
 
 def get_visible_bundles_for_user(user):
