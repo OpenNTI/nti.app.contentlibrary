@@ -324,6 +324,10 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
         return result is None or is_true(result)
 
     def do_restrict_bundles(self, parent_bundles, parent_sm):
+        """
+        Restrict access to parent bundles; explicitly granting to parent site
+        community.
+        """
         site_policy = parent_sm.queryUtility(ISitePolicyUserEventListener)
         community_username = getattr(site_policy, 'COM_USERNAME', '')
         parent_community = None
@@ -353,6 +357,9 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
         self.request.jid = doc_id
 
     def create_bundle(self, parent_bundle, library):
+        """
+        Create a bundle based on the parent bundle as a starting point.
+        """
         bundle = PublishableContentPackageBundle()
         ext_bundle = to_external_object(parent_bundle, decorate=False)
         ext_bundle['ContentPackages'] = [x[NTIID] for x in ext_bundle['ContentPackages']]
@@ -373,7 +380,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
 
     def copy_bundles(self, parent_bundles):
         library = component.queryUtility(IContentPackageBundleLibrary)
-        bundles = library.getBundles(parents=False)
+        bundles = tuple(library.getBundles(parents=False))
         # We do not need to copy bundles if the title already exists
         child_titles = {x.title for x in bundles}
         new_ntiids = []
@@ -401,7 +408,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
                              None)
         parent_sm = source_site.getSiteManager()
         parent_library = parent_sm.queryUtility(IContentPackageBundleLibrary)
-        parent_bundles = parent_library.getBundles(parents=False)
+        parent_bundles = tuple(parent_library.getBundles(parents=False))
         if self.restrict_parent_bundles:
             logger.info('Restricting access to parent bundles (%s)',
                         self.source_site_name)
