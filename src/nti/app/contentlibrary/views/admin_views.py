@@ -263,7 +263,7 @@ class PublishBundleCatalogView(AbstractAuthenticatedView):
 
     def __call__(self):
         library = component.queryUtility(IContentPackageBundleLibrary)
-        bundles = library.getBundles(parents=False)
+        bundles = library.getBundles(False)
         ntiids = []
         for bundle in bundles:
             if IPublishable.providedBy(bundle) and not bundle.is_published():
@@ -322,10 +322,10 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
 
     @Lazy
     def excluded_bundles(self):
-        # Default false
+        # pylint: disable=no-member
         result = self._params.get('exclude') \
               or self._params.get('excluded_bundles')
-        return result or []
+        return result or ()
 
     @Lazy
     def publish_bundles(self):
@@ -394,11 +394,12 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
 
     def copy_bundles(self, parent_bundles):
         library = component.queryUtility(IContentPackageBundleLibrary)
-        bundles = tuple(library.getBundles(parents=False))
+        bundles = tuple(library.getBundles(False))
         # We do not need to copy bundles if the title already exists
         child_titles = {x.title for x in bundles}
         new_ntiids = []
         for parent_bundle in parent_bundles:
+            # pylint: disable=unsupported-membership-test
             if     parent_bundle.title in child_titles \
                 or parent_bundle.ntiid in self.excluded_bundles:
                 continue
@@ -422,7 +423,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
                              None)
         parent_sm = source_site.getSiteManager()
         parent_library = parent_sm.queryUtility(IContentPackageBundleLibrary)
-        parent_bundles = tuple(parent_library.getBundles(parents=False))
+        parent_bundles = tuple(parent_library.getBundles(False))
         if self.restrict_parent_bundles:
             logger.info('Restricting access to parent bundles (%s)',
                         self.source_site_name)
