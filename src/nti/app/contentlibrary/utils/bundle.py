@@ -73,6 +73,9 @@ def dc_metadata(bundle):
 
 
 def save_presentation_assets_to_disk(assets, target):
+    """
+    Copy the presentation-assets found in `assets` to the target path.
+    """
     if     not isinstance(assets, six.string_types) \
         or not os.path.isdir(assets):
         assets = is_valid_presentation_assets_source(assets)
@@ -101,24 +104,22 @@ def save_presentation_assets_to_disk(assets, target):
     # Make sure we touch the dirs so lastModified times are updated correctly
     # (as if we are in new directories). It may be better to write paths in a
     # GUID path to ensure uniqueness.
-    if not os.path.exists(path):
-        shutil.move(assets, path)
-    else:
-        # Recursively iterate until we find our images. Then copy them over.
-        for current_dir, unused_dirs, files in os.walk(assets):
-            for filename in files:
-                if filename.endswith('.png'):
-                    # Makedirs and copy file
-                    rel_path = os.path.relpath(current_dir, assets)
-                    source_path = os.path.join(current_dir, filename)
-                    target_dir = os.path.join(path, rel_path)
-                    target_path = os.path.join(target_dir, filename)
-                    if not os.path.exists(target_dir):
-                        os.makedirs(target_dir)
-                    shutil.copy2(source_path, target_path)
-                    shutil.copystat(current_dir, target_dir)
-        # Update mod time
-        shutil.copystat(assets, path)
+
+    # Recursively iterate until we find our images. Then copy them over.
+    for current_dir, unused_dirs, files in os.walk(assets):
+        for filename in files:
+            if filename.endswith('.png'):
+                # Makedirs and copy file
+                rel_path = os.path.relpath(current_dir, assets)
+                source_path = os.path.join(current_dir, filename)
+                target_dir = os.path.join(path, rel_path)
+                target_path = os.path.join(target_dir, filename)
+                if not os.path.exists(target_dir):
+                    os.makedirs(target_dir)
+                shutil.copy2(source_path, target_path)
+                shutil.copystat(current_dir, target_dir)
+    # Update mod time
+    shutil.copystat(assets, path)
     return path
 
 

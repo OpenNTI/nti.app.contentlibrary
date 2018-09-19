@@ -32,6 +32,8 @@ from nti.app.externalization.error import raise_json_error
 from nti.app.externalization.view_mixins import BatchingUtilsMixin
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
+from nti.app.contentlibrary import MessageFactory as _
+
 from nti.app.contentlibrary.utils.bundle import save_bundle
 
 from nti.app.contentlibrary.views import LibraryPathAdapter
@@ -344,17 +346,12 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
         parent_root = parent_bundle.root
         assets_path = parent_root.getChildNamed('presentation-assets')
         assets_path = getattr(assets_path, 'absolute_path', None)
-        if assets_path is not None:
-            library = self.validate_content_library(new_bundle)
-            # check for transaction retrial
-            jid = getattr(self.request, 'jid', None)
-            if jid is None:
-                # This should keep the source assets path unchanged.
-                save_bundle(new_bundle,
-                            library.enumeration.root,
-                            assets_path,
-                            name=str(doc_id))
-        self.request.jid = doc_id
+        library = self.validate_content_library(new_bundle)
+        # This should keep the source assets path unchanged.
+        save_bundle(new_bundle,
+                    library.enumeration.root,
+                    assets_path,
+                    name=str(doc_id))
 
     def create_bundle(self, parent_bundle, library):
         """
