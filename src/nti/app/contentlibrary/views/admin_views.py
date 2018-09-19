@@ -353,15 +353,20 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
                     assets_path,
                     name=str(doc_id))
 
+    def _get_ext_bundle(self, parent_bundle):
+        ext_bundle = to_external_object(parent_bundle, decorate=False)
+        ext_bundle['ContentPackages'] = [x[NTIID] for x in ext_bundle['ContentPackages']]
+        ext_bundle[MIMETYPE] = PUBLISHABLE_BUNDLE_MIME_TYPE
+        ext_bundle.pop('RestrictedAccess', None)
+        [ext_bundle.pop(x, None) for x in (NTIID, INTERNAL_NTIID)]
+        return ext_bundle
+
     def create_bundle(self, parent_bundle, library):
         """
         Create a bundle based on the parent bundle as a starting point.
         """
         bundle = PublishableContentPackageBundle()
-        ext_bundle = to_external_object(parent_bundle, decorate=False)
-        ext_bundle['ContentPackages'] = [x[NTIID] for x in ext_bundle['ContentPackages']]
-        ext_bundle[MIMETYPE] = PUBLISHABLE_BUNDLE_MIME_TYPE
-        [ext_bundle.pop(x, None) for x in (NTIID, INTERNAL_NTIID)]
+        ext_bundle = self._get_ext_bundle(parent_bundle)
         update_from_external_object(bundle, ext_bundle)
 
         bundle.creator = self.remoteUser.username
