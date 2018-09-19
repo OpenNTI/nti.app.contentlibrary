@@ -307,6 +307,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
 
     @Lazy
     def source_site_name(self):
+        # pylint: disable=no-member
         return self._params.get('source') \
             or self._params.get('source_site') \
             or self._params.get('source_site_name')
@@ -314,6 +315,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
     @Lazy
     def restrict_parent_bundles(self):
         # Default false
+        # pylint: disable=no-member
         result = self._params.get('restrict') \
               or self._params.get('restrict_parent_bundles')
         return is_true(result)
@@ -328,6 +330,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
     @Lazy
     def publish_bundles(self):
         # Default to true
+        # pylint: disable=no-member
         result = self._params.get('publish') \
               or self._params.get('publish_bundles')
         return result is None or is_true(result)
@@ -349,6 +352,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
                 access_provider.grant_access(parent_community)
 
     def save_bundle_to_disk(self, new_bundle, parent_bundle):
+        # pylint: disable=no-member
         doc_id = self.intids.getId(new_bundle)
         parent_root = parent_bundle.root
         assets_path = parent_root.getChildNamed('presentation-assets')
@@ -365,6 +369,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
         ext_bundle['ContentPackages'] = [x[NTIID] for x in ext_bundle['ContentPackages']]
         ext_bundle[MIMETYPE] = PUBLISHABLE_BUNDLE_MIME_TYPE
         ext_bundle.pop('RestrictedAccess', None)
+        # pylint: disable=expression-not-assigned
         [ext_bundle.pop(x, None) for x in (NTIID, INTERNAL_NTIID)]
         return ext_bundle
 
@@ -375,7 +380,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
         bundle = PublishableContentPackageBundle()
         ext_bundle = self._get_ext_bundle(parent_bundle)
         update_from_external_object(bundle, ext_bundle)
-
+        # pylint: disable=no-member
         bundle.creator = self.remoteUser.username
         # register and set ntiid
         intids = component.getUtility(IIntIds)
@@ -407,8 +412,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
         return new_ntiids
 
     def __call__(self):
-        current_site = getSite()
-        source_site = current_site.__parent__.get(self.source_site_name)
+        source_site = getSite().__parent__.get(self.source_site_name)
         if source_site is None:
             raise_json_error(self.request,
                              hexc.HTTPUnprocessableEntity,
