@@ -319,6 +319,13 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
         return is_true(result)
 
     @Lazy
+    def excluded_bundles(self):
+        # Default false
+        result = self._params.get('exclude') \
+              or self._params.get('excluded_bundles')
+        return result or []
+
+    @Lazy
     def publish_bundles(self):
         # Default to true
         result = self._params.get('publish') \
@@ -387,7 +394,8 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
         child_titles = {x.title for x in bundles}
         new_ntiids = []
         for parent_bundle in parent_bundles:
-            if parent_bundle.title in child_titles:
+            if     parent_bundle.title in child_titles \
+                or parent_bundle.ntiid in self.excluded_bundles:
                 continue
             new_bundle = self.create_bundle(parent_bundle, library)
             if self.publish_bundles:
