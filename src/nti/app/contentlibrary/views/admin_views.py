@@ -371,7 +371,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
         # register and set ntiid
         intids = component.getUtility(IIntIds)
         intids.register(bundle)
-        self._set_ntiid(bundle)
+        bundle.ntiid = self.make_bundle_ntiid(bundle)
         # add to library
         lifecycleevent.created(bundle)
         library.add(bundle)
