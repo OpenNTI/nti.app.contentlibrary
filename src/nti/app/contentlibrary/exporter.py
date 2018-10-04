@@ -12,7 +12,7 @@ from collections import Mapping
 
 import simplejson
 
-from six.moves import cStringIO
+from six import StringIO
 
 from zope import component
 from zope import interface
@@ -61,7 +61,7 @@ class AssetExporterMixin(object):
 
     @classmethod
     def dump(cls, ext_obj):
-        source = cStringIO()
+        source = StringIO()
         simplejson.dump(ext_obj, source, indent='\t', sort_keys=True)
         source.seek(0)
         return source
