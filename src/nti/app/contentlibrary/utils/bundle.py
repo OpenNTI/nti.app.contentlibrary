@@ -9,7 +9,6 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
-import six
 import shutil
 import tempfile
 
@@ -20,6 +19,8 @@ from pyramid import httpexceptions as hexc
 from pyramid.threadlocal import get_current_request
 
 import simplejson
+
+import six
 
 from nti.app.contentlibrary import MessageFactory as _
 

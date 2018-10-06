@@ -63,6 +63,7 @@ def _do_synchronize(sleep=None, site=None, ntiids=(), allowRemoval=True, notify=
         # Mostly for testing, if we started up with a different library
         # that could not provide valid site libraries, install
         # one if we can get there now.
+        # pylint: disable=no-member
         site_manager = component.getSiteManager()
         site_name = site_manager.__parent__.__name__
         site_lib = install_site_content_library(site_manager)

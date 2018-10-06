@@ -469,7 +469,9 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView,
         """
         values = self.readInput()
         result = values.get('user') \
-              or values.get('users')
+              or values.get('users') \
+              or values.get('username') \
+              or values.get('usernames') 
         if result:
             entities = result.split(',')
             result = self._get_entities(entities)
@@ -712,6 +714,7 @@ class BundleMembersView(SiteUsersView):
 
     def search_include(self, doc_id):
         result = super(BundleMembersView, self).search_include(doc_id)
+        # pylint: disable=no-member
         if result and self.bundle.RestrictedAccess:
             username = self.username(doc_id)
             result = is_bundle_visible_to_user(username, self.bundle)

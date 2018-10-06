@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
-# disable: accessing protected members, too many methods
-# pylint: disable=W0212,R0904
+# pylint: disable=protected-access,too-many-public-methods,arguments-differ
 
 from hamcrest import not_none
 from hamcrest import has_length
@@ -14,15 +14,16 @@ from hamcrest import contains_inanyorder
 
 import gc
 import os
+
 import fudge
+
+from persistent import Persistent
 
 from zope import component
 
 from zope.component.persistentregistry import PersistentComponents as Components
 
 from zope.intid.interfaces import IIntIds
-
-from persistent import Persistent
 
 from nti.app.contentlibrary.synchronize.subscribers import _load_and_register_json
 from nti.app.contentlibrary.synchronize.subscribers import _get_file_last_mod_namespace
