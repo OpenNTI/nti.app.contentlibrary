@@ -86,7 +86,7 @@ class TestLibraryCollectionDetailExternalizer(NewRequestLayerTest):
         self.acl_policy = ZopeACLAuthorizationPolicy()
         component.provideUtility(self.acl_policy)
 
-        self.library_workspace = component.getMultiAdapter((self.library, self.request), 
+        self.library_workspace = component.getMultiAdapter((self.library, self.request),
                                                            IWorkspace)
         self.library_collection = self.library_workspace.collections[0]
 
@@ -162,7 +162,8 @@ class TestAdapters(NewRequestLayerTest):
 
         lib = fudge.Fake('library').provides('getBundles').is_callable().returns(bundles)
         col = BundleLibraryCollection(lib)
-        assert_that([x.title for x in col.library_items], contains('tiger', 'banana', 'bound ok'))
+        # Default sort title
+        assert_that([x.title for x in col.library_items], contains('banana', 'bound ok', 'tiger'))
 
         # Sorting
         params = self.request.params
@@ -226,7 +227,7 @@ class TestAdapters(NewRequestLayerTest):
 
         lib = fudge.Fake('library').has_attr(contentPackages=bundles)
         col = LibraryCollection(lib)
-        assert_that([x.title for x in col.library_items], contains('tiger', 'banana', 'bound ok'))
+        assert_that([x.title for x in col.library_items], contains('banana', 'bound ok', 'tiger'))
 
         params = self.request.params
         params['sortOn'] = 'title'

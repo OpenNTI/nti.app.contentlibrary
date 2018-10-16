@@ -241,7 +241,7 @@ class LibraryCollection(object):
     def _sort_library_items(self, items):
         # pylint: disable=no-member
         sortOn = self.params.get('sortOn')
-        sortOn = sortOn.lower() if sortOn else sortOn
+        sortOn = sortOn.lower() if sortOn else 'title'
 
         sortOrder = self.params.get('sortOrder', 'ascending')
         sort_reverse = sortOrder == 'descending'
