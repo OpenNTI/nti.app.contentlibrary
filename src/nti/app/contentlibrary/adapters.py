@@ -66,6 +66,7 @@ from nti.dataserver.contenttypes.forums.interfaces import IForum
 
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import system_user
+from nti.dataserver.interfaces import IPublishable
 from nti.dataserver.interfaces import IAccessProvider
 from nti.dataserver.interfaces import IMutableGroupMember
 
@@ -342,6 +343,10 @@ class _BundleAccessProvider(object):
         return role_for_content_bundle(self.context)
 
     @Lazy
+    def _is_published(self):
+        return not IPublishable.providedBy(self.bundle) or self.bundle.is_published()
+
+    @Lazy
     def _package_context_roles(self):
         result = set()
         # pylint: disable=not-an-iterable
@@ -361,8 +366,8 @@ class _BundleAccessProvider(object):
         Grant access to the bundle and all :class:`IContentPackage` objects
         within the bundle.
         """
-        logger.info("Granting access to bundle (%s) (%s)",
-                    self.context.ntiid, entity.username)
+        logger.info("Granting access to bundle (%s) (%s) (published=%s)",
+                    self.context.ntiid, entity.username, self._is_published)
         membership = self._get_membership(entity)
         original_groups = set(membership.groups)
         new_groups = original_groups | set((self._bundle_role,)) | self._package_context_roles
