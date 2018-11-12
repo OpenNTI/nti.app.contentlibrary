@@ -16,17 +16,21 @@ from zope import interface
 from nti.contentlibrary.interfaces import IContentUnit
 
 from nti.contenttypes.completion.completion import CompletedItem
+from nti.contenttypes.completion.policies import AbstractCompletableItemCompletionPolicy
 
 from nti.contenttypes.completion.interfaces import ICompletionContext
 from nti.contenttypes.completion.interfaces import ICompletableItemCompletionPolicy
 from nti.contenttypes.completion.interfaces import ICompletionContextCompletionPolicyContainer
 
+from nti.externalization.persistence import NoPickle
+
 logger = __import__('logging').getLogger(__name__)
 
 
+@NoPickle
 @component.adapter(IContentUnit)
 @interface.implementer(ICompletableItemCompletionPolicy)
-class DefaultContentUnitCompletionPolicy(object):
+class DefaultContentUnitCompletionPolicy(AbstractCompletableItemCompletionPolicy):
     """
     A simple completion policy that only cares about submissions for completion.
     """
