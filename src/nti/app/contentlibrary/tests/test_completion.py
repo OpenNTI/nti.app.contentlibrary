@@ -26,4 +26,5 @@ class TestCompletion(ApplicationLayerTest):
     def test_externalization(self):
         obj = ContentUnit()
         policy = ICompletableItemCompletionPolicy(obj)
-        assert_that(to_external_object(policy), has_entries({'Class': 'DefaultContentUnitCompletionPolicy'}))
+        assert_that(to_external_object(policy), has_entries({'Class': 'DefaultContentUnitCompletionPolicy',
+                                                             'offers_completion_certificate': False}))

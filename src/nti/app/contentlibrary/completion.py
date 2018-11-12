@@ -35,6 +35,8 @@ class DefaultContentUnitCompletionPolicy(AbstractCompletableItemCompletionPolicy
     A simple completion policy that only cares about submissions for completion.
     """
 
+    offers_completion_certificate = False
+
     def __init__(self, obj):
         self.content_unit = obj
 
