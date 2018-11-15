@@ -394,4 +394,8 @@ class _PublishableContentPackageBundleACLProvider(_ContentPackageBundleACLProvid
 
     def _bundle_ace(self, aces):
         if self.context.is_published():
+            # Content role users get access
             super(_PublishableContentPackageBundleACLProvider, self)._bundle_ace(aces)
+        else:
+            # If not published, we should make sure we deny all.
+            aces.append(ACE_DENY_ALL)
