@@ -9,6 +9,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
+import stat
 import shutil
 import tempfile
 
@@ -73,6 +74,23 @@ def dc_metadata(bundle):
     return xmldoc.toprettyxml(encoding="UTF-8")
 
 
+def _update_perms(file_path):
+    """
+    We shouldn't have to do this, but make sure our perms (775) for the
+    output dir retain our parent group id as well as give RW access
+    to both user and (copied) group.
+    """
+    parent = os.path.dirname(file_path)
+    parent_stat = os.stat(parent)
+    parent_gid = parent_stat.st_gid
+    # -1 unchanged
+    os.chown(file_path, -1, parent_gid)
+    os.chmod(file_path,
+             stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+             stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP |
+             stat.S_IROTH | stat.S_IXOTH )
+
+
 def save_presentation_assets_to_disk(assets, target):
     """
     Copy the presentation-assets found in `assets` to the target path.
@@ -121,6 +139,7 @@ def save_presentation_assets_to_disk(assets, target):
                 shutil.copystat(current_dir, target_dir)
     # Update mod time
     shutil.copystat(assets, path)
+    _update_perms(path)
     return path
 
 
