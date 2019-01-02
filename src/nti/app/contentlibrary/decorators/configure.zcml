@@ -31,11 +31,6 @@
 	<subscriber factory=".bundle._ContentBundlePagesLinkDecorator"
 				provides="nti.externalization.interfaces.IExternalMappingDecorator" />
 
-	<subscriber factory=".bundle._PublishableContentPackageBundleDecorator"
-				provides="nti.externalization.interfaces.IExternalObjectDecorator"
-                for="nti.contentlibrary.interfaces.IPublishableContentPackageBundle
-                     pyramid.interfaces.IRequest"/>
-
     <subscriber factory=".bundle._UserBundleRecordsDecorator"
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"
                 for="nti.coremetadata.interfaces.IUser
