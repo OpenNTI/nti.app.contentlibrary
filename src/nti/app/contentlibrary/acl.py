@@ -281,7 +281,8 @@ class _RenderableContentPackageACLProvider(object):
             admin_ace = ace_allowing(prin, ALL_PERMISSIONS, self)
             aces.append(admin_ace)
         # Now add in any supplemental providers.
-        for supplemental in component.subscribers((self.context,), ISupplementalACLProvider):
+        for supplemental in component.subscribers((self.context,),
+                                                  ISupplementalACLProvider):
             for supplemental_ace in supplemental.__acl__ or ():
                 if supplemental_ace is not None:
                     aces.append(supplemental_ace)

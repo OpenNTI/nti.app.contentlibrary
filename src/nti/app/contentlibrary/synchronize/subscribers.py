@@ -265,10 +265,11 @@ def removed_registered(provided, name, intids=None, registry=None,
     registry = get_site_registry(registry)
     if item is None:
         registered = registry.queryUtility(provided, name=name)
-    intids = component.getUtility(IIntIds) if intids is None else intids
     if can_be_removed(registered, force=force):
         catalog = get_library_catalog() if catalog is None else catalog
-        catalog.unindex(registered, intids=intids)
+        if catalog is not None:
+            intids = component.getUtility(IIntIds) if intids is None else intids
+            catalog.unindex(registered, intids=intids)
         if not unregisterUtility(registry, provided=provided, name=name):
             logger.error("Could not unregister (%s,%s) during sync, continuing...",
                          provided.__name__, name)
@@ -439,10 +440,8 @@ def clear_assets_by_interface(content_package, iface, registry=None,
         container = IPresentationAssetContainer(unit)
         # pylint: disable=too-many-function-args
         for key, value in tuple(container.items()):  # mutating
-            registered = None
             provided = interface_of_asset(value)
-            if not force:
-                registered = component.queryUtility(provided, name=key)
+            registered = component.queryUtility(provided, name=key)
             if     registered is None \
                 or (provided.isOrExtends(iface) and can_be_removed(registered, force)):
                 del container[key]
@@ -577,8 +576,19 @@ def update_index_when_content_changes(content_package, index_filename,
 _update_index_when_content_changes = update_index_when_content_changes
 
 
-def clear_package_assets(content_package, force=False):
+def clear_package_assets(content_package, force=False, unregister_assets=False, registry=None):
     result = []
+
+    if unregister_assets:
+        # If global registry, make sure we unregister our assets (since we do not have
+        # an index). This is necessary for test layers.
+        for data in INDICES.values():
+            item_iface = data[0]
+            clear_assets_by_interface(content_package,
+                                      item_iface,
+                                      force=force,
+                                      unregister=True,
+                                      registry=registry)
 
     def _recur(unit):
         # pylint: disable=too-many-function-args
@@ -703,14 +713,18 @@ def _on_content_package_rendered(content_package, unused_event):
 # clear events
 
 
-def clear_content_package_assets(content_package, force=True, process_global=False):
+def clear_content_package_assets(content_package, force=True, process_global=True):
     """
     Because we don't know where the data is stored, when a
     content package is removed we need to clear its data.
     """
     result = []
     catalog = get_library_catalog()
-    clear_package_assets(content_package, force)
+    # pylint: disable=too-many-function-args
+    folder = IHostPolicyFolder(content_package, None)
+    registry = folder.getSiteManager() if folder is not None else None
+    is_global_manager = bool(get_site_registry(registry) == component.getGlobalSiteManager())
+    clear_package_assets(content_package, force, unregister_assets=is_global_manager)
 
     # Remove indexes for our contained items; ignoring the global library.
     # Not sure if this will work when we have shared items
@@ -718,9 +732,6 @@ def clear_content_package_assets(content_package, force=True, process_global=Fal
     if not process_global and IGlobalContentPackage.providedBy(content_package):
         return result
     clear_namespace_last_modified(content_package, catalog)
-    # pylint: disable=too-many-function-args
-    folder = IHostPolicyFolder(content_package, None)
-    registry = folder.getSiteManager() if folder is not None else None
 
     for data in INDICES.values():
         item_iface = data[0]
