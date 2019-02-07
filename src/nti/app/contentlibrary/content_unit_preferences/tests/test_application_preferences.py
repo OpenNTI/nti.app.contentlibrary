@@ -133,7 +133,7 @@ class NIDMapper(object):
 
     def __init__(self, context):
         href = context.href
-        root_package = traversal.find_interface(context, 
+        root_package = traversal.find_interface(context,
                                                 lib_interfaces.IContentPackage)
         if root_package:
             href = root_package.root + '/' + context.href
@@ -263,12 +263,7 @@ class TestContainerPrefs(NewRequestLayerTest):
         self.request.body = json.dumps({"sharedWith": sharedWith})
         self.request.content_type = u'application/json'
 
-        class Accept(object):
-
-            def best_match(self, *unused_args):
-                return 'application/json'
-
-        self.request.accept = Accept()
+        self.request.accept = 'application/json'
 
         @interface.implementer(lib_interfaces.IContentPackageLibrary)
         class Lib(object):
@@ -323,7 +318,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         self._do_update_prefs(content_unit, sharedWith=[u'a', u'b'])
 
-        self._do_check_root_inherited(ntiid=containerId, 
+        self._do_check_root_inherited(ntiid=containerId,
                                       sharedWith=[u'a', u'b'])
 
     @WithMockDSTrans
@@ -340,7 +335,7 @@ class TestContainerPrefs(NewRequestLayerTest):
 
         info = ContentUnitInfo()
         info.contentUnit = content_unit
-        decorator = _ContentUnitPreferencesDecorator(info, 
+        decorator = _ContentUnitPreferencesDecorator(info,
                                                      get_current_request())
         result_map = {}
 

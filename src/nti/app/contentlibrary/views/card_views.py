@@ -35,8 +35,6 @@ from nti.ntiids.interfaces import INTIIDResolver
 # re-export
 PAGE_INFO_MT_JSON = PAGE_INFO_MT_JSON
 
-# See also assessment_views, especially for notes on Accept header handling.
-
 # Content cards are not true modeled content; this package
 # contains traversal helpers to fake it
 class _ContentCard(Contained):
@@ -86,9 +84,8 @@ def get_card_view_link(request):
     # Not supported.
     return hexc.HTTPBadRequest()
 
-# explicit empty accept, else we get a ConfigurationConflict and/or
-# no-Accept header goes to the wrong place
-@view_config(accept='', **_view_defaults)
+# Use default application/json accept header
+@view_config(accept='application/json', **_view_defaults)
 @view_config(**_view_defaults)
 def get_card_view(request):
     # NOTE: These are not modeled content. What we are returning is arbitrary
