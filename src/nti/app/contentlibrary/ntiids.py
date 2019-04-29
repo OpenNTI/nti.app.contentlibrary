@@ -14,10 +14,6 @@ from zope import interface
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
-from nti.dataserver import authorization_acl as nacl
-
-from nti.dataserver.interfaces import ACLLocationProxy
-
 from nti.ntiids.interfaces import INTIIDResolver
 
 logger = __import__('logging').getLogger(__name__)
@@ -32,8 +28,6 @@ class _ContentResolver(object):
         path = library.pathToNTIID(key) if library else None
         if path:
             result = path[-1]
-            result = ACLLocationProxy(result, result.__parent__,
-                                      result.__name__, nacl.ACL(result))
         return result
 
 
