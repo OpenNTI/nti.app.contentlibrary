@@ -40,6 +40,8 @@ from nti.dataserver.contenttypes.forums.board import AnnotatableBoardAdapter
 
 from nti.dataserver.contenttypes.forums.forum import GeneralForum
 
+from nti.dataserver.contenttypes.forums.interfaces import IDefaultForum
+
 from nti.dataserver.contenttypes.forums.post import GeneralHeadlinePost
 from nti.dataserver.contenttypes.forums.post import GeneralForumComment
 
@@ -100,6 +102,7 @@ class ContentBoard(GeneralBoard):
         forum = ContentForum()
         forum.creator = self.creator
         self[forum.__default_name__] = forum
+        interface.alsoProvides(forum, IDefaultForum)
         forum.title = _(u'Forum')
 
         errors = schema.getValidationErrors(IContentForum, forum)
