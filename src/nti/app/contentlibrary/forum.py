@@ -38,6 +38,8 @@ from nti.dataserver.contenttypes.forums.acl import CommunityBoardACLProvider
 from nti.dataserver.contenttypes.forums.board import GeneralBoard
 from nti.dataserver.contenttypes.forums.board import AnnotatableBoardAdapter
 
+from nti.dataserver.contenttypes.forums.forum import DEFAULT_FORUM_NAME
+
 from nti.dataserver.contenttypes.forums.forum import GeneralForum
 
 from nti.dataserver.contenttypes.forums.interfaces import IDefaultForum
@@ -103,7 +105,7 @@ class ContentBoard(GeneralBoard):
         forum.creator = self.creator
         self[forum.__default_name__] = forum
         interface.alsoProvides(forum, IDefaultForum)
-        forum.title = _(u'Forum')
+        forum.title = _(DEFAULT_FORUM_NAME)
 
         errors = schema.getValidationErrors(IContentForum, forum)
         if errors:
