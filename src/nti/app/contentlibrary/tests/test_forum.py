@@ -19,7 +19,9 @@ from nti.app.forums.tests.base_forum_testing import AbstractTestApplicationForum
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
-_FORUM_NAME = ContentForum.__default_name__
+from nti.dataserver.contenttypes.forums.forum import DEFAULT_FORUM_NAME
+
+_FORUM_NAME = DEFAULT_FORUM_NAME
 _BOARD_NAME = ContentBoard.__default_name__
 
 
