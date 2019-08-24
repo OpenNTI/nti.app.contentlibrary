@@ -19,9 +19,9 @@ from nti.app.forums.tests.base_forum_testing import AbstractTestApplicationForum
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
+from nti.dataserver.contenttypes.forums.forum import DEFAULT_FORUM_KEY
 from nti.dataserver.contenttypes.forums.forum import DEFAULT_FORUM_NAME
 
-_FORUM_NAME = DEFAULT_FORUM_NAME
 _BOARD_NAME = ContentBoard.__default_name__
 
 
@@ -36,7 +36,7 @@ class TestApplicationBundlesForum(AbstractTestApplicationForumsBaseMixin, Applic
 
     # default_community = 'zope.security.management.system_user'
     # default_entityname = default_community
-    forum_url_relative_to_user = _BOARD_NAME + '/' + _FORUM_NAME
+    forum_url_relative_to_user = _BOARD_NAME + '/' + DEFAULT_FORUM_KEY
 
     board_ntiid = None
     board_ntiid_checker = not_none()
@@ -49,7 +49,7 @@ class TestApplicationBundlesForum(AbstractTestApplicationForumsBaseMixin, Applic
     forum_headline_class_type = 'Post'
     forum_topic_content_type = None
     board_link_rel = forum_link_rel = _BOARD_NAME
-    forum_title = _FORUM_NAME
+    forum_title = DEFAULT_FORUM_NAME
     forum_type = ContentForum
 
     forum_topic_comment_content_type = 'application/vnd.nextthought.forums.contentforumcomment+json'
@@ -60,7 +60,7 @@ class TestApplicationBundlesForum(AbstractTestApplicationForumsBaseMixin, Applic
         super(TestApplicationBundlesForum, self).setUp()
         self.forum_pretty_url = '/dataserver2/%2B%2Betc%2B%2Bbundles/bundles/tag%3Anextthought.com%2C2011-10%3ANTI-Bundle-ABundle/DiscussionBoard/Forum'
         self.forum_pretty_contents_url = self.forum_pretty_url + '/contents'
-        self.board_pretty_url = self.forum_pretty_url[:-(len(_FORUM_NAME) + 1)]
+        self.board_pretty_url = self.forum_pretty_url[:-(len(DEFAULT_FORUM_KEY) + 1)]
 
         self.board_content_type = ContentBoard.mimeType + '+json'
         self.forum_topic_content_type = ContentHeadlineTopic.mimeType + '+json'
