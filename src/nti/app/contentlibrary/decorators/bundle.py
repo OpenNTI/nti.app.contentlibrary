@@ -20,24 +20,17 @@ from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 from nti.app.contentlibrary import BUNDLE_USERS_PATH_ADAPTER
 
+from nti.app.contentlibrary.interfaces import IContentBoard
 from nti.app.contentlibrary.interfaces import IUserBundleRecord
 
 from nti.app.contentlibrary.utils import get_visible_bundles_for_user
 
-from nti.app.publishing import VIEW_PUBLISH
-from nti.app.publishing import VIEW_UNPUBLISH
-
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
 
-from nti.appserver.pyramid_authorization import has_permission
-
 from nti.contentlibrary.interfaces import IContentPackageBundle
-from nti.contentlibrary.interfaces import IPublishableContentPackageBundle
 
 from nti.coremetadata.interfaces import IUser
 from nti.coremetadata.interfaces import ILastSeenProvider
-
-from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
 from nti.dataserver.authorization import is_admin
 from nti.dataserver.authorization import is_site_admin
@@ -72,6 +65,7 @@ class _ContentBundlePagesLinkDecorator(Singleton):
         link.__name__ = ''
         link.__parent__ = context
         _links.append(link)
+        result['Discussions'] = IContentBoard(context, None)
 
 
 @interface.implementer(IExternalMappingDecorator)
