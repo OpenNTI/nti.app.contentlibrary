@@ -391,7 +391,7 @@ class TestBundleViews(ApplicationLayerTest):
                                                      description=u'Manga bleach',
                                                      RestrictedAccess=True)
             # Validate we can update dublin fields.
-            ext_obj = to_external_object(bundle)
+            ext_obj = to_external_object(bundle, decorate=False)
             [ext_obj.pop(x, None) for x in ('NTIID', 'ntiid')]
             ext_obj['ContentPackages'] = [self.pkg_ntiid]
             ext_obj['creators'] = ['IFSTA']
@@ -464,7 +464,7 @@ class TestBundleViews(ApplicationLayerTest):
         bundle = PublishableContentPackageBundle(title=u'Bleach',
                                                  description=u'Manga bleach',
                                                  RestrictedAccess=True)
-        ext_obj = to_external_object(bundle)
+        ext_obj = to_external_object(bundle, decorate=False)
         [ext_obj.pop(x, None) for x in ('NTIID', 'ntiid')]
         ext_obj['ContentPackages'] = ['tag:nextthought.com,2011-10:NTI-HTML-PackageA']
 
