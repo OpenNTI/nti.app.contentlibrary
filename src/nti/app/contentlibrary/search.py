@@ -17,7 +17,7 @@ from zope.cachedescriptors.property import Lazy
 
 from nti.appserver.pyramid_authorization import has_permission
 
-from nti.contentlibrary.interfaces import IContentUnit
+from nti.contentlibrary.interfaces import IContentUnit, IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
 from nti.contentsearch.interfaces import ISearchHitPredicate
@@ -33,6 +33,7 @@ from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.singleton import Singleton
 
 from nti.publishing.interfaces import IPublishable
+from nti.ntiids.ntiids import find_object_with_ntiid
 
 CONTAINER_ID = StandardExternalFields.CONTAINER_ID
 
@@ -49,16 +50,23 @@ class _DefaultSearchPacakgeResolver(object):
     def __init__(self, *args):
         pass
 
-    def resolve(self, unused_user, unused_ntiid=None):
-        result = ()
-        request = get_current_request()
-        library = component.queryUtility(IContentPackageBundleLibrary)
-        library = component.queryMultiAdapter((library, request),
-                                              IContentPackageBundleLibrary)
-        if library is not None:
-            result = []
-            for bundle in library.getBundles():
-                result.extend(x.ntiid for x in bundle.ContentPackages)
+    def resolve(self, unused_user, ntiid=None):
+        result = set()
+        if ntiid:
+            # If ntiid, return it and any packages under it
+            result.add(ntiid)
+            obj = find_object_with_ntiid(ntiid)
+            if IContentPackageBundle.providedBy(obj):
+                result.update(x for x in obj.ContentPackages)
+        else:
+            # Otherwise, return all bundle packages
+            request = get_current_request()
+            library = component.queryUtility(IContentPackageBundleLibrary)
+            library = component.queryMultiAdapter((library, request),
+                                                  IContentPackageBundleLibrary)
+            if library is not None:
+                for bundle in library.getBundles():
+                    result.update(x.ntiid for x in bundle.ContentPackages)
         return result
 
 
