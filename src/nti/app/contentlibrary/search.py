@@ -95,6 +95,10 @@ class _SearchHitDecorator(Singleton):
             context = original.Target
             parent_key = getattr(context.__parent__, 'key', None)
             if parent_key is not None and parent_key == context.key:
-                external[CONTAINER_ID] = context.__parent__.ntiid
+                external[CONTAINER_ID] = container_id = context.__parent__.ntiid
             else:
-                external[CONTAINER_ID] = context.ntiid
+                external[CONTAINER_ID] = container_id = context.ntiid
+            container = find_object_with_ntiid(container_id)
+            title = getattr(container, 'title', '') \
+                 or getattr(container, 'label', '')
+            external["ContainerTitle"] = title
