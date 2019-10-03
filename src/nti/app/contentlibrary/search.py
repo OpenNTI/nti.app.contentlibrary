@@ -57,7 +57,7 @@ class _DefaultSearchPacakgeResolver(object):
             result.add(ntiid)
             obj = find_object_with_ntiid(ntiid)
             if IContentPackageBundle.providedBy(obj):
-                result.update(x for x in obj.ContentPackages)
+                result.update(x.ntiid for x in obj.ContentPackages)
         else:
             # Otherwise, return all bundle packages
             request = get_current_request()
