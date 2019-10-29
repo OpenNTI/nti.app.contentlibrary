@@ -471,7 +471,7 @@ class AbstractBundleUpdateAccessView(AbstractAuthenticatedView,
         result = values.get('user') \
               or values.get('users') \
               or values.get('username') \
-              or values.get('usernames') 
+              or values.get('usernames')
         if result:
             entities = result.split(',')
             result = self._get_entities(entities)

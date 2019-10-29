@@ -262,8 +262,9 @@ class TestBundleViews(ApplicationLayerTest):
         correctly.
         """
         with mock_dataserver.mock_db_trans(self.ds, site_name='platform.ou.edu'):
-            Community.create_community(dataserver=self.ds,
-                                       username='ou.nextthought.com')
+            if Community.get_community('ou.nextthought.com') is None:
+                Community.create_community(dataserver=self.ds,
+                                           username='ou.nextthought.com')
         # Grant community access
         grant_href = '/dataserver2/ContentBundles/%s/@@%s' \
                      % (ntiid, VIEW_BUNDLE_GRANT_ACCESS)
