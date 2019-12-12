@@ -23,8 +23,6 @@ from nti.externalization.singleton import Singleton
 
 from nti.links.links import Link
 
-from nti.ntiids.ntiids import find_object_with_ntiid
-
 from nti.ntiids.oids import to_external_ntiid_oid
 
 LINKS = StandardExternalFields.LINKS
@@ -35,20 +33,11 @@ logger = __import__('logging').getLogger(__name__)
 @interface.implementer(IExternalMappingDecorator)
 class _UGDLibraryPathLinkDecorator(Singleton):
     """
-    Create a `LibraryPath` link to our container id.
+    Create a `LibraryPath` link to our object ntiid.
     """
 
     def decorateExternalMapping(self, context, result):
-        container_id = context.containerId
-        container = find_object_with_ntiid(container_id)
-        if container is not None:
-            external_ntiid = to_external_ntiid_oid(container)
-        else:
-            external_ntiid = None
-        if external_ntiid is None:
-            # Non-persistent content unit perhaps.
-            # Just add library path to our note.
-            external_ntiid = to_external_ntiid_oid(context)
+        external_ntiid = to_external_ntiid_oid(context)
 
         if external_ntiid is not None:
             path = '/%s/%s' % (get_ds2(), LIBRARY_PATH_GET_VIEW)

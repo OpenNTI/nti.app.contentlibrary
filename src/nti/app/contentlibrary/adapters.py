@@ -128,11 +128,17 @@ def _get_bundles_from_container(obj):
 
 @component.adapter(interface.Interface, IUser)
 @interface.implementer(IHierarchicalContextProvider)
-def _hierarchy_from_obj(obj, unused_user):
-    container_bundles = _get_bundles_from_container(obj)
-    results = [(bundle,) for bundle in container_bundles]
-    results = (results,) if results else results
-    return results
+class UserBookHierarchyPathProvider(object):
+
+    def __init__(self, obj, user):
+        self.obj = obj
+        self.user = user
+
+    def get_context_paths(self, context=None):
+        container_bundles = _get_bundles_from_container(self.obj)
+        results = [(bundle,) for bundle in container_bundles]
+        results = (results,) if results else results
+        return results
 
 
 @component.adapter(IContentUnit, IUser)

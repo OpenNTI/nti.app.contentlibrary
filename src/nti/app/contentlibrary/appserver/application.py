@@ -66,7 +66,6 @@ def _on_process_starting(event):
     xml_conf_machine = event.xml_conf_machine
     gsm = component.getGlobalSiteManager()
     settings = gsm.getUtility(IApplicationSettings)
-
     library_zcml = None
     if 'library_zcml' in settings:
         library_zcml = settings['library_zcml']

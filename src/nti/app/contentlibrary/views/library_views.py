@@ -74,6 +74,8 @@ from nti.contentlibrary.interfaces import IContentUnitHrefMapper
 
 from nti.contenttypes.presentation.interfaces import IPresentationAsset
 
+from nti.coremetadata.interfaces import IContainerContext
+
 from nti.dataserver import authorization as nauth
 
 from nti.dataserver.contenttypes.forums.interfaces import IPost
@@ -82,8 +84,6 @@ from nti.dataserver.contenttypes.forums.interfaces import IForum
 from nti.dataserver.contenttypes.forums.interfaces import IBoard
 from nti.dataserver.contenttypes.forums.interfaces import IPersonalBlog
 
-from nti.dataserver.interfaces import IBookmark
-from nti.dataserver.interfaces import IHighlight
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IDataserverFolder
 
@@ -408,8 +408,9 @@ class _ContentPackageLibraryCacheController(AbstractReliableLastModifiedCacheCon
 
 
 def _get_hierarchy_context_for_context(obj, top_level_context):
-    results = component.queryMultiAdapter((top_level_context, obj),
-                                          IHierarchicalContextProvider)
+    provider = component.queryMultiAdapter((top_level_context, obj),
+                                           IHierarchicalContextProvider)
+    results = provider.get_context_paths()
     return results or ((top_level_context,),)
 
 
@@ -709,9 +710,23 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
                     packages = ()
         return packages
 
+    def get_container_context(self, obj):
+        """
+        Attempt to get the root context from the object itself.
+        """
+        result = None
+        container_context = IContainerContext(obj, None)
+        if container_context:
+            context_id = container_context.context_id
+            result = find_object_with_ntiid(context_id)
+        return result
+
     def _get_path(self, obj, target_ntiid):
         result = LocatedExternalList()
-        hierarchy_contexts = get_hierarchy_context(obj, self.remoteUser)
+        container_context = self.get_container_context(obj)
+        hierarchy_contexts = get_hierarchy_context(obj,
+                                                   self.remoteUser,
+                                                   context=container_context)
         # We have some readings that do not exist in our catalog.
         # We need content units to be indexed.
         for hierarchy_context in hierarchy_contexts:
@@ -765,11 +780,6 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
             raise hexc.HTTPUnprocessableEntity("Invalid ObjectId.")
 
         obj = find_object_with_ntiid(obj_ntiid)
-        # If we get a contained object, we need the path to the container.
-        if     IHighlight.providedBy(obj) \
-            or IBookmark.providedBy(obj):
-            obj_ntiid = obj.containerId
-            obj = find_object_with_ntiid(obj_ntiid)
         if obj is None:
             raise hexc.HTTPNotFound(_('%s not found' % obj_ntiid))
         # See if the reading is no longer visible to our user.

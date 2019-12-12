@@ -24,7 +24,9 @@ from zope import component
 from zope import interface
 
 from pyramid.router import Router
+
 from pyramid.request import Request
+
 from pyramid.traversal import find_interface
 
 from nti.app.contentlibrary.views.library_views import find_page_info_view_helper
@@ -88,7 +90,7 @@ class TestApplication(ApplicationLayerTest):
 
         assert_that(library_ws, has_entry('Items', has_length(1)))
         main_col = library_ws['Items'][0]
-        assert_that(main_col, 
+        assert_that(main_col,
                     has_entry('href',  urllib_parse.unquote(href)))
 
         res = self.testapp.get(href)
@@ -154,7 +156,7 @@ class TestApplicationBundles(ApplicationLayerTest):
 
         assert_that(library_ws, has_entry('Items', has_length(1)))
         main_col = library_ws['Items'][0]
-        assert_that(main_col, 
+        assert_that(main_col,
                     has_entry('href', urllib_parse.unquote(href)))
 
         res = self.testapp.get(href)

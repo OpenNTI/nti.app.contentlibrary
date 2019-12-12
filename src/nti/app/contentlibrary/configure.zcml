@@ -159,7 +159,7 @@
 				for="nti.contentlibrary.interfaces.IContentUnit
 					 nti.dataserver.interfaces.IUser"/>
 
-	<subscriber factory=".adapters._hierarchy_from_obj"
+	<subscriber factory=".adapters.UserBookHierarchyPathProvider"
 				provides="nti.appserver.interfaces.IHierarchicalContextProvider"
 				for="*
 					 nti.dataserver.interfaces.IUser"/>
