@@ -84,6 +84,8 @@ from nti.dataserver.contenttypes.forums.interfaces import IForum
 from nti.dataserver.contenttypes.forums.interfaces import IBoard
 from nti.dataserver.contenttypes.forums.interfaces import IPersonalBlog
 
+from nti.dataserver.interfaces import IBookmark
+from nti.dataserver.interfaces import IHighlight
 from nti.dataserver.interfaces import IDataserver
 from nti.dataserver.interfaces import IDataserverFolder
 
@@ -697,7 +699,7 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
 
         if IContentUnit.providedBy(obj):
             # Short circuit and just use the package we have
-            # XXX: Global libray doesnt have lineage...
+            # XXX: Global library does not have lineage...
             package = find_interface(obj, IContentPackage, strict=False)
             return (package,)
 
@@ -727,6 +729,12 @@ class _LibraryPathView(AbstractCachingLibraryPathView):
     def _get_path(self, obj, target_ntiid):
         result = LocatedExternalList()
         container_context = self.get_container_context(obj)
+        if     IHighlight.providedBy(obj) \
+            or IBookmark.providedBy(obj):
+            # Now that we have our container context, we need to
+            # use that container to find the actual path
+            target_ntiid = obj.containerId
+            obj = find_object_with_ntiid(target_ntiid)
         hierarchy_contexts = get_hierarchy_context(obj,
                                                    self.remoteUser,
                                                    context=container_context)
