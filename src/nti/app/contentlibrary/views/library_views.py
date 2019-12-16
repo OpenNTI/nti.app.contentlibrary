@@ -410,8 +410,11 @@ class _ContentPackageLibraryCacheController(AbstractReliableLastModifiedCacheCon
 def _get_hierarchy_context_for_context(obj, top_level_context):
     provider = component.queryMultiAdapter((top_level_context, obj),
                                            IHierarchicalContextProvider)
-    results = provider.get_context_paths()
-    return results or ((top_level_context,),)
+    if provider is not None:
+        results = provider.get_context_paths()
+    else:
+        results = ((top_level_context,),)
+    return results
 
 
 def _get_board_obj_path(obj):
