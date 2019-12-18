@@ -75,6 +75,7 @@ from nti.contentlibrary.interfaces import IContentUnitHrefMapper
 from nti.contenttypes.presentation.interfaces import IPresentationAsset
 
 from nti.coremetadata.interfaces import IContainerContext
+from nti.coremetadata.interfaces import IDeactivatedObject
 
 from nti.dataserver import authorization as nauth
 
@@ -448,6 +449,8 @@ def _get_board_obj_path(obj):
                 result_list.append(item)
 
     result_list.reverse()
+    if result_list and IDeactivatedObject.providedBy(result_list[0]):
+        raise hexc.HTTPNotFound()
     result.append(result_list)
     return result
 
