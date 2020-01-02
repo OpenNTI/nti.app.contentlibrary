@@ -18,13 +18,13 @@ does_not = is_not
 
 from nti.testing.matchers import validly_provides
 
-from nti.appserver.traversal import find_interface
-
 from nti.contentlibrary import interfaces as lib_interfaces
 
 from nti.contentprocessing import interfaces as cp_interfaces
 
 from nti.contentprocessing.metadata_extractors import get_metadata_from_content_location
+
+from nti.traversal.traversal import find_interface
 
 from nti.app.contentlibrary.tests import ExLibraryApplicationTestLayer
 
@@ -44,15 +44,15 @@ class TestResolvers(ApplicationLayerTest):
         metadata = get_metadata_from_content_location(self.child_ntiid)
         assert_that(metadata, validly_provides(cp_interfaces.IContentMetadata))
         # The URLs are properly mapped
-        assert_that(metadata, 
+        assert_that(metadata,
 					has_property('contentLocation',
                                  '/WithAssessment/tag_nextthought_com_2011-10_MN-HTML-MiladyCosmetology_history_and_career_opportuniities.html'))
 
         # Both a manual icon and a thumbnail are found
         assert_that(metadata.images, has_length(2))
-        assert_that(metadata.images, 
+        assert_that(metadata.images,
 					contains(has_property('url', '/WithAssessment/icons/chapters/C1.png'),
-                             has_property('url', 
+                             has_property('url',
 										  '/WithAssessment/thumbnails/tag_nextthought_com_2011-10_MN-HTML-MiladyCosmetology_history_and_career_opportuniities.png')))
 
         # The lineage to do ACLs is intact
