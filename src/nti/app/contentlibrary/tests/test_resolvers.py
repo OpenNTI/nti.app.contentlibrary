@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -16,6 +17,8 @@ from hamcrest import assert_that
 from hamcrest import has_property
 does_not = is_not
 
+from pyramid.traversal import find_interface
+
 from nti.testing.matchers import validly_provides
 
 from nti.contentlibrary import interfaces as lib_interfaces
@@ -23,8 +26,6 @@ from nti.contentlibrary import interfaces as lib_interfaces
 from nti.contentprocessing import interfaces as cp_interfaces
 
 from nti.contentprocessing.metadata_extractors import get_metadata_from_content_location
-
-from nti.traversal.traversal import find_interface
 
 from nti.app.contentlibrary.tests import ExLibraryApplicationTestLayer
 
@@ -56,6 +57,8 @@ class TestResolvers(ApplicationLayerTest):
 										  '/WithAssessment/thumbnails/tag_nextthought_com_2011-10_MN-HTML-MiladyCosmetology_history_and_career_opportuniities.png')))
 
         # The lineage to do ACLs is intact
+        # Need to use pyramid.traversal since the global library does
+        # not have lineage
         assert_that(find_interface(metadata, lib_interfaces.IContentPackage),
 					is_(not_none()))
 

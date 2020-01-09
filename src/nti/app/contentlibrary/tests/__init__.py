@@ -222,7 +222,6 @@ class ExLibraryApplicationTestLayer(ApplicationTestLayer):
             cls.__old_library.resetContentPackages()
 
         lib = cls._setup_library()
-
         gsm.registerUtility(lib, IContentPackageLibrary)
         lib.syncContentPackages()
         cls.__current_library = lib
