@@ -32,6 +32,7 @@ from nti.app.contentlibrary.interfaces import IContentPackageMetadata
 
 from nti.app.contentlibrary.model import ContentPackageSyncMetadata
 
+from nti.app.contentlibrary.utils import content_unit_to_bundles
 from nti.app.contentlibrary.utils import role_for_content_package
 
 from nti.appserver.context_providers import get_top_level_contexts
@@ -92,21 +93,10 @@ def bundle_to_principal(bundle):
     return IPrincipal(creator) if creator else system_user
 
 
-def _content_unit_to_bundles(unit):
-    result = []
-    package = find_interface(unit, IContentPackage, strict=False)
-    bundle_catalog = component.queryUtility(IContentPackageBundleLibrary)
-    bundles = bundle_catalog.getBundles() if bundle_catalog is not None else ()
-    for bundle in bundles or ():
-        if package in bundle.ContentPackages or ():
-            result.append(bundle)
-    return result
-
-
 @component.adapter(IContentUnit)
 @interface.implementer(IContentPackageBundle)
 def _content_unit_to_bundle(unit):
-    bundles = _content_unit_to_bundles(unit)
+    bundles = content_unit_to_bundles(unit)
     return bundles[0] if bundles else None
 
 

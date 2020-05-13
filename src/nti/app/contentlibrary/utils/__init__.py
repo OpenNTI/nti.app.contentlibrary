@@ -38,6 +38,8 @@ from nti.ntiids.ntiids import get_provider
 from nti.ntiids.ntiids import get_specific
 from nti.ntiids.ntiids import find_object_with_ntiid
 
+from nti.traversal.traversal import find_interface
+
 PAGE_INFO_MT = nti_mimetype_with_class('pageinfo')
 PAGE_INFO_MT_JSON = PAGE_INFO_MT + '+json'
 
@@ -230,5 +232,16 @@ def get_visible_bundles_for_user(user):
     result = []
     for bundle in library.getBundles():
         if is_bundle_visible_to_user(user, bundle):
+            result.append(bundle)
+    return result
+
+
+def content_unit_to_bundles(unit):
+    result = []
+    package = find_interface(unit, IContentPackage, strict=False)
+    bundle_catalog = component.queryUtility(IContentPackageBundleLibrary)
+    bundles = bundle_catalog.getBundles() if bundle_catalog is not None else ()
+    for bundle in bundles or ():
+        if package in bundle.ContentPackages or ():
             result.append(bundle)
     return result

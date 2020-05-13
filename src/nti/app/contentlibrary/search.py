@@ -17,6 +17,8 @@ from zope.cachedescriptors.property import Lazy
 
 from nti.appserver.pyramid_authorization import has_permission
 
+from nti.app.contentlibrary.utils import content_unit_to_bundles
+
 from nti.contentlibrary.interfaces import IContentUnit, IContentPackageBundle
 from nti.contentlibrary.interfaces import IContentPackageBundleLibrary
 
@@ -32,8 +34,9 @@ from nti.externalization.interfaces import StandardExternalFields
 
 from nti.externalization.singleton import Singleton
 
-from nti.publishing.interfaces import IPublishable
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.publishing.interfaces import IPublishable
 
 CONTAINER_ID = StandardExternalFields.CONTAINER_ID
 
@@ -80,11 +83,28 @@ class _ContentUnitSearchHitPredicate(DefaultSearchHitPredicate):
     def request(self):
         return get_current_request()
 
+    def validate_bundle_permission(self, item):
+        """
+        Validate the remote user has READ permission on *any* bundle
+        containing this unit. If not found in a bundle, return True.
+        """
+        bundles = content_unit_to_bundles(item)
+        if not bundles:
+            return True
+        result = False
+        for bundle in bundles:
+            if has_permission(ACT_READ, bundle, self.request):
+                # Just need one hit
+                result = True
+                break
+        return result
+
     def allow(self, item, unused_score, unused_query):  # pylint: disable=arguments-differ
         if self.principal is None:
             return True
         return is_published(item) \
-           and has_permission(ACT_READ, item, self.request)
+           and has_permission(ACT_READ, item, self.request) \
+           and self.validate_bundle_permission(item)
 
 
 @component.adapter(IContentUnitSearchHit)
