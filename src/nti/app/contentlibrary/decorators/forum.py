@@ -113,7 +113,7 @@ class _ContentPackageBundleForumDecorator(Singleton):
 
 @component.adapter(ITopic)
 @interface.implementer(IExternalObjectDecorator)
-class _CourseInstanceForumTopicDecorator(Singleton):
+class _ContentPackageBundleTopicDecorator(Singleton):
 
     def decorateExternalObject(self, original, external):
         book = find_interface(original, IContentPackageBundle, strict=False)
