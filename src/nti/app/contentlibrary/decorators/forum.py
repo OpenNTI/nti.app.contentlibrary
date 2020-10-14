@@ -17,12 +17,13 @@ from nti.app.contentlibrary import LIBRARY_PATH_GET_VIEW
 
 from nti.app.contentlibrary.decorators import AbstractLibraryPathLinkDecorator
 
+from nti.app.contentlibrary.interfaces import IContentForum
+
 from nti.contentlibrary.interfaces import IContentPackageBundle
 
 from nti.dataserver.contenttypes.forums.interfaces import IPost
 from nti.dataserver.contenttypes.forums.interfaces import ITopic
 from nti.dataserver.contenttypes.forums.interfaces import IForum
-from nti.dataserver.contenttypes.forums.interfaces import ICommunityForum
 
 from nti.dataserver.interfaces import ICommunity
 
@@ -100,7 +101,7 @@ def _get_community():
     return None
 
 
-@component.adapter(ICommunityForum)
+@component.adapter(IContentForum)
 @interface.implementer(IExternalObjectDecorator)
 class _ContentPackageBundleForumDecorator(Singleton):
 
@@ -121,4 +122,4 @@ class _ContentPackageBundleTopicDecorator(Singleton):
         if book is not None:
             community = _get_community()
             if community is not None:
-                external['DefaultSharedToNTIIDs'] = [community.NTIID]
+                external['ContainerDefaultSharedToNTIIDs'] = [community.NTIID]
