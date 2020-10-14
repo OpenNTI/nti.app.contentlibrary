@@ -17,11 +17,18 @@ from nti.app.contentlibrary import LIBRARY_PATH_GET_VIEW
 
 from nti.app.contentlibrary.decorators import AbstractLibraryPathLinkDecorator
 
-from nti.dataserver.contenttypes.forums.interfaces import IPost
+from nti.contentlibrary.interfaces import IContentPackageBundle
+
+from nti.dataserver.contenttypes.forums.interfaces import IPost, ICommunityForum
 from nti.dataserver.contenttypes.forums.interfaces import ITopic
 from nti.dataserver.contenttypes.forums.interfaces import IForum
 
+from nti.dataserver.interfaces import ICommunity
+
+from nti.dataserver.users.entity import Entity
+
 from nti.externalization.interfaces import StandardExternalFields
+from nti.externalization.interfaces import IExternalObjectDecorator
 from nti.externalization.interfaces import IExternalMappingDecorator
 
 from nti.externalization.singleton import Singleton
@@ -29,6 +36,10 @@ from nti.externalization.singleton import Singleton
 from nti.links.links import Link
 
 from nti.ntiids.oids import to_external_ntiid_oid
+
+from nti.site.site import get_component_hierarchy_names
+
+from nti.traversal.traversal import find_interface
 
 LINKS = StandardExternalFields.LINKS
 
@@ -73,3 +84,40 @@ class _TopicLibraryPathLinkDecorator(AbstractLibraryPathLinkDecorator):
 @interface.implementer(IExternalMappingDecorator)
 class _ForumLibraryPathLinkDecorator(AbstractLibraryPathLinkDecorator):
     pass
+
+
+def _get_community():
+    """
+    Mimicing what happens during publish. For books, we want to display
+    any viable site communities. This will not always be correct, some
+    books are not available to everyone.
+    """
+    for name in get_component_hierarchy_names() or ():
+        comm = Entity.get_entity(name or '')
+        if ICommunity.providedBy(comm):
+            return comm
+    return None
+
+
+@component.adapter(ICommunityForum)
+@interface.implementer(IExternalObjectDecorator)
+class _ContentPackageBundleForumDecorator(Singleton):
+
+    def decorateExternalObject(self, original, external):
+        book = find_interface(original, IContentPackageBundle, strict=False)
+        if book is not None:
+            community = _get_community()
+            if community is not None:
+                external['DefaultSharedToNTIIDs'] = [community.NTIID]
+
+
+@component.adapter(ITopic)
+@interface.implementer(IExternalObjectDecorator)
+class _CourseInstanceForumTopicDecorator(Singleton):
+
+    def decorateExternalObject(self, original, external):
+        book = find_interface(original, IContentPackageBundle, strict=False)
+        if book is not None:
+            community = _get_community()
+            if community is not None:
+                external['DefaultSharedToNTIIDs'] = [community.NTIID]

@@ -71,4 +71,13 @@
 				for="..interfaces.IContentUnitInfo
 					 pyramid.interfaces.IRequest" />
 
+    <subscriber factory=".forum._ContentPackageBundleForumDecorator"
+                for=".interfaces.ICourseInstanceForum"
+                provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
+
+    <subscriber factory=".forum._ContentPackageBundleTopicDecorator"
+                for="nti.dataserver.contenttypes.forums.interfaces.ITopic"
+                provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
+
+
 </configure>
