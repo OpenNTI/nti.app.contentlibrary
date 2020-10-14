@@ -72,7 +72,7 @@
 					 pyramid.interfaces.IRequest" />
 
     <subscriber factory=".forum._ContentPackageBundleForumDecorator"
-                for=".interfaces.ICourseInstanceForum"
+                for="nti.dataserver.contenttypes.forums.interfaces.ICommunityForum"
                 provides="nti.externalization.interfaces.IExternalObjectDecorator"/>
 
     <subscriber factory=".forum._ContentPackageBundleTopicDecorator"

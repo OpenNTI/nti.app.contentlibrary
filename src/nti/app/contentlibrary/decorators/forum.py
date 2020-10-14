@@ -19,9 +19,10 @@ from nti.app.contentlibrary.decorators import AbstractLibraryPathLinkDecorator
 
 from nti.contentlibrary.interfaces import IContentPackageBundle
 
-from nti.dataserver.contenttypes.forums.interfaces import IPost, ICommunityForum
+from nti.dataserver.contenttypes.forums.interfaces import IPost
 from nti.dataserver.contenttypes.forums.interfaces import ITopic
 from nti.dataserver.contenttypes.forums.interfaces import IForum
+from nti.dataserver.contenttypes.forums.interfaces import ICommunityForum
 
 from nti.dataserver.interfaces import ICommunity
 
