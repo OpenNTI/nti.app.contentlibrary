@@ -8,6 +8,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+from zc.displayname.interfaces import IDisplayNameGenerator
+
 from zope import component
 from zope import interface
 
@@ -111,6 +113,7 @@ class _ContentPackageBundleForumDecorator(Singleton):
             community = _get_community()
             if community is not None:
                 external['DefaultSharedToNTIIDs'] = [community.NTIID]
+                external['DefaultSharedToDisplayNames'] = [IDisplayNameGenerator(community)()]
 
 
 @component.adapter(ITopic)
@@ -123,3 +126,4 @@ class _ContentPackageBundleTopicDecorator(Singleton):
             community = _get_community()
             if community is not None:
                 external['ContainerDefaultSharedToNTIIDs'] = [community.NTIID]
+                external['ContainerDefaultSharedToDisplayNames'] = [IDisplayNameGenerator(community)()]
