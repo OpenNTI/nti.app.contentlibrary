@@ -79,6 +79,8 @@ from nti.app.users.utils import get_community_or_site_members
 
 from nti.app.users.views.list_views import SiteUsersView
 
+from nti.appserver.pyramid_authorization import has_permission
+
 from nti.appserver.ugd_edit_views import ContainerContextUGDPostView
 
 from nti.contentlibrary.bundle import DEFAULT_BUNDLE_MIME_TYPE
@@ -120,6 +122,8 @@ from nti.externalization.interfaces import StandardInternalFields
 from nti.externalization.proxy import removeAllProxies
 
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.publishing.interfaces import IPublishable
 
 from nti.site.interfaces import IHostPolicyFolder
 
@@ -733,6 +737,13 @@ class ContentPackageBundleContentsView(AbstractAuthenticatedView,
     _DEFAULT_BATCH_START = 0
     _DEFAULT_BATCH_SIZE = 20
 
+    def _is_published(self, package):
+        return not IPublishable.providedBy(package) or package.is_published()
+
+    def _batch_selector(self, package):
+        return self._is_published(package) \
+            or has_permission(ACT_CONTENT_EDIT, package, self.request)
+
     def __call__(self):
         # Not sure any sort order here makes sense
         result = LocatedExternalDict()
@@ -742,5 +753,6 @@ class ContentPackageBundleContentsView(AbstractAuthenticatedView,
         result[TOTAL] = len(items)
         self._batch_items_iterable(result,
                                    items,
-                                   number_items_needed=len(items))
+                                   number_items_needed=len(items),
+                                   selector=self._batch_selector)
         return result
