@@ -741,8 +741,9 @@ class ContentPackageBundleContentsView(AbstractAuthenticatedView,
         return not IPublishable.providedBy(package) or package.is_published()
 
     def _batch_selector(self, package):
-        return self._is_published(package) \
-            or has_permission(ACT_CONTENT_EDIT, package, self.request)
+        if     self._is_published(package) \
+            or has_permission(ACT_CONTENT_EDIT, package, self.request):
+            return package
 
     def __call__(self):
         # Not sure any sort order here makes sense
