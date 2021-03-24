@@ -15,6 +15,7 @@ from zope import interface
 
 from zope.location.interfaces import ILocation
 
+from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
@@ -55,16 +56,17 @@ logger = __import__('logging').getLogger(__name__)
 @component.adapter(IContentPackageBundle)
 class _ContentBundlePagesLinkDecorator(Singleton):
     """
-    Places a link to the pages view of a content bundle.
+    Places a link to the pages and contents of a content bundle.
     """
 
     def decorateExternalMapping(self, context, result):
         _links = result.setdefault(LINKS, [])
-        link = Link(context, rel='Pages', elements=('Pages',))
-        interface.alsoProvides(link, ILocation)
-        link.__name__ = ''
-        link.__parent__ = context
-        _links.append(link)
+        for rel in ('Pages', VIEW_CONTENTS):
+            link = Link(context, rel=rel, elements=(rel,))
+            interface.alsoProvides(link, ILocation)
+            link.__name__ = ''
+            link.__parent__ = context
+            _links.append(link)
         result['Discussions'] = IContentBoard(context, None)
 
 

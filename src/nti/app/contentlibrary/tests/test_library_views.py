@@ -44,6 +44,7 @@ from nti.app.testing.application_webtest import ApplicationLayerTest
 from nti.app.testing.decorators import WithSharedApplicationMockDS
 
 from nti.dataserver.tests import mock_dataserver
+from nti.app.contentlibrary import VIEW_CONTENTS
 
 
 @interface.implementer(IContentUnit)
@@ -166,14 +167,16 @@ class TestApplicationBundles(ApplicationLayerTest):
                                 'titles', has_length(2)))
 
         titles = res.json_body['titles']
-        package = next(x for x in titles if x['ntiid'] == u'tag:nextthought.com,2011-10:NTI-Bundle-ABundle')
-        assert_that(package,
-                    has_entry('ContentPackages',
+        bundle = next(x for x in titles if x['ntiid'] == u'tag:nextthought.com,2011-10:NTI-Bundle-ABundle')
+        pkg_rel = self.require_link_href_with_rel(bundle, VIEW_CONTENTS)
+        pkg_res = self.testapp.get(pkg_rel).json_body
+        assert_that(pkg_res,
+                    has_entry('Items',
                               contains(has_entry('Class', 'ContentPackage'))))
 
         expected = '/dataserver2/%2B%2Betc%2B%2Bbundles/bundles/tag%3Anextthought.com%2C2011-10%3ANTI-Bundle-ABundle/DiscussionBoard'
         expected = urllib_parse.unquote(expected)
-        assert_that(urllib_parse.unquote(self.require_link_href_with_rel(package, 'DiscussionBoard')),
+        assert_that(urllib_parse.unquote(self.require_link_href_with_rel(bundle, 'DiscussionBoard')),
                     is_(expected))
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
@@ -183,7 +186,9 @@ class TestApplicationBundles(ApplicationLayerTest):
         res = self.testapp.get(href,
                                extra_environ={'HTTP_USER_AGENT': "NTIFoundation DataLoader NextThought/1.2.0/46149 (x86_64; 7.1)"})
 
-        package = res.json_body['titles'][0]
-        assert_that(package,
-                    has_entry('ContentPackages',
-                              contains('tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.')))
+        bundle = res.json_body['titles'][0]
+        pkg_rel = self.require_link_href_with_rel(bundle, VIEW_CONTENTS)
+        pkg_res = self.testapp.get(pkg_rel).json_body
+        assert_that(pkg_res,
+                    has_entry('Items',
+                              contains(has_entry('NTIID', 'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'))))

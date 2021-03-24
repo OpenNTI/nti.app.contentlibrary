@@ -41,7 +41,7 @@ from nti.app.authentication import get_remote_user
 from nti.app.base.abstract_views import get_all_sources
 from nti.app.base.abstract_views import AbstractAuthenticatedView
 
-from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
+from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS, VIEW_CONTENTS
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
 
@@ -718,4 +718,29 @@ class BundleMembersView(SiteUsersView):
         if result and self.bundle.RestrictedAccess:
             username = self.username(doc_id)
             result = is_bundle_visible_to_user(username, self.bundle)
+        return result
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             context=IContentPackageBundle,
+             permission=ACT_READ,
+             name=VIEW_CONTENTS,
+             request_method='GET')
+class ContentPackageBundleContentsView(AbstractAuthenticatedView,
+                                       BatchingUtilsMixin):
+
+    _DEFAULT_BATCH_START = 0
+    _DEFAULT_BATCH_SIZE = 20
+
+    def __call__(self):
+        # Not sure any sort order here makes sense
+        result = LocatedExternalDict()
+        result.__name__ = self.request.view_name
+        result.__parent__ = self.request.context
+        items = self.context.ContentPackages
+        result[TOTAL] = len(items)
+        self._batch_items_iterable(result,
+                                   items,
+                                   number_items_needed=len(items))
         return result

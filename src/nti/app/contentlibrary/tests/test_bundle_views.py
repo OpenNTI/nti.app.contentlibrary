@@ -32,6 +32,7 @@ from zope import component
 
 from zope.intid.interfaces import IIntIds
 
+from nti.app.contentlibrary import VIEW_CONTENTS
 from nti.app.contentlibrary import VIEW_USER_BUNDLE_RECORDS
 from nti.app.contentlibrary import VIEW_BUNDLE_GRANT_ACCESS
 from nti.app.contentlibrary import VIEW_BUNDLE_REMOVE_ACCESS
@@ -255,7 +256,6 @@ class TestBundleViews(ApplicationLayerTest):
                          extra_environ=user_environ,
                          status=403)
 
-
     def _test_access(self, ntiid):
         """
         Validate granting/removing access to bundle. Multiple calls work
@@ -470,21 +470,26 @@ class TestBundleViews(ApplicationLayerTest):
         ext_obj['ContentPackages'] = ['tag:nextthought.com,2011-10:NTI-HTML-PackageA']
 
         res = self.testapp.post_json(href, ext_obj, status=201)
-        assert_that(res.json_body,
-                    has_entry('ContentPackages', has_length(1)))
+        pkg_rel = self.require_link_href_with_rel(res.json_body, VIEW_CONTENTS)
+        pkg_res = self.testapp.get(pkg_rel).json_body
+        assert_that(pkg_res['Total'], is_(1))
+        assert_that(pkg_res['Items'], has_length(1))
         ntiid = res.json_body['NTIID']
 
         href = '/dataserver2/ContentBundles/%s/@@AddPackage' % ntiid
-        res = self.testapp.post_json(href, {'ntiid':self.pkg_ntiid}, status=200)
-        assert_that(res.json_body,
-                    has_entry('ContentPackages', has_length(2)))
+        self.testapp.post_json(href, {'ntiid':self.pkg_ntiid}, status=200)
+        pkg_res = self.testapp.get(pkg_rel).json_body
+        assert_that(pkg_res['Total'], is_(2))
+        assert_that(pkg_res['Items'], has_length(2))
 
         href = '/dataserver2/ContentBundles/%s/@@RemovePackage' % ntiid
         res = self.testapp.post_json(href, {'ntiid':self.pkg_ntiid}, status=200)
-        assert_that(res.json_body,
-                    has_entry('ContentPackages', has_length(1)))
+        pkg_res = self.testapp.get(pkg_rel).json_body
+        assert_that(pkg_res['Total'], is_(1))
+        assert_that(pkg_res['Items'], has_length(1))
 
         href = '/dataserver2/ContentBundles/%s/@@RemovePackage' % ntiid
         res = self.testapp.post_json(href, {'ntiid': 'tag:nextthought.com,2011-10:NTI-HTML-PackageA'})
-        assert_that(res.json_body,
-                    has_entry('ContentPackages', has_length(0)))
+        pkg_res = self.testapp.get(pkg_rel).json_body
+        assert_that(pkg_res['Total'], is_(0))
+        assert_that(pkg_res['Items'], has_length(0))
