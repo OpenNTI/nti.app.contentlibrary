@@ -366,7 +366,7 @@ class CopyContentPackageBundleCatalogView(AbstractAuthenticatedView,
 
     def _get_ext_bundle(self, parent_bundle):
         ext_bundle = to_external_object(parent_bundle, decorate=False)
-        ext_bundle['ContentPackages'] = [x[NTIID] for x in ext_bundle['ContentPackages']]
+        ext_bundle['ContentPackages'] = [x.ntiid for x in parent_bundle.ContentPackages]
         ext_bundle[MIMETYPE] = PUBLISHABLE_BUNDLE_MIME_TYPE
         ext_bundle.pop('RestrictedAccess', None)
         # pylint: disable=expression-not-assigned
