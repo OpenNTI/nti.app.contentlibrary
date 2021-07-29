@@ -471,8 +471,9 @@ class _BundleLastSeenProvider(object):
 @component.adapter(IContentUnit, IRequest)
 class ContentUnitDisplayNameGenerator(object):
 
-    def __init__(self, context, unused_request):
+    def __init__(self, context, request):
         self.context = context
+        self.request = request
 
     def __call__(self, maxlength=None):
         title = getattr(self.context, 'title', '')
