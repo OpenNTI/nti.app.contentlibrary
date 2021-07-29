@@ -15,6 +15,10 @@ from BTrees.OOBTree import OOBTree
 
 from pyramid.interfaces import IRequest
 
+from zc.displayname.adapters import convertName
+
+from zc.displayname.interfaces import IDisplayNameGenerator
+
 from zope import component
 from zope import interface
 
@@ -461,3 +465,15 @@ class _BundleLastSeenProvider(object):
             ntiid = getattr(self.context, 'ntiid', None)
             _dt = container.get_timestamp(ntiid) if ntiid else None
             return datetime.datetime.utcfromtimestamp(_dt) if _dt else None
+
+
+@interface.implementer(IDisplayNameGenerator)
+@component.adapter(IContentUnit, IRequest)
+class ContentUnitDisplayNameGenerator(object):
+
+    def __init__(self, context, unused_request):
+        self.context = context
+
+    def __call__(self, maxlength=None):
+        title = getattr(self.context, 'title', '')
+        return convertName(title, self.request, maxlength)

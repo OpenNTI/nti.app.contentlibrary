@@ -99,7 +99,7 @@
 	<adapter factory=".adapters._package_from_request"
 			 provides="nti.contentlibrary.interfaces.IContentPackage"
 			 for="pyramid.interfaces.IRequest" />
-
+			 
 	<!-- Externalization -->
 	<!-- Note that we want to use the externalization already present, we just need the
 	correct factories registered -->
@@ -115,6 +115,7 @@
 	<include package=".decorators" />
 
 	<!-- Adapters & Subscribers -->
+	<adapter factory=".adapters.ContentUnitDisplayNameGenerator" />
 	<adapter factory=".renderers._ContentUnitInfoCacheController" />
 
 	<adapter factory=".adapters.presentation_asset_items_factory"
