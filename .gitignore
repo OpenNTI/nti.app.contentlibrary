@@ -1,0 +1,8 @@
+
+# /
+/.project
+/.pydevproject
+/.settings
+
+# /src/
+/src/nti.app.contentlibrary.egg-info
