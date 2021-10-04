@@ -1,8 +1,18 @@
+*.py[cod]
 
-# /
 /.project
 /.pydevproject
-/.settings
+/.settings/
 
-# /src/
-/src/nti.app.contentlibrary.egg-info
+*.DS_Store
+
+# Distribution / packaging
+build/
+dist/
+/.tox/
+
+.coverage
+htmlcov/
+docs/_build/
+
+/src/nti.contentlibrary.egg-info
