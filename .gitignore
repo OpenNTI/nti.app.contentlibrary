@@ -15,4 +15,4 @@ dist/
 htmlcov/
 docs/_build/
 
-/src/nti.contentlibrary.egg-info
+/src/nti.app.contentlibrary.egg-info
