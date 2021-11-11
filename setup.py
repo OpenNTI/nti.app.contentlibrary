@@ -13,6 +13,7 @@ entry_points = {
 
 
 TESTS_REQUIRE = [
+    'nti.app.products.ou', # tests use platform.ou.edu site
     'nti.app.testing',
     'nti.testing',
     'zope.testrunner',
